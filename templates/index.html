@@ -241,5 +241,14 @@
       status.textContent = user ? `Logged in as ${user.email}` : "Not logged in";
     });
   </script>
+<script>
+    function getWeather() {
+      fetch('/api/data/Delhi')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('output').innerText = JSON.stringify(data);
+        });
+    }
+  </script>
 </body>
 </html>
