@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Cart</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .cart-item img {
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .item-price {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #666;
+    }
+
+    .quantity-controls {
+      margin: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .quantity-controls button {
+      padding: 0.3rem 0.6rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    .remove-button {
+      margin-top: 0.5rem;
+      background-color: #f44336;
+      border: none;
+      color: white;
+      padding: 0.5rem 0.8rem;
+      border-radius: 5px;
+      cursor: pointer;
+      width: fit-content;
+    }
+
+    #cartTotal {
+      text-align: right;
+      font-size: 1.3rem;
+      margin-top: 2rem;
+    }
+
+    .checkout-button {
+      background-color: #2196F3;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      float: right;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .item-info {
+        width: 100%;
+      }
+
+      .checkout-button {
+        width: 100%;
+        float: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>Shopping Cart</header>
+
+  <div class="container">
+    <div id="cartContainer"></div>
+    <div id="cartTotal">Total: ₹0</div>
+    <button class="checkout-button" onclick="prepareCheckout()">Proceed to Checkout</button>
+  </div>
+
+<script>
+  const cartContainer = document.getElementById("cartContainer");
+  const cartTotal = document.getElementById("cartTotal");
+  const checkoutBtn = document.querySelector(".checkout-button");
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  function renderCart() {
+    cartContainer.innerHTML = "";
+    let total = 0;
+
+    if (cart.length === 0) {
+      cartContainer.innerHTML = "<p>Your cart is empty.</p>";
+      cartTotal.textContent = "Total: ₹0";
+      updateCheckoutButton();
+      return;
+    }
+
+    cart.forEach((item, index) => {
+      const price = Number(item.price) || 0;
+      const quantity = Number(item.qty) || 1;
+      const itemTotal = price * quantity;
+      total += itemTotal;
+
+      const itemElement = document.createElement("div");
+      itemElement.className = "cart-item";
+      itemElement.innerHTML = `
+        <img src="${item.image}" alt="${item.name}">
+        <div class="item-info">
+          <div class="item-name">${item.name}</div>
+          <div class="item-price">₹${price} x ${quantity} = ₹${itemTotal}</div>
+          <div class="quantity-controls">
+            <button onclick="changeQuantity(${index}, -1)">–</button>
+            ${quantity}
+            <button onclick="changeQuantity(${index}, 1)">+</button>
+          </div>
+          <button class="remove-button" onclick="removeItem(${index})">Remove</button>
+        </div>
+      `;
+
+      cartContainer.appendChild(itemElement);
+    });
+
+    cartTotal.textContent = `Total: ₹${total}`;
+    updateCheckoutButton();
+  }
+
+  function updateCheckoutButton() {
+    if (cart.length === 0) {
+      checkoutBtn.disabled = true;
+      checkoutBtn.style.opacity = "0.5";
+      checkoutBtn.style.cursor = "not-allowed";
+    } else {
+      checkoutBtn.disabled = false;
+      checkoutBtn.style.opacity = "1";
+      checkoutBtn.style.cursor = "pointer";
+    }
+  }
+
+  function changeQuantity(index, delta) {
+    const item = cart[index];
+    item.qty = Number(item.qty) || 1;
+    item.qty += delta;
+    if (item.qty < 1) item.qty = 1;
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+  }
+
+  function removeItem(index) {
+    cart.splice(index, 1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+  }
+
+  function prepareCheckout() {
+    const orderDetails = cart.map(item => {
+      return `${item.name} (₹${item.price} x ${item.qty}) = ₹${item.price * item.qty}`;
+    }).join('\n');
+
+    const totalPrice = cart.reduce((sum, item) => {
+      return sum + (item.price * item.qty);
+    }, 0);
+
+    localStorage.setItem("orderDetails", orderDetails);
+    localStorage.setItem("orderTotal", totalPrice);
+
+    location.href = 'checkout.html';
+  }
+
+  // Initial render
+  renderCart();
+</script>
+
+</body>
+</html>

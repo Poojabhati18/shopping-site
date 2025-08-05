@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About Us - My Store</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #343a40;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #007bff;
+      display: flex;
+      justify-content: center;
+      padding: 10px 0;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    nav button {
+      background-color: white;
+      color: #007bff;
+      border: 2px solid #007bff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s ease;
+      white-space: nowrap;
+    }
+
+    nav button:hover {
+      background-color: #007bff;
+      color: white;
+    }
+
+    /* Smaller style for policy buttons */
+    nav button.policy-link {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      padding: 6px 12px;
+      background-color: transparent;
+      color: #eee;
+      border: none;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    nav button.policy-link:hover {
+      color: #d1e7ff;
+      background-color: transparent;
+    }
+
+    .content {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .content h2 {
+      color: #333;
+    }
+
+    .content p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>About Us</h1>
+  </header>
+
+  <nav>
+    <button onclick="location.href='index.html'">🏠 Home</button>
+    <button onclick="location.href='products.html'">🛍️ Products</button>
+    <button onclick="location.href='cart.html'">🛒 Cart</button>
+    <button onclick="location.href='contact.html'">📞 Contact Us</button>
+
+    <button class="policy-link" onclick="location.href='refund.html'">Cancellation and Refunds</button>
+    <button class="policy-link" onclick="location.href='privacypolicy.html'">Privacy Policy</button>
+    <button class="policy-link" onclick="location.href='terms.html'">Terms and Conditions</button>
+    <button class="policy-link" onclick="location.href='shipping.html'">Shipping Policy</button>
+  </nav>
+
+  <div class="content">
+    <h2>Who Are We?</h2>
+    <p>
+      Welcome to <strong>My Store</strong>, your go-to destination for handcrafted, high-quality wooden keychains and other custom items. Our mission is simple — to combine creativity, craftsmanship, and value in everything we offer.
+    </p>
+    <p>
+      What started as a small idea has now grown into a passionate project dedicated to bringing unique, personalized products to your doorstep. Each piece is crafted with love, precision, and a commitment to quality.
+    </p>
+    <p>
+      Whether you’re buying for yourself or gifting to someone special, we promise to deliver something truly memorable.
+    </p>
+    <p><strong>Thank you for supporting us!</strong></p>
+  </div>
+</body>
+</html>
+
