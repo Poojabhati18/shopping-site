@@ -45,22 +45,8 @@
       color: white;
     }
 
-    /* Smaller style for policy buttons */
-    nav button.policy-link {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      padding: 6px 12px;
-      background-color: transparent;
-      color: #eee;
-      border: none;
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-
-    nav button.policy-link:hover {
-      color: #d1e7ff;
-      background-color: transparent;
-    }
+    /* Remove policy buttons from nav */
+    /* We’ll move them to fixed bottom right */
 
     .content {
       max-width: 900px;
@@ -80,6 +66,33 @@
       line-height: 1.6;
       color: #444;
     }
+
+    /* Policy buttons fixed container like index/products */
+    .policy-buttons {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .policy-buttons button {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      padding: 6px 12px;
+      background-color: transparent;
+      color: #eee;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      transition: color 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .policy-buttons button:hover {
+      color: #d1e7ff;
+    }
   </style>
 </head>
 <body>
@@ -92,26 +105,28 @@
     <button onclick="location.href='products.html'">🛍️ Products</button>
     <button onclick="location.href='cart.html'">🛒 Cart</button>
     <button onclick="location.href='contact.html'">📞 Contact Us</button>
-
-    <button class="policy-link" onclick="location.href='refund.html'">Cancellation and Refunds</button>
-    <button class="policy-link" onclick="location.href='privacypolicy.html'">Privacy Policy</button>
-    <button class="policy-link" onclick="location.href='terms.html'">Terms and Conditions</button>
-    <button class="policy-link" onclick="location.href='shipping.html'">Shipping Policy</button>
   </nav>
 
   <div class="content">
     <h2>Who Are We?</h2>
     <p>
-      Welcome to <strong>My Store</strong>, your go-to destination for handcrafted, high-quality wooden keychains and other custom items. Our mission is simple — to combine creativity, craftsmanship, and value in everything we offer.
+      Welcome to <strong> Ayuhealth</strong>, your go-to destination for ayurvedic medicines and wellness products labeled with India's own ayurvedic certification Ayushmantralay. Our mission is simple — to make products that satisfy your needs.
     </p>
     <p>
-      What started as a small idea has now grown into a passionate project dedicated to bringing unique, personalized products to your doorstep. Each piece is crafted with love, precision, and a commitment to quality.
+     What started as a small idea has now grown into a passionate project dedicated to bringing unique, personalized products to your doorstep. Each product is crafted by one of the best scientists in India who prefer quality over quantity.
     </p>
     <p>
       Whether you’re buying for yourself or gifting to someone special, we promise to deliver something truly memorable.
     </p>
     <p><strong>Thank you for supporting us!</strong></p>
   </div>
+
+  <!-- Policy buttons fixed at bottom right -->
+  <div class="policy-buttons">
+    <button onclick="location.href='refund.html'">Cancellation and Refunds</button>
+    <button onclick="location.href='privacypolicy.html'">Privacy Policy</button>
+    <button onclick="location.href='terms.html'">Terms and Conditions</button>
+    <button onclick="location.href='shipping.html'">Shipping Policy</button>
+  </div>
 </body>
 </html>
-

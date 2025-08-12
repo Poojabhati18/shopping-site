@@ -52,21 +52,6 @@
       background-color: #0056b3;
     }
 
-    nav button.policy-link {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      padding: 6px 12px;
-      background-color: transparent;
-      color: #555;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-
-    nav button.policy-link:hover {
-      color: #007bff;
-    }
-
     .content {
       max-width: 800px;
       margin: 40px auto;
@@ -87,25 +72,31 @@
       line-height: 1.6;
     }
 
-    .auth-section input {
-      padding: 8px;
-      margin: 4px;
-      border-radius: 6px;
-      border: none;
+    /* Fixed container for policy buttons at bottom right */
+    .policy-buttons {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
     }
 
-    .auth-section button {
-      padding: 8px 16px;
-      margin: 4px;
-      border-radius: 6px;
-      background: #28a745;
-      color: white;
-      border: none;
+    .policy-buttons button {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      padding: 6px 12px;
+      background-color: transparent;
+      color: #555;
+      border-radius: 4px;
       cursor: pointer;
+      border: none;
+      transition: color 0.3s ease;
+      white-space: nowrap;
     }
 
-    .auth-section button:hover {
-      background: #218838;
+    .policy-buttons button:hover {
+      color: #007bff;
     }
 
     /* ✅ Toast styles */
@@ -142,21 +133,6 @@
 
   <header>
     <h1>🌿 AyuHealth</h1>
-
-    <div class="auth-section">
-      <h2>Signup</h2>
-      <input type="email" id="signup-email" placeholder="Email">
-      <input type="password" id="signup-password" placeholder="Password">
-      <button onclick="signup()">Sign Up</button>
-
-      <h2>Login</h2>
-      <input type="email" id="login-email" placeholder="Email">
-      <input type="password" id="login-password" placeholder="Password">
-      <button onclick="login()">Log In</button>
-
-      <button onclick="logout()">Logout</button>
-      <p id="user-status">Checking login status...</p>
-    </div>
   </header>
 
   <nav>
@@ -165,83 +141,24 @@
     <button onclick="location.href='cart.html'">🛒 Cart</button>
     <button onclick="location.href='about.html'">👩‍⚕️ About Us</button>
     <button onclick="location.href='contact.html'">📞 Contact Us</button>
-    <button class="policy-link" onclick="location.href='refund.html'">Cancellation and Refunds</button>
-    <button class="policy-link" onclick="location.href='privacypolicy.html'">Privacy Policy</button>
-    <button class="policy-link" onclick="location.href='terms.html'">Terms and Conditions</button>
-    <button class="policy-link" onclick="location.href='shipping.html'">Shipping Policy</button>
   </nav>
 
   <div class="content">
     <h2>Welcome to My Online Store</h2>
     <p>At AyuHealth, we offer a wide range of authentic Ayurvedic products and medicines, carefully crafted using time-tested herbal formulations...</p>
-    <p>Founded in 2025, our mission is simple: to blend creativity with craftsmanship and deliver outstanding products to our customers across India.</p>
+    <p>Founded in 2025, our mission is simple: to make medicines or wellness products that can satisfy your needs and deliver them to you (our customers) across India.</p>
     <p>Thank you for supporting our small business — your satisfaction is what keeps us going!</p>
   </div>
 
-  <!-- ✅ Firebase SDKs + Auth Scripts -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  <!-- Policy buttons fixed at bottom right -->
+  <div class="policy-buttons">
+    <button onclick="location.href='refund.html'">Cancellation and Refunds</button>
+    <button onclick="location.href='privacypolicy.html'">Privacy Policy</button>
+    <button onclick="location.href='terms.html'">Terms and Conditions</button>
+    <button onclick="location.href='shipping.html'">Shipping Policy</button>
+  </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_ag-B108lIH2jTnXK-5FhlI816LFYVTg",
-      authDomain: "mywebsite-3cd6d.firebaseapp.com",
-      projectId: "mywebsite-3cd6d",
-      storageBucket: "mywebsite-3cd6d.appspot.com",
-      messagingSenderId: "1041272148602",
-      appId: "1:1041272148602:web:cf6f09c998d67537c2e1c3",
-      measurementId: "G-ZF9FSZJJSP"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // ✅ Toast function
-    function showToast(message) {
-      const toast = document.createElement("div");
-      toast.className = "toast";
-      toast.innerText = message;
-
-      const container = document.getElementById("toast-container");
-      container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.remove();
-      }, 3000);
-    }
-
-    window.signup = () => {
-      const email = document.getElementById("signup-email").value;
-      const password = document.getElementById("signup-password").value;
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => showToast("✅ Signup successful!"))
-        .catch(error => showToast("❌ " + error.message));
-    };
-
-    window.login = () => {
-      const email = document.getElementById("login-email").value;
-      const password = document.getElementById("login-password").value;
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => showToast("✅ Login successful!"))
-        .catch(error => showToast("❌ " + error.message));
-    };
-
-    window.logout = () => {
-      signOut(auth).then(() => showToast("👋 Logged out!"));
-    };
-
-    onAuthStateChanged(auth, user => {
-      const status = document.getElementById("user-status");
-      status.textContent = user ? `Logged in as ${user.email}` : "Not logged in";
-    });
-  </script>
-<script>
+  <script>
     function getWeather() {
       fetch('/api/data/Delhi')
         .then(res => res.json())

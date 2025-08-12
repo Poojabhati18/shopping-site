@@ -43,3 +43,21 @@ document.addEventListener("DOMContentLoaded", () => {
     qtyDisplay.textContent = quantity;
   });
 });
+// server.js (Node + Express)
+const express = require('express');
+const bodyParser = require('body-parser');
+const pins = require('./gujarat_pincodes.json'); // same JSON file
+const pinSet = new Set(pins.map(p=>String(p)));
+const app = express();
+app.use(bodyParser.json());
+
+app.post('/place-order', (req, res) => {
+  const { pincode } = req.body;
+  if (!/^\d{6}$/.test(pincode)) return res.status(400).json({ok:false, error:'invalid_pincode'});
+  if (!pinSet.has(String(pincode))) return res.status(400).json({ok:false, error:'out_of_area'});
+  // proceed to create order...
+  return res.json({ok:true, message:'order placed'});
+});
+
+app.listen(3000);
+

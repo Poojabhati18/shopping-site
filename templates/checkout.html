@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Checkout</title>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
@@ -42,6 +42,9 @@
       display: none;
       z-index: 9999;
     }
+    .toast.show {
+      display: block;
+    }
     button {
       padding: 10px 20px;
       background: #007bff;
@@ -73,7 +76,7 @@
     <input type="text" id="name" placeholder="Your Name" required />
 
     <label for="address">Address</label>
-    <textarea id="address" required></textarea>
+    <input type="text" id="address" required />
 
     <label for="city">City</label>
     <input type="text" id="city" required />
@@ -98,92 +101,153 @@
   <script>
     emailjs.init("pRBniBEmMGEZnyrek"); // Initialize EmailJS
 
-    window.addEventListener("DOMContentLoaded", function () {
+    const PINS_URL = 'gujarat_pincodes.json'; // Your JSON with pincodes
+    let gujSet = undefined; // undefined = not loaded yet, null = failed load
+
+    async function loadPincodes(){
+      try {
+        const res = await fetch(PINS_URL, {cache: 'no-cache'});
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const arr = await res.json();
+        gujSet = new Set(arr.map(pin => String(pin).padStart(6,'0')));
+        console.log('Loaded pincodes: ', gujSet.size);
+      } catch(err) {
+        console.error('Could not load pincodes:', err);
+        gujSet = null; // fallback
+      }
+    }
+
+    function is6Digits(pin){
+      return /^\d{6}$/.test(pin);
+    }
+
+    function isGujaratPin(pin){
+      if (!is6Digits(pin)) return false;
+      if (gujSet === undefined) {
+        // Still loading, fallback to prefix check
+      }
+      if (gujSet && gujSet.has(pin)) return true;
+      if (gujSet === null) {
+        // fallback heuristic: Gujarat pincodes start with 36, 38, 39
+        const prefix = pin.slice(0,2);
+        return ['36','38','39'].includes(prefix);
+      }
+      return false;
+    }
+
+    function showToast(msg, success=true){
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.background = success ? '#2e7d32' : '#c62828'; // green or red
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    // Populate cart summary on page load
+    function populateCartSummary() {
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
       const cartItemsText = document.getElementById("cartItemsText");
       const cartTotalEl = document.getElementById("cartTotal");
       const productSummaryTextarea = document.getElementById("productSummary");
       const submitBtn = document.getElementById("submitBtn");
 
-      let total = 0;
-      let summaryLines = [];
-
       if (cart.length === 0) {
         cartItemsText.textContent = "Your cart is empty.";
+        cartTotalEl.textContent = "0";
+        productSummaryTextarea.value = "";
         submitBtn.disabled = true;
-      } else {
-        cart.forEach(item => {
+        return;
+      }
+
+      let total = 0;
+      const summaryLines = cart.map(item => {
+        const quantity = Number(item.qty) || 1;
+        const price = Number(item.price) || 0;
+        const itemTotal = quantity * price;
+        total += itemTotal;
+        return `${item.name} (x${quantity}) - ₹${itemTotal}`;
+      });
+
+      cartItemsText.textContent = summaryLines.join("\n");
+      cartTotalEl.textContent = total;
+      productSummaryTextarea.value = summaryLines.join("\n");
+      submitBtn.disabled = false;
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadPincodes();
+      populateCartSummary();
+
+      const form = document.getElementById("checkoutForm");
+      form.addEventListener("submit", async function(e){
+        e.preventDefault();
+
+        const pincode = document.getElementById("pincode").value.trim();
+        const pinEl = document.getElementById("pincode");
+
+        // Validate pincode
+        if (!is6Digits(pincode)) {
+          showToast('Please enter a valid 6-digit pincode.', false);
+          pinEl.focus();
+          return;
+        }
+
+        // Reload pincodes if not loaded
+        if (gujSet === undefined) {
+          await loadPincodes();
+        }
+
+        if (!isGujaratPin(pincode)) {
+          showToast("Sorry, we do not deliver to this pincode yet.", false);
+          pinEl.focus();
+          return;
+        }
+
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        if (cart.length === 0) {
+          showToast("Your cart is empty.", false);
+          return;
+        }
+
+        // Calculate total & product summary again in case of changes
+        let total = 0;
+        const summaryLines = cart.map(item => {
           const quantity = Number(item.qty) || 1;
           const price = Number(item.price) || 0;
           const itemTotal = quantity * price;
           total += itemTotal;
-          summaryLines.push(`${item.name} (x${quantity}) - ₹${itemTotal}`);
+          return `${item.name} (x${quantity}) - ₹${itemTotal}`;
         });
 
-        const finalSummary = summaryLines.join("\n");
-        cartItemsText.textContent = finalSummary;
-        productSummaryTextarea.value = finalSummary;
-        cartTotalEl.textContent = total;
-        submitBtn.disabled = false;
-      }
+        const productSummaryTextarea = document.getElementById("productSummary");
+        productSummaryTextarea.value = summaryLines.join("\n");
+        document.getElementById("cartItemsText").textContent = summaryLines.join("\n");
+        document.getElementById("cartTotal").textContent = total;
 
-      document.getElementById("checkoutForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        const pincode = document.getElementById("pincode").value.trim();
-        const availablePincodes = ["382440", "382405"];
-
-        if (!availablePincodes.includes(pincode)) {
-          showToast("Sorry, we do not deliver to this pincode yet.");
-          return;
-        }
-
-        if (cart.length === 0) {
-          showToast("Your cart is empty.");
-          return;
-        }
-
-        const name = document.getElementById("name").value;
-        const address = document.getElementById("address").value;
-        const city = document.getElementById("city").value;
-        const phone = document.getElementById("phone").value;
-        const email = document.getElementById("email").value;
-        const productSummary = document.getElementById("productSummary").value;
-
-        const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-
+        // Collect form values
         const templateParams = {
-          name,
-          address,
-          city,
+          name: document.getElementById("name").value,
+          address: document.getElementById("address").value,
+          city: document.getElementById("city").value,
           pincode,
-          phone,
-          email,
-          product_summary: productSummary,
-          total: totalAmount.toString()
+          phone: document.getElementById("phone").value,
+          email: document.getElementById("email").value,
+          product_summary: productSummaryTextarea.value,
+          total: total.toString()
         };
 
-        emailjs.send("service_32uffi5", "template_6zo5xgj", templateParams)
-          .then(function () {
-            showToast("Thank you! Your order has been placed.");
-            document.getElementById("checkoutForm").reset();
-            localStorage.removeItem("cart");
-            cartItemsText.textContent = "Your cart is empty.";
-            cartTotalEl.textContent = "0";
-            productSummaryTextarea.value = "";
-            submitBtn.disabled = true;
-          }, function (error) {
-            showToast("Failed to send email. Please contact support.");
-            console.error(error);
-          });
+        try {
+          await emailjs.send("service_32uffi5", "template_6zo5xgj", templateParams);
+          showToast("Thank you! Your order has been placed.");
+          form.reset();
+          localStorage.removeItem("cart");
+          populateCartSummary();
+          document.getElementById("submitBtn").disabled = true;
+        } catch (error) {
+          console.error(error);
+          showToast("Failed to send email. Please contact support.", false);
+        }
       });
-
-      function showToast(message) {
-        const toast = document.getElementById("toast");
-        toast.textContent = message;
-        toast.style.display = "block";
-        setTimeout(() => toast.style.display = "none", 3000);
-      }
     });
   </script>
 </body>
