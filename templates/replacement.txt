@@ -1,0 +1,3 @@
+# This file tells BFG which strings to replace
+YOUR_GOOGLE_API_KEY==>REMOVED
+ANOTHER_SECRET==>REMOVED
