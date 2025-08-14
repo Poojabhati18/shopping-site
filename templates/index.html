@@ -7,166 +7,46 @@
   <meta name="description" content="Shop the best Ayurvedic products certified by Ayushmantralay. Quality, authentic herbal remedies and wellness products delivered across India." />
   <meta name="keywords" content="Ayurvedic products, herbal remedies, ayushmantralay certified, online ayurveda store, herbal wellness products" />
   <meta name="author" content="AyuHealth" />
-<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <style>
-    /* Your existing styles stay the same... */
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-      color: #333;
-    }
-
-    header {
-      background-color: #007bff;
-      color: white;
-      padding: 20px 0;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    nav {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      padding: 15px 0;
-      background-color: #ffffff;
-      border-bottom: 1px solid #eee;
-      flex-wrap: wrap;
-    }
-
-    nav button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      white-space: nowrap;
-    }
-
-    nav button:hover {
-      background-color: #0056b3;
-    }
-
-    .content {
-      max-width: 800px;
-      margin: 40px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    }
-
-    .content h2 {
-      margin-bottom: 20px;
-      font-size: 28px;
-      color: #007bff;
-    }
-
-    .content p {
-      font-size: 17px;
-      line-height: 1.6;
-    }
-
-    /* Fixed container for policy buttons at bottom right */
-    .policy-buttons {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      display: flex;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .policy-buttons button {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      padding: 6px 12px;
-      background-color: transparent;
-      color: #555;
-      border-radius: 4px;
-      cursor: pointer;
-      border: none;
-      transition: color 0.3s ease;
-      white-space: nowrap;
-    }
-
-    .policy-buttons button:hover {
-      color: #007bff;
-    }
-
-    /* ✅ Toast styles */
-    #toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-    }
-
-    .toast {
-      background-color: #333;
-      color: #fff;
-      padding: 12px 20px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      animation: fadein 0.5s, fadeout 0.5s 2.5s;
-    }
-
-    @keyframes fadein {
-      from { opacity: 0; right: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes fadeout {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; color: #333; }
+    header { background-color: #007bff; color: white; padding: 20px 0; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    nav { display: flex; justify-content: center; gap: 20px; padding: 15px 0; background-color: #ffffff; border-bottom: 1px solid #eee; flex-wrap: wrap; }
+    nav button { padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; white-space: nowrap; }
+    nav button:hover { background-color: #0056b3; }
+    .content { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+    .content h2 { margin-bottom: 20px; font-size: 28px; color: #007bff; }
+    .content p { font-size: 17px; line-height: 1.6; }
+    .policy-buttons { position: fixed; bottom: 10px; right: 10px; display: flex; gap: 10px; z-index: 1000; }
+    .policy-buttons button { font-size: 0.75rem; opacity: 0.7; padding: 6px 12px; background-color: transparent; color: #555; border-radius: 4px; cursor: pointer; border: none; transition: color 0.3s ease; white-space: nowrap; }
+    .policy-buttons button:hover { color: #007bff; }
   </style>
 </head>
 <body>
-  <div id="toast-container"></div> <!-- ✅ Toast container -->
-
   <header>
     <h1>🌿 AyuHealth</h1>
   </header>
 
   <nav>
-    <button onclick="location.href='index.html'">🏠 Home</button>
-    <button onclick="location.href='products.html'">🛍️ Products</button>
-    <button onclick="location.href='cart.html'">🛒 Cart</button>
-    <button onclick="location.href='about.html'">👩‍⚕️ About Us</button>
-    <button onclick="location.href='contact.html'">📞 Contact Us</button>
+    <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
+    <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
+    <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
+    <button onclick="location.href='{{ url_for('about_page') }}'">👩‍⚕️ About Us</button>
+    <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
   </nav>
 
   <div class="content">
     <h2>Welcome to My Online Store</h2>
     <p>At AyuHealth, we offer a wide range of authentic Ayurvedic products and medicines, carefully crafted using time-tested herbal formulations...</p>
-    <p>Founded in 2025, our mission is simple: to make medicines or wellness products that can satisfy your needs and deliver them to you (our customers) across India.</p>
+    <p>Founded in 2025, our mission is simple: to make medicines or wellness products that can satisfy your needs and deliver them to you across India.</p>
     <p>Thank you for supporting our small business — your satisfaction is what keeps us going!</p>
   </div>
 
-  <!-- Policy buttons fixed at bottom right -->
   <div class="policy-buttons">
-    <button onclick="location.href='refund.html'">Cancellation and Refunds</button>
-    <button onclick="location.href='privacypolicy.html'">Privacy Policy</button>
-    <button onclick="location.href='terms.html'">Terms and Conditions</button>
-    <button onclick="location.href='shipping.html'">Shipping Policy</button>
+    <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation and Refunds</button>
+    <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
+    <button onclick="location.href='{{ url_for('terms_page') }}'">Terms and Conditions</button>
+    <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
   </div>
-
-  <script>
-    function getWeather() {
-      fetch('/api/data/Delhi')
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('output').innerText = JSON.stringify(data);
-        });
-    }
-  </script>
 </body>
 </html>

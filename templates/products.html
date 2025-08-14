@@ -5,207 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Products</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    nav {
-      margin-bottom: 20px;
-    }
-
-    nav a {
-      margin-right: 15px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    #toast {
-      visibility: hidden;
-      min-width: 200px;
-      background-color: #333;
-      color: #fff;
-      text-align: center;
-      border-radius: 4px;
-      padding: 16px;
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1;
-      transition: visibility 0s, opacity 0.5s linear;
-      opacity: 0;
-    }
-
-    #toast.show {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .product-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .product-card {
-      width: 250px;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-    }
-
-    .product-card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-
-    .qty-selector {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin: 10px 0;
-    }
-
-    .add-to-cart {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    /* Policy buttons styled same as index */
-    .policy-buttons {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      display: flex;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .policy-buttons button {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      padding: 6px 12px;
-      background-color: transparent;
-      color: #555;
-      border-radius: 4px;
-      cursor: pointer;
-      border: none;
-      transition: color 0.3s ease;
-      white-space: nowrap;
-    }
-
-    .policy-buttons button:hover {
-      color: #007bff;
-    }
-
-    /* Reviews styles */
-    .reviews {
-      margin-top: 15px;
-      border-top: 1px solid #eee;
-      padding-top: 10px;
-      font-size: 14px;
-    }
-
-    .average-rating {
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .stars {
-      color: #f5c518;
-    }
-
-    .review-list {
-      max-height: 120px;
-      overflow-y: auto;
-      margin-bottom: 10px;
-    }
-
-    .review-item {
-      border-bottom: 1px solid #ddd;
-      padding: 5px 0;
-    }
-
-    .review-item:last-child {
-      border-bottom: none;
-    }
-
-    .review-item .stars {
-      font-size: 16px;
-      color: #f5c518;
-    }
-
-    .review-form textarea {
-      width: 100%;
-      resize: vertical;
-      margin-top: 5px;
-    }
-
-    .review-form select,
-    .review-form textarea,
-    .review-form button {
-      margin-top: 6px;
-    }
-
-    /* Toggle reviews button */
-    .toggle-reviews-btn {
-      margin-top: 10px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      cursor: pointer;
-      border-radius: 4px;
-      font-size: 14px;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    nav { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+    nav button { padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; }
+    nav button:hover { background-color: #0056b3; }
+    #toast { visibility: hidden; min-width: 200px; background-color: #333; color: #fff; text-align: center; border-radius: 4px; padding: 16px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1; transition: visibility 0s, opacity 0.5s linear; opacity: 0; }
+    #toast.show { visibility: visible; opacity: 1; }
+    .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+    .product-list { display: flex; flex-wrap: wrap; gap: 20px; }
+    .product-card { width: 250px; padding: 20px; border: 1px solid #ccc; border-radius: 10px; box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1); cursor: pointer; }
+    .product-card img { width: 100%; height: 200px; object-fit: cover; }
+    .qty-selector { display: flex; justify-content: center; align-items: center; gap: 10px; margin: 10px 0; }
+    .add-to-cart { background-color: #4CAF50; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; }
+    .policy-buttons { position: fixed; bottom: 10px; right: 10px; display: flex; gap: 10px; z-index: 1000; }
+    .policy-buttons button { font-size: 0.75rem; opacity: 0.7; padding: 6px 12px; background-color: transparent; color: #555; border-radius: 4px; cursor: pointer; border: none; transition: color 0.3s ease; white-space: nowrap; }
+    .policy-buttons button:hover { color: #007bff; }
+    .reviews { margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; font-size: 14px; }
+    .average-rating { font-weight: bold; margin-bottom: 8px; }
+    .stars { color: #f5c518; }
+    .review-list { max-height: 120px; overflow-y: auto; margin-bottom: 10px; }
+    .review-item { border-bottom: 1px solid #ddd; padding: 5px 0; }
+    .review-item:last-child { border-bottom: none; }
+    .review-item .stars { font-size: 16px; color: #f5c518; }
+    .review-form textarea { width: 100%; resize: vertical; margin-top: 5px; }
+    .review-form select, .review-form textarea, .review-form button { margin-top: 6px; }
+    .toggle-reviews-btn { margin-top: 10px; background-color: #007bff; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 14px; }
   </style>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <script>
-    // Replace below config with your Firebase project config from Firebase Console > Project settings
-    const firebaseConfig = {
-      apiKey: "AIzaSyAVUAGmSy8unzvHF9qDwQ8VsBA_D1tBdMc",
-      authDomain: "review-b714a.firebaseapp.com",
-      projectId: "review-b714a",
-      storageBucket: "review-b714a.firebasestorage.app",
-      messagingSenderId: "656434016005",
-      appId: "1:656434016005:web:94d7f104b244db338c916c",
-      measurementId: "G-V8JE9FY1LX"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  </script>
 </head>
 <body>
 
   <nav>
-    <a href="index.html">🏠 Home</a>
-    <a href="products.html">🛍️ Products</a>
-    <a href="cart.html">
-      Cart 🛒 <span id="cartCount" style="background:red;color:white;padding:2px 8px;border-radius:50%;font-size:12px;">0</span>
-    </a>
-    <a href="about.html">👩‍⚕️About Us</a>
-    <a href="contact.html">📞Contact Us</a>
+    <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
+    <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
+    <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart <span id="cartCount" style="background:red;color:white;padding:2px 8px;border-radius:50%;font-size:12px;">0</span></button>
+    <button onclick="location.href='{{ url_for('about_page') }}'">👩‍⚕️About Us</button>
+    <button onclick="location.href='{{ url_for('contact_page') }}'">📞Contact Us</button>
   </nav>
 
   <div class="controls">
@@ -221,37 +55,20 @@
 
   <div id="toast">Added to cart</div>
 
-  <!-- Policy buttons fixed at bottom right -->
   <div class="policy-buttons">
-    <button onclick="location.href='refund.html'">Cancellation and Refunds</button>
-    <button onclick="location.href='privacypolicy.html'">Privacy Policy</button>
-    <button onclick="location.href='terms.html'">Terms and Conditions</button>
-    <button onclick="location.href='shipping.html'">Shipping Policy</button>
+    <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation and Refunds</button>
+    <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
+    <button onclick="location.href='{{ url_for('terms_page') }}'">Terms and Conditions</button>
+    <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
   </div>
 
   <script>
+    const staticUrl = "{{ url_for('static', filename='') }}"; // Base URL to static folder
+
     const products = [
-      {
-        id: "1",
-        name: "3-1 Face Wash",
-        price: 149,
-        image: "images/facewash.jpeg",
-        description: "This is a powerful 3-in-1 face wash that cleanses, exfoliates, and moisturizes your skin."
-      },
-      {
-        id: "2",
-        name: "Multi-Action Fairness Cream",
-        price: 199,
-        image: "images/facecream.jpeg",
-        description: "Made with ancient Ayurvedic herbs to nourish and hydrate your skin naturally."
-      },
-      {
-        id: "3",
-        name: "Anti-Dandruff Shampoo",
-        price: 129,
-        image: "images/antidandruffshampoo.jpeg",
-        description: "A gentle herbal shampoo that strengthens your hair and prevents dandruff."
-      }
+      { id: "1", name: "3-1 Face Wash", price: 149, image: staticUrl + "images/facewash.jpeg", description: "This is a powerful 3-in-1 face wash that cleanses, exfoliates, and moisturizes your skin." },
+      { id: "2", name: "Multi-Action Fairness Cream", price: 199, image: staticUrl + "images/facecream.jpeg", description: "Made with ancient Ayurvedic herbs to nourish and hydrate your skin naturally." },
+      { id: "3", name: "Anti-Dandruff Shampoo", price: 129, image: staticUrl + "images/antidandruffshampoo.jpeg", description: "A gentle herbal shampoo that strengthens your hair and prevents dandruff." }
     ];
 
     let filteredProducts = [...products];
@@ -303,24 +120,16 @@
 
         container.appendChild(card);
 
-        // Toggle reviews button
         const toggleBtn = card.querySelector(".toggle-reviews-btn");
         const reviewsSection = card.querySelector(".reviews");
 
         toggleBtn.addEventListener("click", () => {
-          if (reviewsSection.style.display === "none") {
-            reviewsSection.style.display = "block";
-            toggleBtn.textContent = "Hide Reviews";
-          } else {
-            reviewsSection.style.display = "none";
-            toggleBtn.textContent = "Show Reviews";
-          }
+          reviewsSection.style.display = reviewsSection.style.display === "none" ? "block" : "none";
+          toggleBtn.textContent = reviewsSection.style.display === "block" ? "Hide Reviews" : "Show Reviews";
         });
 
-        // Load and render reviews for this product
         await loadReviews(product.id, card.querySelector(".review-list"), card.querySelector(".average-rating"));
 
-        // Attach review form submit
         card.querySelector(".review-form").addEventListener("submit", async e => {
           e.preventDefault();
           const form = e.target;
@@ -339,12 +148,10 @@
 
     async function loadReviews(productId, reviewListEl, avgRatingElContainer) {
       try {
-        const snapshot = await db.collection('reviews')
-          .where('productId', '==', productId)
-          .orderBy('timestamp', 'desc')
-          .get();
+        const res = await fetch(`/api/reviews/${productId}`);
+        const data = await res.json();
 
-        if (snapshot.empty) {
+        if (!data || data.length === 0) {
           reviewListEl.innerHTML = "<i>No reviews yet. Be the first!</i>";
           avgRatingElContainer.querySelector(".stars").textContent = "-";
           avgRatingElContainer.querySelector(".count").textContent = "0";
@@ -352,27 +159,18 @@
         }
 
         let totalRating = 0;
-        let count = 0;
         reviewListEl.innerHTML = "";
-
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          totalRating += data.rating;
-          count++;
-
+        data.forEach(r => {
+          totalRating += r.rating;
           const reviewEl = document.createElement("div");
           reviewEl.className = "review-item";
-          reviewEl.innerHTML = `
-            <div class="stars">${'⭐️'.repeat(data.rating)}</div>
-            <div>${data.review}</div>
-            <small style="color:#666;font-size:12px;">${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : ''}</small>
-          `;
+          reviewEl.innerHTML = `<div class="stars">${'⭐️'.repeat(r.rating)}</div><div>${r.review}</div><small style="color:#666;font-size:12px;">${r.timestamp}</small>`;
           reviewListEl.appendChild(reviewEl);
         });
 
-        const avgRating = totalRating / count;
+        const avgRating = totalRating / data.length;
         avgRatingElContainer.querySelector(".stars").textContent = avgRating.toFixed(1);
-        avgRatingElContainer.querySelector(".count").textContent = count;
+        avgRatingElContainer.querySelector(".count").textContent = data.length;
 
       } catch (error) {
         reviewListEl.innerHTML = `<i>Error loading reviews</i>`;
@@ -382,17 +180,16 @@
 
     async function submitReview(productId, rating, reviewText, form, reviewListEl, avgRatingElContainer) {
       try {
-        await db.collection('reviews').add({
-          productId,
-          rating,
-          review: reviewText,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        await fetch(`/api/reviews/${productId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rating, review: reviewText })
         });
         showToast('Review submitted!');
         form.reset();
         await loadReviews(productId, reviewListEl, avgRatingElContainer);
       } catch (error) {
-        showToast('Error submitting review: ' + error.message);
+        showToast('Error submitting review');
         console.error(error);
       }
     }
@@ -405,76 +202,43 @@
         const qtyDisplay = card.querySelector(".qty");
         const addToCartBtn = card.querySelector(".add-to-cart");
 
-        plusBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          quantity++;
-          qtyDisplay.textContent = quantity;
-        });
-
-        minusBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          if (quantity > 1) {
-            quantity--;
-            qtyDisplay.textContent = quantity;
-          }
-        });
-
-        addToCartBtn.addEventListener("click", (e) => {
+        plusBtn.addEventListener("click", e => { e.stopPropagation(); quantity++; qtyDisplay.textContent = quantity; });
+        minusBtn.addEventListener("click", e => { e.stopPropagation(); if (quantity>1){quantity--; qtyDisplay.textContent = quantity;} });
+        addToCartBtn.addEventListener("click", e => {
           e.stopPropagation();
           const product = {
             id: card.dataset.id,
             name: card.querySelector("h2").textContent,
-            price: parseFloat(card.querySelector("p").textContent.replace(/[^\d.]/g, '')),
+            price: parseFloat(card.querySelector("p").textContent.replace(/[^\d.]/g,'')),
             qty: quantity,
-            image: card.querySelector("img").getAttribute("src")
+            image: card.querySelector("img").src
           };
-
           let cart = JSON.parse(localStorage.getItem("cart")) || [];
-          const existingProduct = cart.find(item => item.id === product.id);
-          if (existingProduct) {
-            existingProduct.qty += quantity;
-          } else {
-            cart.push(product);
-          }
-
+          const existing = cart.find(i=>i.id===product.id);
+          if(existing) existing.qty+=quantity; else cart.push(product);
           localStorage.setItem("cart", JSON.stringify(cart));
-
           showToast('Added to cart');
           updateCartCount();
-          quantity = 1;
-          qtyDisplay.textContent = quantity;
+          quantity = 1; qtyDisplay.textContent = quantity;
         });
       });
     }
 
-    function showToast(message) {
+    function showToast(msg){
       const toast = document.getElementById("toast");
-      toast.textContent = message;
+      toast.textContent = msg;
       toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 2000);
+      setTimeout(()=>toast.classList.remove("show"),2000);
     }
 
-    function updateCartCount() {
+    function updateCartCount(){
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-      document.getElementById("cartCount").textContent = totalItems;
+      const total = cart.reduce((sum,item)=>sum+item.qty,0);
+      document.getElementById("cartCount").textContent = total;
     }
 
-    document.getElementById("searchBox").addEventListener("input", (e) => {
-      const term = e.target.value.toLowerCase();
-      filteredProducts = products.filter(p => p.name.toLowerCase().includes(term));
-      renderProducts();
-    });
-
-    document.getElementById("sortBox").addEventListener("change", (e) => {
-      const sort = e.target.value;
-      if (sort === "low") {
-        filteredProducts.sort((a, b) => a.price - b.price);
-      } else if (sort === "high") {
-        filteredProducts.sort((a, b) => b.price - a.price);
-      }
-      renderProducts();
-    });
+    document.getElementById("searchBox").addEventListener("input",(e)=>{ filteredProducts=products.filter(p=>p.name.toLowerCase().includes(e.target.value.toLowerCase())); renderProducts(); });
+    document.getElementById("sortBox").addEventListener("change",(e)=>{ const sort=e.target.value; if(sort==="low"){filteredProducts.sort((a,b)=>a.price-b.price);}else if(sort==="high"){filteredProducts.sort((a,b)=>b.price-a.price);} renderProducts(); });
 
     renderProducts();
     updateCartCount();

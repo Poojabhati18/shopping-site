@@ -12,7 +12,6 @@
       background-color: #f9f9f9;
       color: #333;
     }
-
     header {
       background-color: #4CAF50;
       color: white;
@@ -20,127 +19,98 @@
       text-align: center;
       font-size: 1.5rem;
     }
-
-    .container {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 1rem;
-    }
-
-    .cart-item {
+    nav {
+      background-color: #007bff;
       display: flex;
-      align-items: center;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 1rem;
-      margin-bottom: 1rem;
-      gap: 1rem;
+      justify-content: center;
+      padding: 10px 0;
       flex-wrap: wrap;
+      gap: 10px;
     }
-
-    .cart-item img {
-      width: 100px;
-      height: 100px;
-      border-radius: 8px;
-      object-fit: cover;
-    }
-
-    .item-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .item-name {
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-
-    .item-price {
-      margin-top: 0.5rem;
-      font-size: 1rem;
-      color: #666;
-    }
-
-    .quantity-controls {
-      margin: 0.5rem 0;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .quantity-controls button {
-      padding: 0.3rem 0.6rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 5px;
-      background-color: #4CAF50;
-      color: white;
-      cursor: pointer;
-    }
-
-    .remove-button {
-      margin-top: 0.5rem;
-      background-color: #f44336;
-      border: none;
-      color: white;
-      padding: 0.5rem 0.8rem;
+    nav button {
+      background-color: white;
+      color: #007bff;
+      border: 2px solid #007bff;
+      padding: 10px 20px;
       border-radius: 5px;
       cursor: pointer;
-      width: fit-content;
+      font-size: 16px;
+      transition: 0.3s ease;
+      white-space: nowrap;
     }
+    nav button:hover { background-color: #007bff; color: white; }
 
-    #cartTotal {
-      text-align: right;
-      font-size: 1.3rem;
-      margin-top: 2rem;
-    }
-
-    .checkout-button {
-      background-color: #2196F3;
-      color: white;
-      padding: 0.8rem 1.5rem;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      cursor: pointer;
-      float: right;
-      margin-top: 1rem;
-    }
+    .container { max-width: 800px; margin: 2rem auto; padding: 1rem; }
+    .cart-item { display: flex; align-items: center; background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); padding: 1rem; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap; }
+    .cart-item img { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; }
+    .item-info { flex: 1; display: flex; flex-direction: column; }
+    .item-name { font-size: 1.2rem; font-weight: bold; }
+    .item-price { margin-top: 0.5rem; font-size: 1rem; color: #666; }
+    .quantity-controls { margin: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem; }
+    .quantity-controls button { padding: 0.3rem 0.6rem; font-size: 1rem; border: none; border-radius: 5px; background-color: #4CAF50; color: white; cursor: pointer; }
+    .remove-button { margin-top: 0.5rem; background-color: #f44336; border: none; color: white; padding: 0.5rem 0.8rem; border-radius: 5px; cursor: pointer; width: fit-content; }
+    #cartTotal { text-align: right; font-size: 1.3rem; margin-top: 2rem; }
+    .checkout-button { background-color: #2196F3; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; float: right; margin-top: 1rem; }
 
     @media (max-width: 600px) {
-      .cart-item {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .item-info {
-        width: 100%;
-      }
-
-      .checkout-button {
-        width: 100%;
-        float: none;
-      }
+      .cart-item { flex-direction: column; align-items: flex-start; }
+      .item-info { width: 100%; }
+      .checkout-button { width: 100%; float: none; }
     }
+
+    /* Policy buttons fixed at bottom right */
+    .policy-buttons {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
+    }
+    .policy-buttons button {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      padding: 6px 12px;
+      background-color: transparent;
+      color: #555;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      transition: color 0.3s ease;
+      white-space: nowrap;
+    }
+    .policy-buttons button:hover { color: #007bff; }
   </style>
 </head>
 <body>
 
-  <header>Shopping Cart</header>
+<header>Shopping Cart</header>
 
-  <div class="container">
-    <div id="cartContainer"></div>
-    <div id="cartTotal">Total: ₹0</div>
-    <button class="checkout-button" onclick="prepareCheckout()">Proceed to Checkout</button>
-  </div>
+<nav>
+  <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
+  <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
+  <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
+  <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
+</nav>
+
+<div class="container">
+  <div id="cartContainer"></div>
+  <div id="cartTotal">Total: ₹0</div>
+  <button class="checkout-button" onclick="prepareCheckout()">Proceed to Checkout</button>
+</div>
+
+<!-- Policy buttons fixed -->
+<div class="policy-buttons">
+  <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation and Refunds</button>
+  <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
+  <button onclick="location.href='{{ url_for('terms_page') }}'">Terms and Conditions</button>
+  <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
+</div>
 
 <script>
   const cartContainer = document.getElementById("cartContainer");
   const cartTotal = document.getElementById("cartTotal");
   const checkoutBtn = document.querySelector(".checkout-button");
-
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   function renderCart() {
@@ -175,7 +145,6 @@
           <button class="remove-button" onclick="removeItem(${index})">Remove</button>
         </div>
       `;
-
       cartContainer.appendChild(itemElement);
     });
 
@@ -215,17 +184,14 @@
       return `${item.name} (₹${item.price} x ${item.qty}) = ₹${item.price * item.qty}`;
     }).join('\n');
 
-    const totalPrice = cart.reduce((sum, item) => {
-      return sum + (item.price * item.qty);
-    }, 0);
+    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
     localStorage.setItem("orderDetails", orderDetails);
     localStorage.setItem("orderTotal", totalPrice);
 
-    location.href = 'checkout.html';
+    location.href = '{{ url_for("checkout_page") }}';
   }
 
-  // Initial render
   renderCart();
 </script>
 

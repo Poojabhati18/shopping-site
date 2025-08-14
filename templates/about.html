@@ -3,96 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>About Us - My Store</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background-color: #343a40;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    nav {
-      background-color: #007bff;
-      display: flex;
-      justify-content: center;
-      padding: 10px 0;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    nav button {
-      background-color: white;
-      color: #007bff;
-      border: 2px solid #007bff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: 0.3s ease;
-      white-space: nowrap;
-    }
-
-    nav button:hover {
-      background-color: #007bff;
-      color: white;
-    }
-
-    /* Remove policy buttons from nav */
-    /* We’ll move them to fixed bottom right */
-
-    .content {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .content h2 {
-      color: #333;
-    }
-
-    .content p {
-      font-size: 18px;
-      line-height: 1.6;
-      color: #444;
-    }
-
-    /* Policy buttons fixed container like index/products */
-    .policy-buttons {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      display: flex;
-      gap: 10px;
-      z-index: 1000;
-    }
-
-    .policy-buttons button {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      padding: 6px 12px;
-      background-color: transparent;
-      color: #eee;
-      border-radius: 4px;
-      cursor: pointer;
-      border: none;
-      transition: color 0.3s ease;
-      white-space: nowrap;
-    }
-
-    .policy-buttons button:hover {
-      color: #d1e7ff;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background-color: #f7f7f7; margin: 0; padding: 0; }
+    header { background-color: #343a40; color: white; padding: 20px; text-align: center; }
+    nav { background-color: #007bff; display: flex; justify-content: center; padding: 10px 0; flex-wrap: wrap; gap: 10px; }
+    nav button { background-color: white; color: #007bff; border: 2px solid #007bff; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; transition: 0.3s ease; white-space: nowrap; }
+    nav button:hover { background-color: #007bff; color: white; }
+    .content { max-width: 900px; margin: 30px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+    .content h2 { color: #333; }
+    .content p { font-size: 18px; line-height: 1.6; color: #444; }
+    .policy-buttons { position: fixed; bottom: 10px; right: 10px; display: flex; gap: 10px; z-index: 1000; }
+    .policy-buttons button { font-size: 0.75rem; opacity: 0.7; padding: 6px 12px; background-color: transparent; color: #eee; border-radius: 4px; cursor: pointer; border: none; transition: color 0.3s ease; white-space: nowrap; }
+    .policy-buttons button:hover { color: #d1e7ff; }
   </style>
 </head>
 <body>
@@ -101,10 +24,10 @@
   </header>
 
   <nav>
-    <button onclick="location.href='index.html'">🏠 Home</button>
-    <button onclick="location.href='products.html'">🛍️ Products</button>
-    <button onclick="location.href='cart.html'">🛒 Cart</button>
-    <button onclick="location.href='contact.html'">📞 Contact Us</button>
+    <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
+    <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
+    <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
+    <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
   </nav>
 
   <div class="content">
@@ -113,7 +36,7 @@
       Welcome to <strong> Ayuhealth</strong>, your go-to destination for ayurvedic medicines and wellness products labeled with India's own ayurvedic certification Ayushmantralay. Our mission is simple — to make products that satisfy your needs.
     </p>
     <p>
-     What started as a small idea has now grown into a passionate project dedicated to bringing unique, personalized products to your doorstep. Each product is crafted by one of the best scientists in India who prefer quality over quantity.
+      What started as a small idea has now grown into a passionate project dedicated to bringing unique, personalized products to your doorstep. Each product is crafted by one of the best scientists in India who prefer quality over quantity.
     </p>
     <p>
       Whether you’re buying for yourself or gifting to someone special, we promise to deliver something truly memorable.
@@ -121,12 +44,11 @@
     <p><strong>Thank you for supporting us!</strong></p>
   </div>
 
-  <!-- Policy buttons fixed at bottom right -->
   <div class="policy-buttons">
-    <button onclick="location.href='refund.html'">Cancellation and Refunds</button>
-    <button onclick="location.href='privacypolicy.html'">Privacy Policy</button>
-    <button onclick="location.href='terms.html'">Terms and Conditions</button>
-    <button onclick="location.href='shipping.html'">Shipping Policy</button>
+    <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation and Refunds</button>
+    <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
+    <button onclick="location.href='{{ url_for('terms_page') }}'">Terms and Conditions</button>
+    <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
   </div>
 </body>
 </html>

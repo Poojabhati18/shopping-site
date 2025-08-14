@@ -4,66 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Checkout</title>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f0f2f5;
-    }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+    h2 { text-align: center; margin-bottom: 20px; }
     form, #orderSummary {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 600px;
-      margin-bottom: 20px;
+      background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #28a745;
-      color: #fff;
-      padding: 12px 20px;
-      border-radius: 5px;
-      display: none;
-      z-index: 9999;
-    }
-    .toast.show {
-      display: block;
-    }
-    button {
-      padding: 10px 20px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      margin-top: 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:disabled {
-      background: #6c757d;
-      cursor: not-allowed;
-    }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; }
+    input::placeholder { color: #999; font-style: italic; }
+    button { background: #007bff; color: white; border: none; border-radius: 5px; padding: 12px 20px; font-size: 16px; cursor: pointer; margin-top: 15px; }
+    button:disabled { background: #6c757d; cursor: not-allowed; }
+    .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 5px; color: #fff; display: none; z-index: 9999; }
+    .toast.show { display: block; }
+    #orderSummary strong { display: block; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-  <h2>Checkout Form</h2>
+  <h2>Checkout</h2>
 
   <div id="orderSummary">
     <h3>Your Order</h3>
@@ -72,78 +32,41 @@
   </div>
 
   <form id="checkoutForm">
-    <label for="name">Name</label>
+    <label>Name</label>
     <input type="text" id="name" placeholder="Your Name" required />
 
-    <label for="address">Address</label>
-    <input type="text" id="address" required />
+    <label>Address</label>
+    <input type="text" id="address" placeholder="Your Address" required />
 
-    <label for="city">City</label>
-    <input type="text" id="city" required />
+    <label>City</label>
+    <input type="text" id="city" placeholder="Your City" required />
 
-    <label for="pincode">Pincode</label>
-    <input type="text" id="pincode" required />
+    <label>Pincode</label>
+    <input type="text" id="pincode" placeholder="6-digit Pincode" required />
 
-    <label for="phone">Phone No.</label>
-    <input type="tel" id="phone" required />
+    <label>Phone</label>
+    <input type="tel" id="phone" placeholder="Your Phone Number" required />
 
-    <label for="email">Email</label>
-    <input type="email" id="email" required />
+    <label>Email</label>
+    <input type="email" id="email" placeholder="Your Email" required />
 
-    <label for="productSummary">Product Summary:</label>
-    <textarea id="productSummary" name="productSummary" readonly rows="4" cols="50"></textarea>
+    <label>Product Summary</label>
+    <textarea id="productSummary" rows="4" readonly></textarea>
 
-    <button type="submit" id="submitBtn">Submit</button>
+    <button type="submit" id="submitBtn">Place Order</button>
   </form>
 
-  <div class="toast" id="toast">Thank you! Your order has been placed.</div>
+  <div class="toast" id="toast"></div>
 
   <script>
-    emailjs.init("pRBniBEmMGEZnyrek"); // Initialize EmailJS
-
-    const PINS_URL = 'gujarat_pincodes.json'; // Your JSON with pincodes
-    let gujSet = undefined; // undefined = not loaded yet, null = failed load
-
-    async function loadPincodes(){
-      try {
-        const res = await fetch(PINS_URL, {cache: 'no-cache'});
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const arr = await res.json();
-        gujSet = new Set(arr.map(pin => String(pin).padStart(6,'0')));
-        console.log('Loaded pincodes: ', gujSet.size);
-      } catch(err) {
-        console.error('Could not load pincodes:', err);
-        gujSet = null; // fallback
-      }
-    }
-
-    function is6Digits(pin){
-      return /^\d{6}$/.test(pin);
-    }
-
-    function isGujaratPin(pin){
-      if (!is6Digits(pin)) return false;
-      if (gujSet === undefined) {
-        // Still loading, fallback to prefix check
-      }
-      if (gujSet && gujSet.has(pin)) return true;
-      if (gujSet === null) {
-        // fallback heuristic: Gujarat pincodes start with 36, 38, 39
-        const prefix = pin.slice(0,2);
-        return ['36','38','39'].includes(prefix);
-      }
-      return false;
-    }
-
     function showToast(msg, success=true){
       const toast = document.getElementById('toast');
       toast.textContent = msg;
-      toast.style.background = success ? '#2e7d32' : '#c62828'; // green or red
+      toast.style.background = success ? '#2e7d32' : '#c62828';
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2800);
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Populate cart summary on page load
     function populateCartSummary() {
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
       const cartItemsText = document.getElementById("cartItemsText");
@@ -161,11 +84,10 @@
 
       let total = 0;
       const summaryLines = cart.map(item => {
-        const quantity = Number(item.qty) || 1;
+        const qty = Number(item.qty) || 1;
         const price = Number(item.price) || 0;
-        const itemTotal = quantity * price;
-        total += itemTotal;
-        return `${item.name} (x${quantity}) - ₹${itemTotal}`;
+        total += qty * price;
+        return `${item.name} (x${qty}) - ₹${qty*price}`;
       });
 
       cartItemsText.textContent = summaryLines.join("\n");
@@ -174,78 +96,51 @@
       submitBtn.disabled = false;
     }
 
-    window.addEventListener('DOMContentLoaded', async () => {
-      await loadPincodes();
+    document.addEventListener("DOMContentLoaded", () => {
       populateCartSummary();
 
       const form = document.getElementById("checkoutForm");
-      form.addEventListener("submit", async function(e){
+      form.addEventListener("submit", async e => {
         e.preventDefault();
-
-        const pincode = document.getElementById("pincode").value.trim();
-        const pinEl = document.getElementById("pincode");
-
-        // Validate pincode
-        if (!is6Digits(pincode)) {
-          showToast('Please enter a valid 6-digit pincode.', false);
-          pinEl.focus();
-          return;
-        }
-
-        // Reload pincodes if not loaded
-        if (gujSet === undefined) {
-          await loadPincodes();
-        }
-
-        if (!isGujaratPin(pincode)) {
-          showToast("Sorry, we do not deliver to this pincode yet.", false);
-          pinEl.focus();
-          return;
-        }
-
         const cart = JSON.parse(localStorage.getItem("cart")) || [];
-        if (cart.length === 0) {
-          showToast("Your cart is empty.", false);
+        if(cart.length === 0){
+          showToast("Your cart is empty", false);
           return;
         }
 
-        // Calculate total & product summary again in case of changes
-        let total = 0;
-        const summaryLines = cart.map(item => {
-          const quantity = Number(item.qty) || 1;
-          const price = Number(item.price) || 0;
-          const itemTotal = quantity * price;
-          total += itemTotal;
-          return `${item.name} (x${quantity}) - ₹${itemTotal}`;
-        });
-
-        const productSummaryTextarea = document.getElementById("productSummary");
-        productSummaryTextarea.value = summaryLines.join("\n");
-        document.getElementById("cartItemsText").textContent = summaryLines.join("\n");
-        document.getElementById("cartTotal").textContent = total;
-
-        // Collect form values
-        const templateParams = {
+        const payload = {
           name: document.getElementById("name").value,
           address: document.getElementById("address").value,
           city: document.getElementById("city").value,
-          pincode,
+          pincode: document.getElementById("pincode").value,
           phone: document.getElementById("phone").value,
           email: document.getElementById("email").value,
-          product_summary: productSummaryTextarea.value,
-          total: total.toString()
+          product: document.getElementById("productSummary").value
         };
 
         try {
-          await emailjs.send("service_32uffi5", "template_6zo5xgj", templateParams);
-          showToast("Thank you! Your order has been placed.");
-          form.reset();
-          localStorage.removeItem("cart");
-          populateCartSummary();
-          document.getElementById("submitBtn").disabled = true;
-        } catch (error) {
-          console.error(error);
-          showToast("Failed to send email. Please contact support.", false);
+          // ✅ Change here: POST to /api/checkout
+          const res = await fetch("/api/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json();
+          if(data.success){
+            showToast("Order placed successfully!");
+            // Clear cart and reset form
+            localStorage.removeItem("cart");
+            populateCartSummary();
+            form.reset();
+            // Redirect to home after 2 seconds
+            setTimeout(()=> { window.location.href = '/'; }, 2000);
+          } else {
+            showToast("Error placing order: " + data.message, false);
+          }
+        } catch(err) {
+          console.error(err);
+          showToast("Server error. Try again later.", false);
         }
       });
     });
