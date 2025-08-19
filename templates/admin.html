@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background:#f5f5f5; margin:20px; }
+        h1 { text-align:center; }
+        table { width:100%; border-collapse: collapse; background:#fff; }
+        th, td { border:1px solid #ddd; padding:10px; text-align:left; }
+        th { background:#333; color:#fff; }
+        tr:nth-child(even) { background:#f9f9f9; }
+        .btn { padding:5px 10px; margin-right:5px; text-decoration:none; border-radius:4px; }
+        .pending { background:#ff9800; color:white; }
+        .completed { background:#4caf50; color:white; }
+        .cancelled { background:#f44336; color:white; }
+    </style>
+</head>
+<body>
+    <h1>📋 Orders Dashboard</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Product</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.customer_name }}</td>
+                <td>{{ order.customer_email }}</td>
+                <td>{{ order.address }}</td>
+                <td><pre>{{ order.product_summary }}</pre></td>
+                <td>{{ order.order_status }}</td>
+                <td>{{ order.date_ordered.strftime("%Y-%m-%d %H:%M") if order.date_ordered }}</td>
+                
+                {% if order.order_status != "Completed" %}
+                <td>
+                    <a href="{{ url_for('update_order', order_id=order.id, status='Cancelled') }}">Cancel</a>
+<a href="{{ url_for('update_order', order_id=order.id, status='Completed') }}">Complete</a>
+                    <a class="btn pending" href="/update_order/{{ order.id }}/Pending">Pending</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% else %}
+            <tr><td colspan="7" style="text-align:center;">No orders found</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+<div class="admin-notifications">
+  <h3>🔔 Notifications</h3>
+  <ul>
+    {% for notification in notifications %}
+      <li style="font-weight: {% if not notification.read %}bold{% endif %};">
+        {{ notification.message }} - {{ notification.timestamp.strftime('%Y-%m-%d %H:%M') }}
+        {% if not notification.read %}
+          <a href="{{ url_for('mark_notification_read', notification_id=notification.id) }}">Mark Read</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+</body>
+</html>

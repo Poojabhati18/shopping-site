@@ -1,30 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Checkout</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; }
-    h2 { text-align: center; margin-bottom: 20px; }
-    form, #orderSummary {
-      background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    label { display: block; margin-top: 10px; font-weight: bold; }
-    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; }
-    input::placeholder { color: #999; font-style: italic; }
-    button { background: #007bff; color: white; border: none; border-radius: 5px; padding: 12px 20px; font-size: 16px; cursor: pointer; margin-top: 15px; }
-    button:disabled { background: #6c757d; cursor: not-allowed; }
-    .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 5px; color: #fff; display: none; z-index: 9999; }
-    .toast.show { display: block; }
-    #orderSummary strong { display: block; margin-top: 10px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Checkout - Ayurvedic Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style> body { font-family: "Poppins", sans-serif; background: #f9f6f1; margin: 0; padding: 0; color: #2e2e2e; } h2 { text-align: center; margin: 25px 0; color: #3d5a40; } .container { max-width: 700px; margin: 0 auto 50px; padding: 0 20px; } form, #orderSummary { background: #fff; padding: 20px; border-radius: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); margin-bottom: 20px; } #orderSummary h3 { margin-top: 0; color: #3d5a40; } label { display: block; margin-top: 15px; font-weight: 600; } input, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 12px; border: 1px solid #ccc; font-size: 14px; transition: border 0.2s; } input:focus, textarea:focus { border-color: #b0e57c; outline: none; } button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; border: none; border-radius: 25px; padding: 12px 20px; font-size: 16px; cursor: pointer; margin-top: 20px; transition: background 0.2s ease; } button:hover { background: #3d5a40; } button:disabled { background: #6c757d; cursor: not-allowed; } .toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 12px; color: #fff; display: none; z-index: 9999; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); } .toast.show { display: block; } #orderSummary strong { display: block; margin-top: 12px; font-size: 1.1rem; color: #2b4d3a; } textarea[readonly] { background: #f0f2f5; resize: none; } </style>
 </head>
 <body>
 
-  <h2>Checkout</h2>
+<h2>Checkout</h2>
 
+<div class="container">
   <div id="orderSummary">
     <h3>Your Order</h3>
     <div id="cartItemsText">Loading...</div>
@@ -42,7 +29,7 @@
     <input type="text" id="city" placeholder="Your City" required />
 
     <label>Pincode</label>
-    <input type="text" id="pincode" placeholder="6-digit Pincode" required />
+    <input type="text" id="pincode" pattern="\d{6}" title="Enter a valid 6-digit pincode" placeholder="6-digit Pincode" required />
 
     <label>Phone</label>
     <input type="tel" id="phone" placeholder="Your Phone Number" required />
@@ -55,95 +42,122 @@
 
     <button type="submit" id="submitBtn">Place Order</button>
   </form>
+</div>
 
-  <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
-  <script>
-    function showToast(msg, success=true){
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.style.background = success ? '#2e7d32' : '#c62828';
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+<script>
+let gujaratPincodes = [];
+
+// Load pincodes once when page loads
+async function loadPincodes() {
+  const res = await fetch('/static/gujarat_pincodes.json');
+  gujaratPincodes = await res.json();
+}
+
+function showToast(msg, success=true){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.background = success ? '#2e7d32' : '#c62828';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+function populateCartSummary() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const cartItemsText = document.getElementById("cartItemsText");
+  const cartTotalEl = document.getElementById("cartTotal");
+  const productSummaryTextarea = document.getElementById("productSummary");
+  const submitBtn = document.getElementById("submitBtn");
+
+  if (cart.length === 0) {
+    cartItemsText.textContent = "Your cart is empty.";
+    cartTotalEl.textContent = "0";
+    productSummaryTextarea.value = "";
+    submitBtn.disabled = true;
+    return;
+  }
+
+  let total = 0;
+  const summaryLines = cart.map(item => {
+    const qty = Number(item.qty) || 1;
+    const price = Number(item.price) || 0;
+    total += qty * price;
+    return `${item.name} (x${qty}) - ₹${qty*price}`;
+  });
+
+  cartItemsText.textContent = summaryLines.join("\n");
+  cartTotalEl.textContent = total;
+  productSummaryTextarea.value = summaryLines.join("\n");
+  submitBtn.disabled = false;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadPincodes();
+  populateCartSummary();
+
+  const form = document.getElementById("checkoutForm");
+  const submitBtn = document.getElementById("submitBtn");
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if(cart.length === 0){
+      showToast("Your cart is empty", false);
+      return;
     }
 
-    function populateCartSummary() {
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const cartItemsText = document.getElementById("cartItemsText");
-      const cartTotalEl = document.getElementById("cartTotal");
-      const productSummaryTextarea = document.getElementById("productSummary");
-      const submitBtn = document.getElementById("submitBtn");
+    const enteredPincode = document.getElementById("pincode").value.trim();
+    if (!gujaratPincodes.includes(enteredPincode)) {
+      showToast("Sorry, we only deliver to Gujarat pincodes.", false);
+      return;
+    }
 
-      if (cart.length === 0) {
-        cartItemsText.textContent = "Your cart is empty.";
-        cartTotalEl.textContent = "0";
-        productSummaryTextarea.value = "";
-        submitBtn.disabled = true;
-        return;
+    const payload = {
+      name: document.getElementById("name").value,
+      address: document.getElementById("address").value,
+      city: document.getElementById("city").value,
+      pincode: enteredPincode,
+      phone: document.getElementById("phone").value,
+      email: document.getElementById("email").value,
+      product: document.getElementById("productSummary").value
+    };
+
+    // Disable button and show feedback
+    submitBtn.disabled = true;
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = "Placing Order...";
+
+    try {
+      const res = await fetch("/place_order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if(data.success){
+        showToast("Order placed successfully!");
+        localStorage.removeItem("cart");
+        populateCartSummary();
+        form.reset();
+        setTimeout(()=> { window.location.href = '/'; }, 2000);
+      } else {
+        showToast("Error placing order: " + data.message, false);
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalText;
       }
-
-      let total = 0;
-      const summaryLines = cart.map(item => {
-        const qty = Number(item.qty) || 1;
-        const price = Number(item.price) || 0;
-        total += qty * price;
-        return `${item.name} (x${qty}) - ₹${qty*price}`;
-      });
-
-      cartItemsText.textContent = summaryLines.join("\n");
-      cartTotalEl.textContent = total;
-      productSummaryTextarea.value = summaryLines.join("\n");
+    } catch(err) {
+      console.error(err);
+      showToast("Server error. Try again later.", false);
       submitBtn.disabled = false;
+      submitBtn.innerText = originalText;
     }
+  });
+});
+</script>
 
-    document.addEventListener("DOMContentLoaded", () => {
-      populateCartSummary();
-
-      const form = document.getElementById("checkoutForm");
-      form.addEventListener("submit", async e => {
-        e.preventDefault();
-        const cart = JSON.parse(localStorage.getItem("cart")) || [];
-        if(cart.length === 0){
-          showToast("Your cart is empty", false);
-          return;
-        }
-
-        const payload = {
-          name: document.getElementById("name").value,
-          address: document.getElementById("address").value,
-          city: document.getElementById("city").value,
-          pincode: document.getElementById("pincode").value,
-          phone: document.getElementById("phone").value,
-          email: document.getElementById("email").value,
-          product: document.getElementById("productSummary").value
-        };
-
-        try {
-          // ✅ Change here: POST to /api/checkout
-          const res = await fetch("/api/checkout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-
-          const data = await res.json();
-          if(data.success){
-            showToast("Order placed successfully!");
-            // Clear cart and reset form
-            localStorage.removeItem("cart");
-            populateCartSummary();
-            form.reset();
-            // Redirect to home after 2 seconds
-            setTimeout(()=> { window.location.href = '/'; }, 2000);
-          } else {
-            showToast("Error placing order: " + data.message, false);
-          }
-        } catch(err) {
-          console.error(err);
-          showToast("Server error. Try again later.", false);
-        }
-      });
-    });
-  </script>
 </body>
 </html>

@@ -4,53 +4,151 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Your Cart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Poppins', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f9f9f9;
-      color: #333;
+      background-color: #f9f6f1;
+      color: #2e2e2e;
     }
+
     header {
-      background-color: #4CAF50;
+      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
       color: white;
-      padding: 1rem 2rem;
+      padding: 1.2rem 2rem;
       text-align: center;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
     }
+
     nav {
-      background-color: #007bff;
       display: flex;
       justify-content: center;
-      padding: 10px 0;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
+      padding: 12px 0;
     }
-    nav button {
-      background-color: white;
-      color: #007bff;
-      border: 2px solid #007bff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: 0.3s ease;
-      white-space: nowrap;
-    }
-    nav button:hover { background-color: #007bff; color: white; }
 
-    .container { max-width: 800px; margin: 2rem auto; padding: 1rem; }
-    .cart-item { display: flex; align-items: center; background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); padding: 1rem; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap; }
-    .cart-item img { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; }
-    .item-info { flex: 1; display: flex; flex-direction: column; }
-    .item-name { font-size: 1.2rem; font-weight: bold; }
-    .item-price { margin-top: 0.5rem; font-size: 1rem; color: #666; }
-    .quantity-controls { margin: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem; }
-    .quantity-controls button { padding: 0.3rem 0.6rem; font-size: 1rem; border: none; border-radius: 5px; background-color: #4CAF50; color: white; cursor: pointer; }
-    .remove-button { margin-top: 0.5rem; background-color: #f44336; border: none; color: white; padding: 0.5rem 0.8rem; border-radius: 5px; cursor: pointer; width: fit-content; }
-    #cartTotal { text-align: right; font-size: 1.3rem; margin-top: 2rem; }
-    .checkout-button { background-color: #2196F3; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; float: right; margin-top: 1rem; }
+    nav button {
+      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    nav button:hover {
+      background: #3d5a40;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 1rem;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .cart-item img {
+      width: 100px;
+      height: 100px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    .item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #3d5a40;
+    }
+
+    .item-price {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #666;
+    }
+
+    .quantity-controls {
+      margin: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .quantity-controls button {
+      padding: 0.3rem 0.6rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #5a7f65;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .quantity-controls button:hover { background: #3d5a40; }
+
+    .remove-button {
+      margin-top: 0.5rem;
+      background-color: #c62828;
+      border: none;
+      color: white;
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      width: fit-content;
+      transition: background 0.2s;
+    }
+
+    .remove-button:hover { background-color: #8e1d1d; }
+
+    #cartTotal {
+      text-align: right;
+      font-size: 1.3rem;
+      margin-top: 2rem;
+      font-weight: 600;
+      color: #3d5a40;
+    }
+
+    .checkout-button {
+      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      float: right;
+      margin-top: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .checkout-button:hover {
+      background: #3d5a40;
+    }
 
     @media (max-width: 600px) {
       .cart-item { flex-direction: column; align-items: flex-start; }
@@ -58,33 +156,37 @@
       .checkout-button { width: 100%; float: none; }
     }
 
-    /* Policy buttons fixed at bottom right */
     .policy-buttons {
       position: fixed;
-      bottom: 10px;
-      right: 10px;
+      bottom: 15px;
+      right: 20px;
       display: flex;
-      gap: 10px;
+      gap: 12px;
       z-index: 1000;
     }
+
     .policy-buttons button {
-      font-size: 0.75rem;
-      opacity: 0.7;
+      font-size: 0.85rem;
+      opacity: 0.8;
       padding: 6px 12px;
       background-color: transparent;
-      color: #555;
-      border-radius: 4px;
+      color: #3d5a40;
+      border-radius: 8px;
       cursor: pointer;
       border: none;
-      transition: color 0.3s ease;
+      transition: all 0.2s ease;
       white-space: nowrap;
     }
-    .policy-buttons button:hover { color: #007bff; }
+
+    .policy-buttons button:hover {
+      background: #b0e57c33;
+      color: #2b4d3a;
+    }
   </style>
 </head>
 <body>
 
-<header>Shopping Cart</header>
+<header>🌿 AyuHealth Cart</header>
 
 <nav>
   <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
@@ -99,11 +201,10 @@
   <button class="checkout-button" onclick="prepareCheckout()">Proceed to Checkout</button>
 </div>
 
-<!-- Policy buttons fixed -->
 <div class="policy-buttons">
-  <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation and Refunds</button>
+  <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation & Refunds</button>
   <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
-  <button onclick="location.href='{{ url_for('terms_page') }}'">Terms and Conditions</button>
+  <button onclick="location.href='{{ url_for('terms_page') }}'">Terms & Conditions</button>
   <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
 </div>
 

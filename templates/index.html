@@ -8,24 +8,56 @@
   <meta name="keywords" content="Ayurvedic products, herbal remedies, ayushmantralay certified, online ayurveda store, herbal wellness products" />
   <meta name="author" content="AyuHealth" />
   <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; color: #333; }
-    header { background-color: #007bff; color: white; padding: 20px 0; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    nav { display: flex; justify-content: center; gap: 20px; padding: 15px 0; background-color: #ffffff; border-bottom: 1px solid #eee; flex-wrap: wrap; }
-    nav button { padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; white-space: nowrap; }
-    nav button:hover { background-color: #0056b3; }
-    .content { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
-    .content h2 { margin-bottom: 20px; font-size: 28px; color: #007bff; }
-    .content p { font-size: 17px; line-height: 1.6; }
-    .policy-buttons { position: fixed; bottom: 10px; right: 10px; display: flex; gap: 10px; z-index: 1000; }
-    .policy-buttons button { font-size: 0.75rem; opacity: 0.7; padding: 6px 12px; background-color: transparent; color: #555; border-radius: 4px; cursor: pointer; border: none; transition: color 0.3s ease; white-space: nowrap; }
-    .policy-buttons button:hover { color: #007bff; }
+    body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background-color: #f9f6f1; color: #2e2e2e; }
+    header { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; padding: 20px 0; text-align: center; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; }
+    nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 15px 10px; margin-top: 10px; }
+    nav button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: white; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; transition: all 0.2s ease; font-size: 0.95rem; }
+    nav button:hover { background: #3d5a40; }
+    .content { max-width: 800px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+    .content h2 { font-size: 2rem; color: #3d5a40; margin-bottom: 20px; }
+    .content p { font-size: 1rem; line-height: 1.6; margin-bottom: 15px; }
+    .hottest-product { background: #e8f5e9; padding: 20px; border-radius: 12px; margin-bottom: 30px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .hottest-product h3 { color: #2e7d32; font-size: 1.5rem; margin-bottom: 10px; }
+    .hottest-product p { font-size: 1.2rem; font-weight: 600; color: #1b5e20; }
+    .policy-buttons { position: fixed; bottom: 15px; right: 20px; display: flex; flex-direction: row; gap: 15px; z-index: 999; }
+    .policy-buttons button { background: transparent; border: none; color: #3d5a40; font-size: 0.85rem; cursor: pointer; padding: 6px 10px; border-radius: 12px; transition: background 0.2s, color 0.2s; }
+    .policy-buttons button:hover { background: #b0e57c33; color: #2b4d3a; }
+.hottest-products-section {
+    max-width: 900px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.hottest-products-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.product-card {
+  text-align: center;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  width: 150px;
+}
+
+.product-image {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.product-name {
+  margin-top: 8px;
+  font-weight: bold;
+}
   </style>
 </head>
 <body>
-  <header>
-    <h1>🌿 AyuHealth</h1>
-  </header>
+  <header>🌿 AyuHealth</header>
 
   <nav>
     <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
@@ -35,6 +67,22 @@
     <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
   </nav>
 
+  {% if hottest_products %}
+<div class="hottest-products-section">
+  <h3>🔥 Top Hottest Products This Week</h3>
+  <div class="hottest-products-container">
+    {% for product in hottest_products %}
+      <div class="product-card">
+        <img src="{{ product.image }}" alt="{{ product.name }}" class="product-image" />
+        <p class="product-name">{{ product.name }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+
+
   <div class="content">
     <h2>Welcome to My Online Store</h2>
     <p>At AyuHealth, we offer a wide range of authentic Ayurvedic products and medicines, carefully crafted using time-tested herbal formulations...</p>
@@ -43,9 +91,9 @@
   </div>
 
   <div class="policy-buttons">
-    <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation and Refunds</button>
+    <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation & Refunds</button>
     <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
-    <button onclick="location.href='{{ url_for('terms_page') }}'">Terms and Conditions</button>
+    <button onclick="location.href='{{ url_for('terms_page') }}'">Terms & Conditions</button>
     <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
   </div>
 </body>

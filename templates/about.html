@@ -2,53 +2,136 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>About Us - My Store</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <title>About Us - AyuHealth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background-color: #f7f7f7; margin: 0; padding: 0; }
-    header { background-color: #343a40; color: white; padding: 20px; text-align: center; }
-    nav { background-color: #007bff; display: flex; justify-content: center; padding: 10px 0; flex-wrap: wrap; gap: 10px; }
-    nav button { background-color: white; color: #007bff; border: 2px solid #007bff; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; transition: 0.3s ease; white-space: nowrap; }
-    nav button:hover { background-color: #007bff; color: white; }
-    .content { max-width: 900px; margin: 30px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
-    .content h2 { color: #333; }
-    .content p { font-size: 18px; line-height: 1.6; color: #444; }
-    .policy-buttons { position: fixed; bottom: 10px; right: 10px; display: flex; gap: 10px; z-index: 1000; }
-    .policy-buttons button { font-size: 0.75rem; opacity: 0.7; padding: 6px 12px; background-color: transparent; color: #eee; border-radius: 4px; cursor: pointer; border: none; transition: color 0.3s ease; white-space: nowrap; }
-    .policy-buttons button:hover { color: #d1e7ff; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f6f1;
+      color: #2e2e2e;
+    }
+
+    header {
+      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+      color: white;
+      padding: 1.5rem 0;
+      text-align: center;
+      font-size: 1.8rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 0;
+    }
+
+    nav button {
+      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    nav button:hover {
+      background: #3d5a40;
+    }
+
+    .content {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    .content h2 {
+      color: #3d5a40;
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+
+    .content p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #555;
+      margin-bottom: 15px;
+    }
+
+    .content strong {
+      color: #2b4d3a;
+    }
+
+    .policy-buttons {
+      position: fixed;
+      bottom: 15px;
+      right: 20px;
+      display: flex;
+      gap: 12px;
+      z-index: 1000;
+    }
+
+    .policy-buttons button {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      padding: 6px 12px;
+      background-color: transparent;
+      color: #3d5a40;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .policy-buttons button:hover {
+      background: #b0e57c33;
+      color: #2b4d3a;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>About Us</h1>
-  </header>
 
-  <nav>
-    <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
-    <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
-    <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
-    <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
-  </nav>
+<header>🌿 About Us - AyuHealth</header>
 
-  <div class="content">
-    <h2>Who Are We?</h2>
-    <p>
-      Welcome to <strong> Ayuhealth</strong>, your go-to destination for ayurvedic medicines and wellness products labeled with India's own ayurvedic certification Ayushmantralay. Our mission is simple — to make products that satisfy your needs.
-    </p>
-    <p>
-      What started as a small idea has now grown into a passionate project dedicated to bringing unique, personalized products to your doorstep. Each product is crafted by one of the best scientists in India who prefer quality over quantity.
-    </p>
-    <p>
-      Whether you’re buying for yourself or gifting to someone special, we promise to deliver something truly memorable.
-    </p>
-    <p><strong>Thank you for supporting us!</strong></p>
-  </div>
+<nav>
+  <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
+  <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
+  <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
+  <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
+</nav>
 
-  <div class="policy-buttons">
-    <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation and Refunds</button>
-    <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
-    <button onclick="location.href='{{ url_for('terms_page') }}'">Terms and Conditions</button>
-    <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
-  </div>
+<div class="content">
+  <h2>Who Are We?</h2>
+  <p>
+    Welcome to <strong>AyuHealth</strong>, your go-to destination for Ayurvedic medicines and wellness products labeled with India's own certification, Ayushmantralay. Our mission is simple — to make products that satisfy your needs.
+  </p>
+  <p>
+    What started as a small idea has now grown into a passionate project dedicated to bringing unique, personalized products to your doorstep. Each product is crafted by top Indian scientists who prioritize quality over quantity.
+  </p>
+  <p>
+    Whether you’re buying for yourself or gifting someone special, we promise to deliver something truly memorable.
+  </p>
+  <p><strong>Thank you for supporting us!</strong></p>
+</div>
+
+<div class="policy-buttons">
+  <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation & Refunds</button>
+  <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
+  <button onclick="location.href='{{ url_for('terms_page') }}'">Terms & Conditions</button>
+  <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
+</div>
+
 </body>
 </html>
