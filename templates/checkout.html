@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -88,7 +88,7 @@ function populateCartSummary() {
 
   cartItemsText.textContent = summaryLines.join("\n");
   cartTotalEl.textContent = total;
-  productSummaryTextarea.value = summaryLines.join("\n"); // send as string
+  productSummaryTextarea.value = summaryLines.join("\n");
   submitBtn.disabled = false;
 }
 
@@ -114,13 +114,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Convert cart to string summary for backend/email
-    const productSummaryStr = cart.map(item => {
-      const qty = Number(item.qty) || 1;
-      const price = Number(item.price) || 0;
-      return `${item.name} (x${qty}) - ₹${qty*price}`;
-    }).join("\n");
-
     const payload = {
       name: document.getElementById("name").value,
       address: document.getElementById("address").value,
@@ -128,7 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       pincode: enteredPincode,
       phone: document.getElementById("phone").value,
       email: document.getElementById("email").value,
-      product: productSummaryStr
+      product: document.getElementById("productSummary").value
     };
 
     // Disable button and show feedback
@@ -165,5 +158,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 });
 </script>
+
 </body>
 </html>

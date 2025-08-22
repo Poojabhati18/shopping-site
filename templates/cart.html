@@ -234,13 +234,13 @@
       const itemElement = document.createElement("div");
       itemElement.className = "cart-item";
       itemElement.innerHTML = `
-        <img src="${item.image || '/static/default.png'}" alt="${item.name}">
+        <img src="${item.image}" alt="${item.name}">
         <div class="item-info">
           <div class="item-name">${item.name}</div>
           <div class="item-price">₹${price} x ${quantity} = ₹${itemTotal}</div>
           <div class="quantity-controls">
             <button onclick="changeQuantity(${index}, -1)">–</button>
-            <span class="qty">${quantity}</span>
+            ${quantity}
             <button onclick="changeQuantity(${index}, 1)">+</button>
           </div>
           <button class="remove-button" onclick="removeItem(${index})">Remove</button>
@@ -270,8 +270,6 @@
     item.qty = Number(item.qty) || 1;
     item.qty += delta;
     if (item.qty < 1) item.qty = 1;
-
-    cart[index] = item; // Update cart entry
     localStorage.setItem("cart", JSON.stringify(cart));
     renderCart();
   }
@@ -295,23 +293,8 @@
     location.href = '{{ url_for("checkout_page") }}';
   }
 
-  // Ensure product images exist in cart from products.json
-  function syncCartImages() {
-    fetch("/static/products.json")
-      .then(res => res.json())
-      .then(products => {
-        cart = cart.map(item => {
-          const product = products.find(p => p.id === item.id);
-          if (product) item.image = `/static/${product.image}`;
-          return item;
-        });
-        localStorage.setItem("cart", JSON.stringify(cart));
-        renderCart();
-      })
-      .catch(err => console.error("Failed to sync cart images:", err));
-  }
-
-  syncCartImages();
+  renderCart();
 </script>
+
 </body>
 </html>

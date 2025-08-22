@@ -270,41 +270,13 @@
       to { transform: translate(-50%, 0); opacity: 1; }
     }
     @keyframes fadeOut { to { opacity: 0; transform: translate(-50%, 20px);} }
-
-.filter-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin: 20px 0;
-  flex-wrap: wrap;
-}
-
-.filter-buttons button {
-  background: linear-gradient(135deg, var(--green-2), var(--green-3));
-  color: #fff;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 30px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.filter-buttons button:hover {
-  background: linear-gradient(135deg, var(--green-3), var(--green-2));
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-}
-
-.filter-buttons button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(176, 229, 124, 0.5);
-}
   </style>
 </head>
 <body>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <nav>
     <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
     <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
@@ -315,21 +287,19 @@
 
   <div class="controls">
     <input type="text" id="searchBox" placeholder="Search products..." />
-   <!-- Category Dropdown -->
-<select id="categoryBox">
-  <option value="all">All Categories</option>
-  <option value="wellness">Wellness</option>
-  <option value="medicinal">Medicinal</option>
-</select>
-
-<!-- Price Sort Dropdown -->
-<select id="priceBox">
-  <option value="default">Sort by Price</option>
-  <option value="low">Low to High</option>
-  <option value="high">High to Low</option>
-</select>
+    <select id="sortBox">
+      <option value="">Sort by</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+    </select>
   </div>
 
+  <div class="container" id="productList"></div>
+
+  <!-- legacy node kept but no longer directly used -->
+  <div id="toast" style="display:none;"></div>
+
+  <!-- Footer Policy Links -->
   <div class="policy-links">
     <a href="{{ url_for('refund_page') }}">Cancellation & Refunds</a>
     <a href="{{ url_for('privacy_page') }}">Privacy Policy</a>
@@ -337,280 +307,330 @@
     <a href="{{ url_for('shipping_page') }}">Shipping Policy</a>
   </div>
 
-<div id="productList"></div>
+  <script>
+    const staticUrl = "{{ url_for('static', filename='') }}";
 
-<script>
-let products = {{ products|tojson }};
-let filteredProducts = [...products];
+    const products = [
+      { id: "1", name: "3-1 Face Wash", price: 149, image: staticUrl + "images/31facewash.jpeg", description: "Cleanses, exfoliates & moisturizes naturally." },
+      { id: "2", name: "Multi-Action Fairness Cream", price: 199, image: staticUrl + "images/facecream.jpeg", description: "Ayurvedic herbs nourish & hydrate skin." },
+      { id: "3", name: "Anti-Dandruff Shampoo", price: 129, image: staticUrl + "images/antidandruffshampoo.jpeg", description: "Strengthens hair & prevents dandruff." }
+    ];
 
-document.addEventListener("DOMContentLoaded", () => {
+    let filteredProducts = [...products];
 
-  /* ====== Utility Functions ====== */
-  function debounce(fn, delay=300) {
-    let t;
-    return (...args) => {
-      clearTimeout(t);
-      t = setTimeout(() => fn(...args), delay);
+    // --- Initialize Firebase ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAVUAGmSy8unzvHF9qDwQ8VsBA_D1tBdMc",
+      authDomain: "review-b714a.firebaseapp.com",
+      databaseURL: "https://review-b714a-default-rtdb.firebaseio.com",
+      projectId: "review-b714a",
+      storageBucket: "review-b714a.firebasestorage.app",
+      messagingSenderId: "656434016005",
+      appId: "1:656434016005:web:94d7f104b244db338c916c",
+      measurementId: "G-V8JE9FY1LX"
     };
-  }
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-  function showToast(msg, type="success") {
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.style.cssText = `
-      position: fixed; bottom: 20px; right: 20px; padding: 12px 20px;
-      border-radius: 6px; color: #fff; font-weight: bold; z-index: 9999;
-      background-color: ${type==="success"?"#28a745":"#dc3545"}; opacity:0; transition:opacity 0.3s;
-    `;
-    toast.innerHTML = (type==="success"?"✅ ":"⚠️ ") + msg;
-    document.body.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = 1; }, 50);
-    setTimeout(() => { toast.style.opacity = 0; setTimeout(() => toast.remove(), 300); }, 3000);
-  }
+    // Simple in-memory cache for reviews per product
+    const reviewCache = new Map(); // productId -> { items: [...], loaded: true }
 
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const total = cart.reduce((s, i) => s + i.qty, 0);
-    const el = document.getElementById("cartCount");
-    if (!el) return;
-    el.textContent = total;
-    el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
-  }
-
-  /* ====== Render Products ====== */
-  function renderProducts() {
-    const container = document.getElementById("productList");
-    if(!container) return;
-
-    container.innerHTML = "";
-
-    filteredProducts.forEach(product => {
-      const card = document.createElement("div");
-      card.className = "product-card";
-      card.dataset.id = product.id;
-
-      card.innerHTML = `
-        <img src="${product.image_url}" alt="${product.name}">
-        <h2>${product.name}</h2>
-        <p class="price">₹${product.price}</p>
-        <div class="qty-selector">
-          <button class="minus">-</button>
-          <span class="qty">1</span>
-          <button class="plus">+</button>
-        </div>
-        <button class="add-to-cart">Add to Cart</button>
-        <button class="show-description-btn btn">Description</button>
-        <button class="toggle-reviews-btn">Show Reviews</button>
-        <div class="reviews" style="display:none;">
-          <div class="average-rating" data-product-id="${product.id}">
-            <span class="avg-stars">☆☆☆☆☆</span>
-            <span class="avg-num">-</span>
-            <small>(<span class="count">0</span> reviews)</small>
-          </div>
-          <div class="review-list">—</div>
-          <form class="review-form" data-product-id="${product.id}">
-            <div class="star-selector">
-              <span data-value="1">☆</span>
-              <span data-value="2">☆</span>
-              <span data-value="3">☆</span>
-              <span data-value="4">☆</span>
-              <span data-value="5">☆</span>
-            </div>
-            <input type="hidden" name="rating" value="0">
-            <textarea name="review" rows="3" maxlength="200" placeholder="Share your experience..."></textarea>
-            <div class="char-counter">0/200</div>
-            <button type="submit">Submit Review</button>
-          </form>
-        </div>
-      `;
-
-      container.appendChild(card);
-      attachProductEvents(card, product);
-      attachReviewEvents(card, product);
-      ensureReviewsLoaded(card, product.id);
-    });
-  }
-
-  /* ====== Product Events ====== */
-  function attachProductEvents(card, product) {
-  const addBtn = card.querySelector(".add-to-cart");
-  const plusBtn = card.querySelector(".plus");
-  const minusBtn = card.querySelector(".minus");
-  const qtyEl = card.querySelector(".qty");
-  const descBtn = card.querySelector(".show-description-btn");
-  const reviewBtn = card.querySelector(".toggle-reviews-btn");
-  const reviewSection = card.querySelector(".reviews");
-
-  let qty = 1;
-
-  plusBtn?.addEventListener("click", () => { qty++; qtyEl.textContent = qty; });
-  minusBtn?.addEventListener("click", () => { if(qty>1) qty--; qtyEl.textContent = qty; });
-
-  addBtn?.addEventListener("click", () => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const existingIndex = cart.findIndex(i => i.id === product.id);
-    if(existingIndex > -1) cart[existingIndex].qty += qty;
-    else cart.push({ id: product.id, name: product.name, price: product.price, image: product.image_url, qty });
-    localStorage.setItem("cart", JSON.stringify(cart));
-    updateCartCount();
-    showToast(`${product.name} added to cart!`, "success");
-    qty = 1; qtyEl.textContent = qty;
-  });
-
-  // ✅ Description Button
-  descBtn?.addEventListener("click", () => showDescriptionModal(product));
-
-  // ✅ Review toggle
-  reviewBtn?.addEventListener("click", () => {
-    if(reviewSection.style.display === "none"){
-        reviewSection.style.display = "block";
-        reviewBtn.textContent = "Hide Reviews";
-    } else {
-        reviewSection.style.display = "none";
-        reviewBtn.textContent = "Show Reviews";
+    // --- Utils ---
+    function debounce(fn, delay=300){
+      let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), delay); };
     }
-  });
-}
 
-  /* ====== Reviews Fetch + Render Logic ====== */
-const reviewCache = new Map();
+    function showToast(message, type = "success") {
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      const icon = document.createElement("span");
+      icon.className = "icon";
+      icon.textContent = type === "success" ? "✅" : "⚠️";
+      const text = document.createElement("span");
+      text.textContent = message;
+      toast.appendChild(icon);
+      toast.appendChild(text);
+      document.body.appendChild(toast);
+      setTimeout(()=> toast.remove(), 3000);
+    }
 
-async function fetchReviews(productId){
-  const res = await fetch(`/api/reviews/${productId}`);
-  return await res.json();
-}
+    function renderAvgStars(rating){
+      // Return a string like ★★★★☆ plus numeric
+      const full = Math.floor(rating);
+      const hasHalf = (rating - full) >= 0.5;
+      let s = "★".repeat(full);
+      if (hasHalf) s += "☆"; // simple half representation (can be upgraded to SVG)
+      s = s.padEnd(5, "☆");
+      return s;
+    }
 
-function renderReviews(list, container, avgContainer){
-  if(!list.length){ container.innerHTML="<i>No reviews yet</i>"; return; }
-  container.innerHTML="";
-  let total=0;
-  list.forEach(r=>{
-    total+=Number(r.rating)||0;
-    const el=document.createElement("div");
-    el.className="review-item";
-    el.innerHTML=`<div>⭐️`.repeat(r.rating)+`</div><div>${r.review}</div><small>${new Date(r.timestamp).toLocaleString()}</small>`;
-    container.appendChild(el);
-  });
-  const avg = total/list.length;
-  avgContainer.querySelector(".avg-stars").textContent = "★".repeat(Math.floor(avg)).padEnd(5,"☆");
-  avgContainer.querySelector(".avg-num").textContent = avg.toFixed(1);
-  avgContainer.querySelector(".count").textContent = String(list.length);
-}
+    // --- Reviews ---
+    async function fetchReviews(productId){
+      const snap = await db.collection("reviews").where("productId","==",productId).orderBy("timestamp","desc").get();
+      return snap.docs.map(d=>d.data());
+    }
 
-function attachReviewEvents(card, product){
-  const form = card.querySelector(".review-form");
-  const stars = card.querySelectorAll(".star-selector span");
-  const hiddenRating = form.querySelector("input[name='rating']");
-  const textarea = form.querySelector("textarea[name='review']");
-  const counter = form.querySelector(".char-counter");
-  const submitBtn = form.querySelector("button[type='submit']");
-
-  stars.forEach(s=>{
-    s.addEventListener("click",()=>{
-      hiddenRating.value=s.dataset.value;
-      stars.forEach(st=>st.classList.toggle("selected",st.dataset.value<=s.dataset.value));
-    });
-  });
-
-  textarea.addEventListener("input",()=>counter.textContent=`${textarea.value.length}/200`);
-
-  form.addEventListener("submit", async e=>{
-    e.preventDefault();
-    const rating = Number(hiddenRating.value);
-    const reviewText = textarea.value.trim();
-    if(rating===0||reviewText.length<10){ showToast("Rating & min 10 chars","error"); return; }
-    submitBtn.disabled=true;
-    try{
-      const res = await fetch(`/api/reviews/${product.id}`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({rating, review:reviewText})
-      });
-      const data = await res.json();
-      if(data.success){
-        showToast("Review submitted!","success");
-        form.reset();
-        hiddenRating.value=0;
-        counter.textContent="0/200";
-        stars.forEach(st=>st.classList.remove("selected"));
-        reviewCache.delete(product.id);
-        await ensureReviewsLoaded(card, product.id);
-      } else {
-        showToast(data.message,"error");
+    function renderReviews(list, container, avgContainer){
+      if (!list.length){
+        container.innerHTML = "<i>No reviews yet. Be the first!</i>";
+        avgContainer.querySelector(".avg-stars").textContent = "☆☆☆☆☆";
+        avgContainer.querySelector(".avg-num").textContent = "-";
+        avgContainer.querySelector(".count").textContent = "0";
+        return;
       }
-    } catch(e){ console.error(e); showToast("Submit failed","error"); }
-    finally{ submitBtn.disabled=false; }
-  });
-}
-
-async function ensureReviewsLoaded(card, productId){
-  const container = card.querySelector(".review-list");
-  const avgContainer = card.querySelector(".average-rating");
-  if(!reviewCache.has(productId)){
-    const reviews = await fetchReviews(productId);
-    reviewCache.set(productId,reviews);
-  }
-  renderReviews(reviewCache.get(productId), container, avgContainer);
-}
-
-  /* ====== Description Modal ====== */
-  function showDescriptionModal(product) {
-    const modal = document.createElement("div");
-    modal.style.cssText = `
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;
-      z-index: 9999; padding: 20px;
-    `;
-
-    modal.innerHTML = `
-      <div style="background:#fff;padding:20px;border-radius:12px;max-width:500px;width:100%;position:relative;">
-        <h2>${product.name}</h2>
-        <p>${product.description || "No description available."}</p>
-        <p class="price">₹${product.price}</p>
-        <button id="closeModal" style="position:absolute;top:10px;right:10px;">Close</button>
-      </div>
-    `;
-    document.body.appendChild(modal);
-
-    modal.querySelector("#closeModal").addEventListener("click", ()=>modal.remove());
-    modal.addEventListener("click", e => { if(e.target===modal) modal.remove(); });
-  }
-
-  /* ====== Filters: Search + Category + Price ====== */
-  const searchBox = document.getElementById("searchBox");
-  const categoryBox = document.getElementById("categoryBox");
-  const priceBox = document.getElementById("priceBox");
-
-  function applyFilters() {
-    let tempProducts = [...products];
-
-    const categoryVal = categoryBox?.value || "all";
-    if(categoryVal !== "all") tempProducts = tempProducts.filter(p => p.category === categoryVal);
-
-    const searchTerm = searchBox?.value.trim().toLowerCase() || "";
-    if(searchTerm !== "") {
-      tempProducts = tempProducts.filter(p =>
-        p.name.toLowerCase().includes(searchTerm) ||
-        (p.description && p.description.toLowerCase().includes(searchTerm))
-      );
+      container.innerHTML = "";
+      let total = 0;
+      list.forEach(r=>{
+        total += Number(r.rating)||0;
+        const el = document.createElement("div");
+        el.className = "review-item";
+        const stars = "⭐️".repeat(r.rating);
+        el.innerHTML = `
+          <div class="stars" style="margin-bottom:2px;">${stars}</div>
+          <div>${r.review}</div>
+          <small style="color:#666;font-size:12px;">${new Date(r.timestamp).toLocaleString()}</small>
+        `;
+        container.appendChild(el);
+      });
+      const avg = total / list.length;
+      avgContainer.querySelector(".avg-stars").textContent = renderAvgStars(avg);
+      avgContainer.querySelector(".avg-num").textContent = avg.toFixed(1);
+      avgContainer.querySelector(".count").textContent = String(list.length);
     }
 
-    const priceVal = priceBox?.value || "default";
-    if(priceVal === "low") tempProducts.sort((a,b)=>a.price-b.price);
-    else if(priceVal === "high") tempProducts.sort((a,b)=>b.price-a.price);
+    function attachReviewEvents(card, product) {
+      const form = card.querySelector(".review-form");
+      const starSelector = card.querySelector(".star-selector");
+      const hiddenRating = form.querySelector("input[name='rating']");
+      const textarea = form.querySelector("textarea[name='review']");
+      const counter = form.querySelector(".char-counter");
+      const submitBtn = form.querySelector("button[type='submit']");
 
-    filteredProducts = tempProducts;
+      // Stars: hover + click with gradient fill
+      const stars = Array.from(starSelector.querySelectorAll("span"));
+      const setVisual = (value, hover=false)=>{
+        stars.forEach((s,i)=>{
+          const idx = i+1;
+          s.textContent = idx <= value ? "★" : "☆";
+          s.classList.toggle("selected", idx <= value);
+          s.classList.toggle("hovered", hover && idx <= value);
+        });
+      };
+      stars.forEach(s=>{
+        s.addEventListener("mouseover", ()=> setVisual(Number(s.dataset.value), true));
+        s.addEventListener("mouseout", ()=> setVisual(Number(hiddenRating.value), false));
+        s.addEventListener("click", ()=>{
+          const value = Number(s.dataset.value);
+          hiddenRating.value = value;
+          setVisual(value, false);
+        });
+      });
+
+      // Char counter
+      const maxLen = textarea.getAttribute("maxlength") ? Number(textarea.getAttribute("maxlength")) : 200;
+      const updateCounter = ()=> { counter.textContent = `${textarea.value.length}/${maxLen}`; };
+      textarea.setAttribute("maxlength", String(maxLen));
+      textarea.addEventListener("input", updateCounter);
+      updateCounter();
+
+      // Submit
+      form.addEventListener("submit", async e => {
+        e.preventDefault();
+        const rating = Number(form.rating.value);
+        const reviewText = textarea.value.trim();
+
+        if (rating === 0) { showToast("Please select a star rating!", "error"); return; }
+        if (reviewText.length < 10) { showToast("Please write at least 10 characters.", "error"); return; }
+
+        try{
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Submitting...";
+          await db.collection("reviews").add({
+            productId: product.id,
+            rating,
+            review: reviewText,
+            timestamp: new Date().toISOString()
+          });
+
+          // update cache immediately
+          const cached = reviewCache.get(product.id) || { items: [], loaded: true };
+          cached.items.unshift({ productId: product.id, rating, review: reviewText, timestamp: new Date().toISOString() });
+          reviewCache.set(product.id, cached);
+
+          // Re-render list + average
+          const reviewListEl = card.querySelector(".review-list");
+          const avgRatingElContainer = card.querySelector(".average-rating");
+          renderReviews(cached.items, reviewListEl, avgRatingElContainer);
+
+          // reset form
+          form.reset();
+          hiddenRating.value = 0;
+          setVisual(0,false);
+          updateCounter();
+          showToast("Review submitted!", "success");
+        } catch(err){
+          console.error(err);
+          showToast("Failed to submit review.", "error");
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit Review";
+        }
+      });
+    }
+
+    // Load reviews only when opened (and cache them)
+    async function ensureReviewsLoaded(card, productId){
+      const reviewListEl = card.querySelector(".review-list");
+      const avgRatingElContainer = card.querySelector(".average-rating");
+
+      if (reviewCache.has(productId)){
+        const cached = reviewCache.get(productId);
+        renderReviews(cached.items, reviewListEl, avgRatingElContainer);
+        return;
+      }
+      reviewListEl.innerHTML = "Loading reviews...";
+      try{
+        const items = await fetchReviews(productId);
+        reviewCache.set(productId, { items, loaded: true });
+        renderReviews(items, reviewListEl, avgRatingElContainer);
+      }catch(err){
+        console.error("Error loading reviews:", err);
+        reviewListEl.innerHTML = "<i>Error loading reviews</i>";
+      }
+    }
+
+    // --- Cart + quantity ---
+    function attachProductEvents() {
+      document.querySelectorAll(".product-card").forEach(card => {
+        let quantity = 1;
+        const plusBtn = card.querySelector(".plus");
+        const minusBtn = card.querySelector(".minus");
+        const qtyDisplay = card.querySelector(".qty");
+        const addToCartBtn = card.querySelector(".add-to-cart");
+
+        const syncMinusState = ()=> { minusBtn.disabled = quantity <= 1; };
+        syncMinusState();
+
+        plusBtn.addEventListener("click", e => { e.stopPropagation(); quantity++; qtyDisplay.textContent = quantity; syncMinusState(); });
+        minusBtn.addEventListener("click", e => { e.stopPropagation(); if(quantity>1){quantity--; qtyDisplay.textContent=quantity; } syncMinusState(); });
+
+        addToCartBtn.addEventListener("click", e => {
+          e.stopPropagation();
+          const product = {
+            id: card.dataset.id,
+            name: card.querySelector("h2").textContent,
+            price: parseFloat(card.querySelector(".price").textContent.replace(/[^\d.]/g,'')),
+            qty: quantity,
+            image: card.querySelector("img").src
+          };
+          let cart = JSON.parse(localStorage.getItem("cart")) || [];
+          const existing = cart.find(i=>i.id===product.id);
+          if(existing) existing.qty+=quantity; else cart.push(product);
+          localStorage.setItem("cart", JSON.stringify(cart));
+          showToast('Added to cart', "success");
+          updateCartCount();
+          quantity = 1; qtyDisplay.textContent = quantity; syncMinusState();
+        });
+      });
+    }
+
+    function updateCartCount(){
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const total = cart.reduce((sum,item)=>sum+item.qty,0);
+      const el = document.getElementById("cartCount");
+      el.textContent = total;
+      el.classList.remove("bump");
+      // reflow to restart animation
+      void el.offsetWidth;
+      el.classList.add("bump");
+    }
+
+    // --- Render products ---
+    async function renderProducts() {
+      const container = document.getElementById("productList");
+      container.innerHTML = "";
+
+      for (const product of filteredProducts) {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.dataset.id = product.id;
+
+        card.innerHTML = `
+          <img src="${product.image}" alt="${product.name}">
+          <h2>${product.name}</h2>
+          <p class="price">₹${product.price}</p>
+          <p class="description" style="display:none;">${product.description}</p>
+
+          <button class="toggle-reviews-btn">Show Reviews</button>
+          <div class="reviews" style="display:none;">
+            <div class="average-rating" data-product-id="${product.id}">
+              <span class="avg-stars">☆☆☆☆☆</span>
+              <span class="avg-num">-</span>
+              <small>(<span class="count">0</span> reviews)</small>
+            </div>
+
+            <div class="review-list">—</div>
+
+            <!-- Review Form -->
+            <form class="review-form" data-product-id="${product.id}">
+              <div class="star-selector">
+                <span data-value="1">☆</span>
+                <span data-value="2">☆</span>
+                <span data-value="3">☆</span>
+                <span data-value="4">☆</span>
+                <span data-value="5">☆</span>
+              </div>
+              <input type="hidden" name="rating" value="0" required>
+              <textarea name="review" rows="3" maxlength="200" placeholder="Share your Ayurvedic experience..."></textarea>
+              <div class="char-counter">0/200</div>
+              <button type="submit">Submit Review</button>
+            </form>
+          </div>
+
+          <div class="qty-selector">
+            <button class="minus">-</button>
+            <span class="qty">1</span>
+            <button class="plus">+</button>
+          </div>
+          <button class="add-to-cart">Add to Cart</button>
+        `;
+
+        container.appendChild(card);
+
+        // Review expand/collapse + lazy load
+        const toggleBtn = card.querySelector(".toggle-reviews-btn");
+        const reviewsSection = card.querySelector(".reviews");
+        toggleBtn.addEventListener("click", async () => {
+          const nowOpen = reviewsSection.style.display !== "block";
+          reviewsSection.style.display = nowOpen ? "block" : "none";
+          toggleBtn.textContent = nowOpen ? "Hide Reviews" : "Show Reviews";
+          if (nowOpen) {
+            await ensureReviewsLoaded(card, product.id);
+          }
+        });
+
+        attachReviewEvents(card, product);
+      }
+
+      attachProductEvents();
+    }
+
+    // --- Search + Sort (debounced search) ---
+    document.getElementById("searchBox").addEventListener("input", debounce((e)=>{
+      filteredProducts = products.filter(p=>p.name.toLowerCase().includes(e.target.value.toLowerCase()));
+      renderProducts();
+    }, 250));
+
+    document.getElementById("sortBox").addEventListener("change",(e)=>{
+      const sort=e.target.value;
+      if(sort==="low"){filteredProducts.sort((a,b)=>a.price-b.price);}
+      else if(sort==="high"){filteredProducts.sort((a,b)=>b.price-a.price);}
+      renderProducts();
+    });
+
+    // --- Init ---
     renderProducts();
-  }
-
-  searchBox?.addEventListener("input", debounce(applyFilters, 300));
-  categoryBox?.addEventListener("change", applyFilters);
-  priceBox?.addEventListener("change", applyFilters);
-
-  /* ====== Init ====== */
-  renderProducts();
-  updateCartCount();
-});
-</script>
+    updateCartCount();
+  </script>
 </body>
 </html>

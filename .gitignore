@@ -1,3 +1,22 @@
+# Environment & Secrets
 .env
-.vercel
 serviceAccountKey.json
+
+# Python virtual environments
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS / editor files
+*.DS_Store
+*.log
+*.sqlite3
+.idea/
+.vscode/
+*.swp

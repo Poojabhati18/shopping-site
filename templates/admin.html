@@ -10,11 +10,10 @@
         th, td { border:1px solid #ddd; padding:10px; text-align:left; }
         th { background:#333; color:#fff; }
         tr:nth-child(even) { background:#f9f9f9; }
-        .btn { padding:5px 10px; margin-right:5px; text-decoration:none; border-radius:4px; cursor:pointer; }
-        .pending { background:#ff9800; color:white; border:none; }
-        .completed { background:#4caf50; color:white; border:none; }
-        .cancelled { background:#f44336; color:white; border:none; }
-        form { display:inline; }
+        .btn { padding:5px 10px; margin-right:5px; text-decoration:none; border-radius:4px; }
+        .pending { background:#ff9800; color:white; }
+        .completed { background:#4caf50; color:white; }
+        .cancelled { background:#f44336; color:white; }
     </style>
 </head>
 <body>
@@ -43,23 +42,10 @@
                 
                 {% if order.order_status != "Completed" %}
                 <td>
-                    <!-- Cancel -->
-                    <form action="{{ url_for('update_order', order_id=order.id, status='Cancelled') }}" method="POST">
-                        <button class="btn cancelled" type="submit">Cancel</button>
-                    </form>
-
-                    <!-- Complete -->
-                    <form action="{{ url_for('update_order', order_id=order.id, status='Completed') }}" method="POST">
-                        <button class="btn completed" type="submit">Complete</button>
-                    </form>
-
-                    <!-- Pending -->
-                    <form action="{{ url_for('update_order', order_id=order.id, status='Pending') }}" method="POST">
-                        <button class="btn pending" type="submit">Pending</button>
-                    </form>
+                    <a href="{{ url_for('update_order', order_id=order.id, status='Cancelled') }}">Cancel</a>
+<a href="{{ url_for('update_order', order_id=order.id, status='Completed') }}">Complete</a>
+                    <a class="btn pending" href="/update_order/{{ order.id }}/Pending">Pending</a>
                 </td>
-                {% else %}
-                <td>-</td>
                 {% endif %}
             </tr>
             {% else %}
@@ -67,5 +53,19 @@
             {% endfor %}
         </tbody>
     </table>
+
+<div class="admin-notifications">
+  <h3>🔔 Notifications</h3>
+  <ul>
+    {% for notification in notifications %}
+      <li style="font-weight: {% if not notification.read %}bold{% endif %};">
+        {{ notification.message }} - {{ notification.timestamp.strftime('%Y-%m-%d %H:%M') }}
+        {% if not notification.read %}
+          <a href="{{ url_for('mark_notification_read', notification_id=notification.id) }}">Mark Read</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
 </body>
 </html>
