@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from werkzeug.security import check_password_hash
-
+from firebase_admin import firestore
 from firebase_config import db  # Updated Firebase config
 from order_emails import notify_customer  # Your email helper
 
@@ -225,7 +225,7 @@ def admin_dashboard():
     orders = []
     try:
         orders_ref = db.collection("orders").order_by(
-            "date_ordered", direction=db._client.Query.DESCENDING
+            "date_ordered", direction=firestore.Query.DESCENDING
         )
         for doc in orders_ref.stream():
             try:
