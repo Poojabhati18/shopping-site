@@ -292,6 +292,21 @@
   gap: 15px;
   margin: 20px 0;
   flex-wrap: wrap;
+
+  /* 👇 added for sticky top */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fff; /* so products don’t overlap behind */
+  padding: 12px 20px;
+  border-bottom: 1px solid #ddd;
+  z-index: 1000;
+}
+
+/* push products down so they don’t hide behind fixed bar */
+.products-container {
+  margin-top: 100px; /* adjust depending on .filter-buttons height */
 }
 
 .filter-buttons button {
@@ -330,12 +345,13 @@
 
   <div class="controls">
     <input type="text" id="searchBox" placeholder="Search products..." />
+
    <!-- Category Dropdown -->
 <select id="categoryBox">
   <option value="all">All Categories</option>
   <option value="wellness">Wellness</option>
   <option value="medicinal">Medicinal</option>
-  <option value="dailyuse"> Daily-Use</option>
+  <option value="personalcare">Personal Care</option>
 </select>
 
 <!-- Price Sort Dropdown -->

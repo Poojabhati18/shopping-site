@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify You Are Human</title>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <style>
+    /* Full-screen centered container */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to bottom, #f0f4f8, #d9e2ec);
+    }
+
+    .verify-container {
+      background: white;
+      padding: 30px 25px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .verify-container h1 {
+      font-size: 22px;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .btn-verify {
+      margin-top: 20px;
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      width: 100%;
+    }
+
+    .btn-verify:hover {
+      background-color: #45a049;
+    }
+
+    @media (max-width: 500px) {
+      .verify-container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="verify-container">
+    <h1>Welcome! Please verify you are human</h1>
+    <form action="{{ url_for('verify') }}" method="POST">
+      <div class="g-recaptcha" data-sitekey="{{ site_key }}"></div>
+      <button type="submit" class="btn-verify">Enter Website</button>
+    </form>
+  </div>
+</body>
+</html>
