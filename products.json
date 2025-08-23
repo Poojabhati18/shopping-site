@@ -129,21 +129,21 @@
         "name": "Kavachprash",
         "price": 1424,
         "description": "",
-        "image": "images/kavachprash",
+        "image": "images/kavachprash.jpeg",
         "categories": ["wellness", "medicinal"]
     },
     {
         "name": "No Vedana Gel",
         "price": 319,
         "description": "",
-        "image": "images/novedanagel",
+        "image": "images/novedanagel.jpeg",
         "categories": ["medicinal"]
     },
     {
         "name": "No Vedana Capsule",
         "price": 1265,
         "description": "",
-        "image": "images/novedanacap",
+        "image": "images/novedanacap.jpeg",
         "categories": ["medicinal"]
     },
     {
