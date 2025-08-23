@@ -54,13 +54,13 @@
       background:#fff;
     }
 
-    .container {
+    .container, #productList {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
       max-width: 1100px;
       margin: 0 auto 80px;
       padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
     }
 
     .product-card {
@@ -70,20 +70,26 @@
       overflow: hidden;
       transition: transform 0.2s ease;
       position: relative;
-      padding-bottom: 15px;
+      display: flex;
+      flex-direction: column;
     }
-    .product-card:hover { transform: translateY(-5px); }
+    .product-card:hover {
+      transform: translateY(-8px) scale(1.03);  /* card lifts and grows slightly */
+      box-shadow: 0 12px 24px rgba(61, 90, 64, 0.25);  /* deeper shadow */
+      order: 2px solid var(--leaf);
+      z-index: 10;  /* ensures it stays above neighbors */
+    }
 
     .product-card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
+     width: 100%;
+     aspect-ratio: 1 / 1; /* Keeps square 1080x1080 aspect ratio */
+     object-fit: cover;
+     border-radius: 10px 10px 0 0;
     }
 
-    .product-card h2 {
-      margin: 10px 20px 5px;
-      color: var(--green-1);
-      font-size: 1.2rem;
+    .product-card h2, .product-card p, .product-card .price, .product-card .btn {
+     margin: 8px 15px;
+     text-align: center;
     }
 
     .product-card p {
@@ -146,7 +152,16 @@
       padding: 10px 0 0;
       border-top: 1px solid #e6e6e6;
     }
-    .review-item { margin-bottom: 10px; }
+    .review-item {
+      margin-bottom: 10px;
+    }
+
+    .review-stars {
+      display: inline-block;
+      font-size: 1.1rem;
+      color: #f7d000; /* golden stars */
+      margin-right: 8px;
+    }
 
     .average-rating{
       display:flex;
@@ -320,6 +335,7 @@
   <option value="all">All Categories</option>
   <option value="wellness">Wellness</option>
   <option value="medicinal">Medicinal</option>
+  <option value="dailyuse"> Daily-Use</option>
 </select>
 
 <!-- Price Sort Dropdown -->
@@ -379,57 +395,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ====== Render Products ====== */
   function renderProducts() {
-    const container = document.getElementById("productList");
-    if(!container) return;
+  const container = document.getElementById("productList");
+  if (!container) return;
 
-    container.innerHTML = "";
+  container.innerHTML = ""; // clear old items
 
-    filteredProducts.forEach(product => {
-      const card = document.createElement("div");
-      card.className = "product-card";
-      card.dataset.id = product.id;
+  filteredProducts.forEach(product => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.dataset.id = product.id;
 
-      card.innerHTML = `
-        <img src="${product.image_url}" alt="${product.name}">
-        <h2>${product.name}</h2>
-        <p class="price">₹${product.price}</p>
-        <div class="qty-selector">
-          <button class="minus">-</button>
-          <span class="qty">1</span>
-          <button class="plus">+</button>
+    card.innerHTML = `
+      <img src="${product.image_url}" alt="${product.name}">
+      <h2>${product.name}</h2>
+      <p class="price">₹${product.price}</p>
+      <div class="qty-selector">
+        <button class="minus">-</button>
+        <span class="qty">1</span>
+        <button class="plus">+</button>
+      </div>
+      <button class="add-to-cart">Add to Cart</button>
+      <button class="show-description-btn btn">Description</button>
+      <button class="toggle-reviews-btn">Show Reviews</button>
+      <div class="reviews" style="display:none;">
+        <div class="average-rating" data-product-id="${product.id}">
+          <span class="avg-stars">☆☆☆☆☆</span>
+          <span class="avg-num">-</span>
+          <small>(<span class="count">0</span> reviews)</small>
         </div>
-        <button class="add-to-cart">Add to Cart</button>
-        <button class="show-description-btn btn">Description</button>
-        <button class="toggle-reviews-btn">Show Reviews</button>
-        <div class="reviews" style="display:none;">
-          <div class="average-rating" data-product-id="${product.id}">
-            <span class="avg-stars">☆☆☆☆☆</span>
-            <span class="avg-num">-</span>
-            <small>(<span class="count">0</span> reviews)</small>
+        <div class="review-list">—</div>
+        <form class="review-form" data-product-id="${product.id}">
+          <div class="star-selector">
+            <span data-value="1">☆</span>
+            <span data-value="2">☆</span>
+            <span data-value="3">☆</span>
+            <span data-value="4">☆</span>
+            <span data-value="5">☆</span>
           </div>
-          <div class="review-list">—</div>
-          <form class="review-form" data-product-id="${product.id}">
-            <div class="star-selector">
-              <span data-value="1">☆</span>
-              <span data-value="2">☆</span>
-              <span data-value="3">☆</span>
-              <span data-value="4">☆</span>
-              <span data-value="5">☆</span>
-            </div>
-            <input type="hidden" name="rating" value="0">
-            <textarea name="review" rows="3" maxlength="200" placeholder="Share your experience..."></textarea>
-            <div class="char-counter">0/200</div>
-            <button type="submit">Submit Review</button>
-          </form>
-        </div>
-      `;
+          <input type="hidden" name="rating" value="0">
+          <textarea name="review" rows="3" maxlength="200" placeholder="Share your experience..."></textarea>
+          <div class="char-counter">0/200</div>
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+    `;
 
-      container.appendChild(card);
-      attachProductEvents(card, product);
-      attachReviewEvents(card, product);
-      ensureReviewsLoaded(card, product.id);
-    });
-  }
+    container.appendChild(card);
+    attachProductEvents(card, product);
+    attachReviewEvents(card, product);
+    ensureReviewsLoaded(card, product.id);
+  });
+}
+
 
   /* ====== Product Events ====== */
   function attachProductEvents(card, product) {
@@ -488,7 +505,11 @@ function renderReviews(list, container, avgContainer){
     total+=Number(r.rating)||0;
     const el=document.createElement("div");
     el.className="review-item";
-    el.innerHTML=`<div>⭐️`.repeat(r.rating)+`</div><div>${r.review}</div><small>${new Date(r.timestamp).toLocaleString()}</small>`;
+    el.innerHTML = `
+      <span class="review-stars">${"⭐️".repeat(r.rating)}</span>
+      <div>${r.review}</div>
+      <small>${new Date(r.timestamp).toLocaleString()}</small>
+    `;
     container.appendChild(el);
   });
   const avg = total/list.length;
@@ -567,7 +588,7 @@ async function ensureReviewsLoaded(card, productId){
         <h2>${product.name}</h2>
         <p>${product.description || "No description available."}</p>
         <p class="price">₹${product.price}</p>
-        <button id="closeModal" style="position:absolute;top:10px;right:10px;">Close</button>
+        <button id="closeModal" class="btn" style="position:absolute;top:10px;right:10px;">X</button>
       </div>
     `;
     document.body.appendChild(modal);
@@ -577,35 +598,45 @@ async function ensureReviewsLoaded(card, productId){
   }
 
   /* ====== Filters: Search + Category + Price ====== */
-  const searchBox = document.getElementById("searchBox");
-  const categoryBox = document.getElementById("categoryBox");
-  const priceBox = document.getElementById("priceBox");
+const searchBox = document.getElementById("searchBox");
+const categoryBox = document.getElementById("categoryBox");
+const priceBox = document.getElementById("priceBox");
 
-  function applyFilters() {
-    let tempProducts = [...products];
+function applyFilters() {
+  let tempProducts = [...products];
 
-    const categoryVal = categoryBox?.value || "all";
-    if(categoryVal !== "all") tempProducts = tempProducts.filter(p => p.category === categoryVal);
-
-    const searchTerm = searchBox?.value.trim().toLowerCase() || "";
-    if(searchTerm !== "") {
-      tempProducts = tempProducts.filter(p =>
-        p.name.toLowerCase().includes(searchTerm) ||
-        (p.description && p.description.toLowerCase().includes(searchTerm))
-      );
-    }
-
-    const priceVal = priceBox?.value || "default";
-    if(priceVal === "low") tempProducts.sort((a,b)=>a.price-b.price);
-    else if(priceVal === "high") tempProducts.sort((a,b)=>b.price-a.price);
-
-    filteredProducts = tempProducts;
-    renderProducts();
+  // ====== Category filter ======
+  const categoryVal = categoryBox?.value || "all";
+  if (categoryVal !== "all") {
+    tempProducts = tempProducts.filter(p =>
+      Array.isArray(p.categories)
+        ? p.categories.includes(categoryVal)   // ✅ supports multiple categories
+        : p.category === categoryVal           // ✅ fallback if product has single category
+    );
   }
 
-  searchBox?.addEventListener("input", debounce(applyFilters, 300));
-  categoryBox?.addEventListener("change", applyFilters);
-  priceBox?.addEventListener("change", applyFilters);
+  // ====== Search filter ======
+  const searchTerm = searchBox?.value.trim().toLowerCase() || "";
+  if (searchTerm !== "") {
+    tempProducts = tempProducts.filter(p =>
+      p.name.toLowerCase().includes(searchTerm) ||
+      (p.description && p.description.toLowerCase().includes(searchTerm))
+    );
+  }
+
+  // ====== Price filter ======
+  const priceVal = priceBox?.value || "default";
+  if (priceVal === "low") tempProducts.sort((a, b) => a.price - b.price);
+  else if (priceVal === "high") tempProducts.sort((a, b) => b.price - a.price);
+
+  filteredProducts = tempProducts;
+  renderProducts();
+}
+
+// ====== Event Listeners ======
+searchBox?.addEventListener("input", debounce(applyFilters, 300));
+categoryBox?.addEventListener("change", applyFilters);
+priceBox?.addEventListener("change", applyFilters);
 
   /* ====== Init ====== */
   renderProducts();

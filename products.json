@@ -3,427 +3,484 @@
         "name": "Cough Neel",
         "price": 214,
         "description": "",
-        "image": "",
-        "category": "medicinal"
+        "image": "images/cofnil.jpeg",
+        "categories": ["medicinal"]
+    },
+    {
+        "name": "Anti-dandruff Shampoo",
+        "price": 374,
+        "description": "",
+        "image": "images/antishampoo.jpeg",
+        "categories": ["dailyuse"]
+    },
+    {
+        "name": "Complete Care Shampoo",
+        "price": 374,
+        "description": "",
+        "image": "images/careshampoo.jpeg",
+        "categories": ["dailyuse"]
+    },
+    {
+        "name": "Multi-Complextion Cream",
+        "price": 374,
+        "description": "",
+        "image": "images/facecream.jpeg",
+        "categories": ["dailyuse"]
+    },
+    {
+        "name": "3-1 Face Wash",
+        "price": 198,
+        "description": "",
+        "image": "images/31facewash.jpeg",
+        "categories": ["dailyuse"]
+    },
+    {
+        "name": "Radiant Glow Face Wash",
+        "price": 258,
+        "description": "",
+        "image": "images/radiantfacewash.jpeg",
+        "categories": ["dailyuse"]
     },
     {
         "name": "9e5 Premium Health Drink",
         "price": 4070,
         "description": "",
-        "image": "",
-        "category": "wellness"
+        "image": "images/9e5.jpeg",
+        "categories": ["wellness", "medicinal"]
     },
     {
-        "name": "Multiguard Blood Purifier",
+        "name": "Multigard Blood Purifier",
         "price": 418,
         "description": "",
-        "image": "",
-        "category": "medicinal"
+        "image": "images/multigard.jpeg",
+        "categories": ["wellness", "medicinal"]
     },
     {
         "name": "Spirulina Gold Capsules",
         "price": 1650,
         "description": "",
-        "image": "",
-        "category": "medicinal"
+        "image": "images/spirulina.jpeg",
+        "categories": ["wellness", "medicinal"]
     },
     {
-        "name": "Women's Campaign",
+        "name": "Woman Companion",
         "price": 374,
         "description": "",
-        "image": "",
-        "category": "wellness"
+        "image": "images/womancompanion.jpeg",
+        "categories": ["medicinal"]
     },
     {
         "name": "Nutrilife (Vanilla)",
         "price": 2640,
         "description": "",
-        "image": "",
-        "category": "wellness"
+        "image": "images/nutrilifeV.jpeg",
+        "categories": ["wellness", "medicinal", "dailyuse"]
     },
     {
-        "name": "Leave-A-Gain Liquid",
-        "price": 264,
+        "name": "Nutrilife (Cocolate)",
+        "price": 2640,
         "description": "",
-        "image": "",
-        "category": "medicinal"
+        "image": "images/nutrilifeC.jpeg",
+        "categories": ["wellness", "medicinal", "dailyuse"]
     },
     {
-        "name": "Dybalalife",
-        "price": 2750,
+        "name": "Nutrilife (Mango)",
+        "price": 2640,
         "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Wound Healing Creams",
-        "price": 214,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Kavachprash",
-        "price": 1424,
-        "description": "",
-        "image": "",
-        "category": "wellness"
-    },
-    {
-        "name": "No Pain Prison",
-        "price": 319,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Morigo Capsule",
-        "price": 790,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Champi Champion Oil",
-        "price": 577,
-        "description": "",
-        "image": "",
-        "category": "wellness"
-    },
-    {
-        "name": "Vitamin C",
-        "price": 700,
-        "description": "",
-        "image": "",
-        "category": "wellness"
-    },
-    {
-        "name": "Mann - Shaktimaan Capsule",
-        "price": 1375,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Herbal Toothpaste",
-        "price": 194,
-        "description": "",
-        "image": "",
-        "category": "wellness"
-    },
-    {
-        "name": "Fight Stress Capsule",
-        "price": 1122,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Mahabhungraj Herbal Hair Oil",
-        "price": 484,
-        "description": "",
-        "image": "",
-        "category": "wellness"
-    },
-    {
-        "name": "Well Heart Capsule",
-        "price": 797,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Milk and Strawberry Soap",
-        "price": 108,
-        "description": "",
-        "image": "",
-        "category": "wellness"
-    },
-    {
-        "name": "No Pain Capsule",
-        "price": 1265,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Neem Sanu",
-        "price": 108,
-        "description": "",
-        "image": "",
-        "category": "wellness"
-    },
-    {
-        "name": "Immuno-3 Plus Capsule",
-        "price": 1034,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Sandalwood Soap",
-        "price": 108,
-        "description": "",
-        "image": "",
-        "category": "wellness"
-    },
-    {
-        "name": "Live-A Gain Capsule",
-        "price": 990,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Turmeric Soap",
-        "price": 108,
-        "description": "",
-        "image": "",
-        "category": "wellness"
-    },
-    {
-        "name": "Daily Detox Capsule",
-        "price": 990,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Papaya Soap",
-        "price": 108,
-        "description": "",
-        "image": "",
-        "category": "wellness"
-    },
-    {
-        "name": "Billo-37 Capsule",
-        "price": 1001,
-        "description": "",
-        "image": "",
-        "category": "medicinal"
-    },
-    {
-        "name": "Strawberry Body Butter Moisturizer Cream",
-        "price": 330,
-        "description": "",
-        "image": "",
-        "category": "wellness"
+        "image": "images/nutrilifeM.jpeg",
+        "categories": ["wellness", "medicinal", "dailyuse"]
     },
     {
         "name": "Protein Powder",
         "price": 3080,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     },
     {
-        "name": "Desi Kawaha Green Tea",
-        "price": 209,
+        "name": "Liv-A-Gain Liquid",
+        "price": 264,
+        "description": "",
+        "image": "images/livliquid.jpeg",
+        "categories": ["medicinal", "wellness"]
+    },
+    {
+        "name": "Liv-A-Gain Capsule",
+        "price": 990,
+        "description": "",
+        "image": "images/livcap.jpeg",
+        "categories": ["medicinal", "wellness"]
+    },
+    {
+        "name": "DibaLife",
+        "price": 2750,
+        "description": "",
+        "image": "images/dibalife.jpeg",
+        "categories": ["medicinal"]
+    },
+    {
+        "name": "Wound Healing Cream",
+        "price": 214,
+        "description": "",
+        "image": "images/woundhealing.jpeg",
+        "categories": ["medicinal"]
+    },
+    {
+        "name": "Kavachprash",
+        "price": 1424,
+        "description": "",
+        "image": "images/kavachprash",
+        "categories": ["wellness", "medicinal"]
+    },
+    {
+        "name": "No Vedana Gel",
+        "price": 319,
+        "description": "",
+        "image": "images/novedanagel",
+        "categories": ["medicinal"]
+    },
+    {
+        "name": "No Vedana Capsule",
+        "price": 1265,
+        "description": "",
+        "image": "images/novedanacap",
+        "categories": ["medicinal"]
+    },
+    {
+        "name": "Moringo Capsule",
+        "price": 790,
+        "description": "",
+        "image": "images/moringo.jpeg",
+        "categories": ["medicinal", "wellness"]
+    },
+    {
+        "name": "Champi Champion Oil",
+        "price": 577,
+        "description": "",
+        "image": "images/champichampion.jpeg",
+        "categories": ["wellness", "medicinal"]
+    },
+    {
+        "name": "Vitamin C",
+        "price": 700,
+        "description": "",
+        "image": "images/vitaminC.jpeg",
+        "categories": ["wellness", "medicinal"]
+    },
+    {
+        "name": "MAN Shakti-man Capsule",
+        "price": 1375,
+        "description": "",
+        "image": "images/manshakti.jpeg",
+        "categories": ["medicinal", "wellness"]
+    },
+    {
+        "name": "Herbal Toothpaste",
+        "price": 194,
+        "description": "",
+        "image": "images/herbaltoothpaste.jpeg",
+        "categories": ["dailyuse", "medicinal", "wellness"]
+    },
+    {
+        "name": "Red Herbal Toothpaste",
+        "price": 205,
+        "description": "",
+        "image": "images/redherbaltoothpaste.jpeg",
+        "categories": ["dailyuse", "medicinal", "wellness"]
+    },
+    {
+        "name": "Fresh-O-Guard Toothpaste",
+        "price": 262,
+        "description": "",
+        "image": "images/freshtoothpaste.jpeg",
+        "categories": ["dailyuse", "medicinal", "wellness"]
+    },
+    {
+        "name": "Phyt Stress Capsule",
+        "price": 1122,
+        "description": "",
+        "image": "images/phytstress.jpeg",
+        "categories": ["medicinal"]
+    },
+    {
+        "name": "Mahabhrungraj Herbal Hair Oil",
+        "price": 484,
+        "description": "",
+        "image": "images/bhringraj.jpeg",
+        "categories": ["wellness", "medicinal", "dailyuse"]
+    },
+    {
+        "name": "Well Heart Capsule",
+        "price": 797,
+        "description": "",
+        "image": "images/wellheart.jpeg",
+        "categories": ["medicinal", "wellness"]
+    },
+    {
+        "name": "Neem Soap",
+        "price": 108,
+        "description": "",
+        "image": "images/neemsoap.jpeg",
+        "categories": ["wellness", "medicinal", "dailyuse"]
+    },
+    {
+        "name": "Milk and Strawberry Soap",
+        "price": 108,
+        "description": "",
+        "image": "images/strawberrysoap.jpeg",
+        "categories": ["wellness", "medicinal", "dailyuse"]
+    },
+    {
+        "name": "Sandalwood Soap",
+        "price": 108,
+        "description": "",
+        "image": "images/sandalsoap.jpeg",
+        "categories": ["wellness", "medicinal", "dailyuse"]
+    },
+    {
+        "name": "Turmeric Soap",
+        "price": 108,
+        "description": "",
+        "image": "images/turmericsoap.jpeg",
+        "categories": ["wellness", "medicinal", "dailyuse"]
+    },
+    {
+        "name": "Papaya Soap",
+        "price": 108,
+        "description": "",
+        "image": "images/papayasoap.jpeg",
+        "categories": ["wellness", "medicinal", "dailyuse"]
+    },
+    {
+        "name": "Immuno-3 Plus Capsule",
+        "price": 1034,
+        "description": "",
+        "image": "images/immuno.jpeg",
+        "categories": "medicinal"
+    },
+    {
+        "name": "Daily Detox Capsule",
+        "price": 990,
+        "description": "",
+        "image": "images/detox.jpeg",
+        "categories": "medicinal"
+    },
+    {
+        "name": "Below-37 Capsule",
+        "price": 1001,
+        "description": "",
+        "image": "images/below37.jpeg",
+        "categories": "medicinal"
+    },
+    {
+        "name": "Strawberry Body Butter Moisturizer Cream",
+        "price": 330,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     },
     {
-        "name": "Natsium",
+        "name": "Natcium",
         "price": 1375,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Kashmiri Kwaha Green Tea",
         "price": 418,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     },
     {
         "name": "Morolife",
         "price": 3300,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Herbal Roll-On Inhaler",
         "price": 192,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     },
     {
-        "name": "Sachklova Capsule",
+        "name": "Cyclova Capsule",
         "price": 2200,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Hair Color Shampoo",
         "price": 110,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     },
     {
         "name": "Antiallergy Liquid",
         "price": 385,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
-        "name": "ThaiHealth Liquid",
+        "name": "ThyHealth Liquid",
         "price": 770,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Ayushvaas",
         "price": 1430,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
-        "name": "Yuri Flush-3 Liquid",
+        "name": "Uri Flush-3 Liquid",
         "price": 522,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
-        "name": "Yuri Flush-3 Plus Tablet",
+        "name": "Uri Flush-3 Plus Tablet",
         "price": 1210,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Filling Iron Liquid",
         "price": 418,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Filling Iron Capsule",
         "price": 852,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Ayuhill",
         "price": 242,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
-        "name": "Prof. Nasal Nozzle Spray",
+        "name": "Pro Nasika Nozzle Spray",
         "price": 200,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
-        "name": "Energy Drop",
+        "name": "E-nergy Drop",
         "price": 209,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Probiotic - G Plus Capsule",
         "price": 825,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Herbal Antacid Tablet",
         "price": 550,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
-        "name": "Ayurvedic Drop",
+        "name": "Ayu-Vir Drop",
         "price": 320,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Full and Easy Powder",
         "price": 720,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Nerve Energy",
         "price": 1015,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
         "name": "Piles CC Tablet",
         "price": 675,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
-        "name": "Piles C C Cream",
+        "name": "Piles CC Cream",
         "price": 340,
         "description": "",
         "image": "",
-        "category": "medicinal"
+        "categories": "medicinal"
     },
     {
-        "name": "EGA-12 Day Protection Sequence",
+        "name": "EGA-12 Day Protection Cream",
         "price": 671,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     },
     {
-        "name": "EGA-12 Night Protection Sequence",
+        "name": "EGA-12 Night Protection Cream",
         "price": 671,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     },
     {
         "name": "Under Eye Gel",
         "price": 297,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     },
     {
-        "name": "Privy Posh",
+        "name": "Privy Wash",
         "price": 363,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     },
     {
         "name": "8 in 1 Hair Conditioner",
         "price": 451,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     },
     {
         "name": "Nu Woman Sanitary Pads",
         "price": 357,
         "description": "",
         "image": "",
-        "category": "wellness"
+        "categories": "wellness"
     }
+    
 ]

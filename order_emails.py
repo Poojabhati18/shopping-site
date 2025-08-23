@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 SENDER_EMAIL = "digvijaybhati33@gmail.com"
 SENDER_PASS = "obrvekonagzhtmdx"  # Use App Password (not Gmail password)
 SHOP_NAME = "AyuHealth"
-SHOP_WEBSITE = "https://yourshop.com"
+SHOP_WEBSITE = "https://ayuhealth.onrender.com"
 
 # ---------- Build Email Template ----------
 def build_order_email(customer_name, cart_html, status):
