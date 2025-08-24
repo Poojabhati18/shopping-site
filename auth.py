@@ -52,17 +52,10 @@ def signup():
             'date_created': str(datetime.now())
         })
 
-        # Store in session
-        session['customer'] = {
-            'id': customer_ref.id,
-            'name': name,
-            'email': email
-        }
-
-        return redirect(url_for('home'))  # Redirect to home or profile page
+        flash("Signup successful! Please log in.", "success")
+return redirect(url_for('auth.login_customer'))
 
     return render_template('signup.html')
-
 
 # ================= LOGIN =================
 @auth.route('/loginC', methods=['GET', 'POST'])

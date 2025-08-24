@@ -18,6 +18,12 @@ app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
 # ================= REGISTER BLUEPRINT =================
 app.register_blueprint(auth)  # Customer auth routes (signup/login/logout)
 
+# ================= GLOBAL CONTEXT PROCESSOR =================
+@app.context_processor
+def inject_customer_global():
+    """Make logged-in customer available in all templates"""
+    return dict(customer=session.get('customer'))
+
 # ================= ENV VARIABLES =================
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")

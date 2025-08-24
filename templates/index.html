@@ -102,17 +102,19 @@
     <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
   </nav>
 
-<div class="profile-top-right">
-    {% if customer_name %}
-      <div class="profile-info">
-        <span class="profile-icon">👤</span>
-        <span class="profile-name">{{ customer_name }}</span>
-        <a href="{{ url_for('auth.logout_customer') }}" class="logout-link">Logout</a>
-      </div>
-    {% else %}
-      <a href="{{ url_for('auth.login_customer') }}" class="login-link">Login / Signup</a>
-    {% endif %}
-  </div>
+<div class="header-right">
+  {% if customer %}
+    <!-- Show profile icon and name if logged in -->
+    <a href="{{ url_for('auth.logout_customer') }}" style="text-decoration:none; color:#fff;">
+      <img src="{{ url_for('static', filename='profile_icon.png') }}" alt="Profile" style="width:25px; vertical-align:middle; border-radius:50%;">
+      {{ customer.name }}
+    </a>
+  {% else %}
+    <!-- Show login/signup buttons if not logged in -->
+    <a href="{{ url_for('auth.login_customer') }}">Login</a> |
+    <a href="{{ url_for('auth.signup') }}">Sign Up</a>
+  {% endif %}
+</div>
 
   {% if hottest_products %}
 <div class="hottest-products-section">
