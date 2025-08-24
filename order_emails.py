@@ -2,8 +2,8 @@ import smtplib
 from email.mime.text import MIMEText
 
 # ⚡ CONFIGURE THIS
-SENDER_EMAIL = "digvijaybhati33@gmail.com"
-SENDER_PASS = "obrvekonagzhtmdx"  # Use App Password (not Gmail password)
+SENDER_EMAIL = "elementsofvita@gmail.com"
+SENDER_PASS = "clypdjyejytbytec"  # Use App Password (not Gmail password)
 SHOP_NAME = "AyuHealth"
 SHOP_WEBSITE = "https://ayuhealth.onrender.com"
 

@@ -17,7 +17,7 @@ app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
 # ================= ENV VARIABLES =================
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
-TO_EMAIL = os.getenv("TO_EMAIL", "digvijaybhati33@gmail.com")
+TO_EMAIL = os.getenv("TO_EMAIL", "elementsofvita@gmail.com")
 
 ADMIN_USER = os.getenv("ADMIN_USER", "admin")
 ADMIN_PASS_HASH = os.getenv("ADMIN_PASS_HASH")  # Hashed password from .env
