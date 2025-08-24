@@ -233,6 +233,97 @@ def place_order():
         traceback.print_exc()
         return jsonify({"success": False, "message": f"Server error: {repr(e)}"}), 500
 
+# ================= Notifications =================
+@app.route('/admin/notifications/mark_read/<notification_id>')
+def mark_notification_read(notification_id):
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+    try:
+        db.collection("admin_notifications").document(notification_id).update({"read": True})
+    except Exception as e:
+        print("Error marking notification as read:", e)
+    return redirect(url_for("admin_dashboard"))
+
+# ================= REVIEWS =================
+@app.route("/api/reviews/<product_id>", methods=["GET"])
+def get_reviews(product_id):
+    return jsonify(REVIEWS.get(product_id, []))
+
+@app.route("/api/reviews/<product_id>", methods=["POST"])
+def post_review(product_id):
+    data = request.json
+    rating = data.get("rating")
+    review_text = data.get("review")
+    if not rating or not review_text:
+        return jsonify({"success": False, "message": "Missing fields"}), 400
+    REVIEWS.setdefault(product_id, []).append({
+        "rating": rating,
+        "review": review_text,
+        "timestamp": datetime.now().isoformat()
+    })
+    return jsonify({"success": True})
+
+# ================= ADMIN DASHBOARD =================
+@app.route('/admin')
+def admin_dashboard():
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+
+    # Fetch orders
+    orders = []
+    try:
+        orders_ref = db.collection("orders").order_by(
+            "date_ordered", direction=firestore.Query.DESCENDING
+        )
+        for doc in orders_ref.stream():
+            try:
+                order_data = doc.to_dict()
+                order_data["id"] = doc.id
+                orders.append(order_data)
+            except Exception as e:
+                print("Error processing order:", e)
+    except Exception as e:
+        print("Firebase fetch error:", e)
+        orders = []
+
+    # Fetch notifications
+    notifications = []
+    try:
+        notifications_ref = db.collection("admin_notifications").order_by(
+            "timestamp", direction=db._client.Query.DESCENDING
+        )
+        for n in notifications_ref.stream():
+            try:
+                notif = n.to_dict()
+                notif["id"] = n.id
+                notifications.append(notif)
+            except Exception as e:
+                print("Error processing notification:", e)
+    except Exception as e:
+        print("Firebase notifications error:", e)
+        notifications = []
+
+    return render_template("admin.html", orders=orders, notifications=notifications)
+
+# ================= Update / Cancel Order =================
+@app.route("/update_order/<order_id>/<status>", methods=["POST"])
+def update_order(order_id, status):
+    order_ref = db.collection("orders").document(order_id)
+    order = order_ref.get()
+    if not order.exists:
+        return jsonify({"success": False, "error": "Order not found"}), 404
+
+    order_data = order.to_dict()
+
+    if status == "Cancelled":
+        order_ref.delete()
+    else:
+        order_ref.update({"order_status": status})
+
+    # Send email
+    success, msg = notify_customer(order_data, status)
+    return jsonify({"success": success, "message": msg})
+
 # ================= RUN APP =================
 if __name__ == "__main__":
     app.run(debug=True)
