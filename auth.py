@@ -52,9 +52,10 @@ def signup():
             'date_created': str(datetime.now())
         })
 
-        flash("Signup successful! Please log in.", "success")
-return redirect(url_for('auth.login_customer'))
+        # Redirect to login page after signup
+        return redirect(url_for('auth.login_customer'))
 
+    # GET request renders signup page
     return render_template('signup.html')
 
 # ================= LOGIN =================
