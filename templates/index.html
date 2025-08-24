@@ -54,6 +54,41 @@
   margin-top: 8px;
   font-weight: bold;
 }
+
+.profile-top-right {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.profile-icon { font-size: 1.1rem; }
+.profile-name { font-weight: 600; }
+
+.logout-link, .login-link {
+  margin-left: 8px;
+  font-size: 0.85rem;
+  color: #fff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.logout-link:hover, .login-link:hover { color: #b0e57c; }
+
   </style>
 </head>
 <body>
@@ -66,6 +101,18 @@
     <button onclick="location.href='{{ url_for('about_page') }}'">👩‍⚕️ About Us</button>
     <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
   </nav>
+
+<div class="profile-top-right">
+    {% if customer_name %}
+      <div class="profile-info">
+        <span class="profile-icon">👤</span>
+        <span class="profile-name">{{ customer_name }}</span>
+        <a href="{{ url_for('auth.logout_customer') }}" class="logout-link">Logout</a>
+      </div>
+    {% else %}
+      <a href="{{ url_for('auth.login_customer') }}" class="login-link">Login / Signup</a>
+    {% endif %}
+  </div>
 
   {% if hottest_products %}
 <div class="hottest-products-section">

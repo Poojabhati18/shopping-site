@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login | AyuHealth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background-color: #f9f6f1; color: #2e2e2e; }
+    header { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; padding: 20px 0; text-align: center; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; }
+    nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 15px 10px; margin-top: 10px; }
+    nav button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: white; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; transition: all 0.2s ease; font-size: 0.95rem; }
+    nav button:hover { background: #3d5a40; }
+    .content { max-width: 400px; margin: 50px auto; background: #fff; padding: 30px; border-radius: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); text-align: center; }
+    .content h2 { font-size: 2rem; color: #3d5a40; margin-bottom: 20px; }
+    .content input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 12px; border: 1px solid #ccc; font-size: 1rem; }
+    .content button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin-top: 10px; transition: all 0.2s ease; }
+    .content button:hover { background: #3d5a40; }
+    .error-msg { color: red; margin-bottom: 10px; font-size: 0.9rem; }
+    .signup-link { margin-top: 15px; font-size: 0.95rem; }
+    .signup-link a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
+    .signup-link a:hover { text-decoration: underline; }
+    .checkbox-container { display: flex; align-items: center; font-size: 0.9rem; margin: 10px 0; text-align: left; }
+    .checkbox-container input { margin-right: 8px; }
+    .checkbox-container a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
+    .checkbox-container a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>🌿 AyuHealth</header>
+
+  <nav>
+    <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
+    <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
+    <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
+    <button onclick="location.href='{{ url_for('about_page') }}'">👩‍⚕️ About Us</button>
+    <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
+  </nav>
+
+  <div class="content">
+    <h2>Login</h2>
+    {% if error %}
+      <div class="error-msg">{{ error }}</div>
+    {% endif %}
+    <form method="POST" action="{{ url_for('login_user') }}">
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="password" name="password" placeholder="Password" required>
+      
+      <div class="checkbox-container">
+        <input type="checkbox" name="agree" required>
+        <span>By logging in, I agree to the <a href="{{ url_for('privacy_page') }}">Privacy Policy</a> and <a href="{{ url_for('terms_page') }}">Terms & Conditions</a>.</span>
+      </div>
+
+      <button type="submit">Login</button>
+    </form>
+    <div class="signup-link">
+      Don't have an account yet? <a href="{{ url_for('signup') }}">Create it here</a>
+    </div>
+  </div>
+</body>
+</html>
