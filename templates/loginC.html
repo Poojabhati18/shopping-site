@@ -42,7 +42,7 @@
     {% if error %}
       <div class="error-msg">{{ error }}</div>
     {% endif %}
-    <form method="POST" action="{{ url_for('login_user') }}">
+   <form method="POST" action="{{ url_for('auth.login_customer') }}">
       <input type="email" name="email" placeholder="Email" required>
       <input type="password" name="password" placeholder="Password" required>
       

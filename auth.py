@@ -2,6 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from firebase_config import db  # Your initialized Firestore
+from datetime import datetime
 
 auth = Blueprint('auth', __name__)
 
