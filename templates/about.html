@@ -1,187 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>About Us - AyuHealth</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f6f1;
-      color: #2e2e2e;
-    }
+{% extends "base.html" %}
 
-    header {
-      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
-      color: white;
-      padding: 1.5rem 0;
-      text-align: center;
-      font-size: 1.8rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      border-bottom-left-radius: 18px;
-      border-bottom-right-radius: 18px;
-    }
+{% block title %}About Us - Ayurvedic Store{% endblock %}
 
-    nav {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      padding: 12px 0;
-    }
+{% block content %}
+  <div class="header-right">
+    {% if customer %}
+      <a href="{{ url_for('auth.logout_customer') }}" style="text-decoration:none; color:#fff;">
+        <img src="{{ url_for('static', filename='profile_icon.png') }}" 
+             alt="Profile" 
+             style="width:25px; vertical-align:middle; border-radius:50%;">
+        {{ customer.name }}
+      </a>
+    {% else %}
+      <a href="{{ url_for('auth.login_customer') }}">Login</a> |
+      <a href="{{ url_for('auth.signup') }}">Sign Up</a>
+    {% endif %}
+  </div>
 
-    nav button {
-      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 25px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: all 0.2s ease;
-    }
+  <section class="about-section">
+    <h2>About Our Ayurvedic Store 🌿</h2>
+    <p>
+      Welcome to our Ayurvedic store, where we bring you traditional wellness and herbal care products 
+      rooted in the ancient wisdom of Ayurveda. Our mission is to provide natural remedies, 
+      promote holistic living, and ensure sustainable practices.
+    </p>
 
-    nav button:hover {
-      background: #3d5a40;
-    }
+    <p>
+      We offer a wide range of herbal medicines, wellness supplements, and personal care products 
+      made with 100% authentic ingredients. Your health and well-being are at the heart of everything we do.
+    </p>
 
-    .content {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 30px;
-      background: white;
-      border-radius: 18px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    }
+    <h3>Why Choose Us?</h3>
+    <ul>
+      <li>🌱 100% Natural & Herbal Products</li>
+      <li>🔬 Backed by Ayurvedic Research</li>
+      <li>🚚 Fast & Reliable Shipping</li>
+      <li>🤝 Trusted by Thousands of Customers</li>
+    </ul>
 
-    .content h2 {
-      color: #3d5a40;
-      font-size: 1.8rem;
-      margin-bottom: 15px;
-    }
-
-    .content p {
-      font-size: 1rem;
-      line-height: 1.6;
-      color: #555;
-      margin-bottom: 15px;
-    }
-
-    .content strong {
-      color: #2b4d3a;
-    }
-
-    .policy-buttons {
-      position: fixed;
-      bottom: 15px;
-      right: 20px;
-      display: flex;
-      gap: 12px;
-      z-index: 1000;
-    }
-
-    .policy-buttons button {
-      font-size: 0.85rem;
-      opacity: 0.8;
-      padding: 6px 12px;
-      background-color: transparent;
-      color: #3d5a40;
-      border-radius: 8px;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-
-    .policy-buttons button:hover {
-      background: #b0e57c33;
-      color: #2b4d3a;
-    }
-
-    .profile-top-right {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.profile-info {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, #5a7f65, #2b4d3a);
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 25px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.profile-icon { font-size: 1.1rem; }
-.profile-name { font-weight: 600; }
-
-.logout-link, .login-link {
-  margin-left: 8px;
-  font-size: 0.85rem;
-  color: #fff;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.logout-link:hover, .login-link:hover { color: #b0e57c; }
-
-  </style>
-</head>
-<body>
-
-<header>🌿 About Us - AyuHealth</header>
-
-<nav>
-  <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
-  <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
-  <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
-  <button onclick="location.href='{{ url_for('about_page') }}'">👩‍⚕️ About Us</button>
-  <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
-</nav>
-
-<div class="header-right">
-  {% if customer %}
-    <!-- Show profile icon and name if logged in -->
-    <a href="{{ url_for('auth.logout_customer') }}" style="text-decoration:none; color:#fff;">
-      <img src="{{ url_for('static', filename='profile_icon.png') }}" alt="Profile" style="width:25px; vertical-align:middle; border-radius:50%;">
-      {{ customer.name }}
-    </a>
-  {% else %}
-    <!-- Show login/signup buttons if not logged in -->
-    <a href="{{ url_for('auth.login_customer') }}">Login</a> |
-    <a href="{{ url_for('auth.signup') }}">Sign Up</a>
-  {% endif %}
-</div>
-
-<div class="content">
-  <h2>Who Are We?</h2>
-  <p>
-    Welcome to <strong>AyuHealth</strong>, your go-to destination for Ayurvedic medicines and wellness products labeled with India's own certification, Ayushmantralay. Our mission is simple — to make products that satisfy your needs.
-  </p>
-  <p>
-    What started as a small idea has now grown into a passionate project dedicated to bringing unique, personalized products to your doorstep. Each product is crafted by top Indian scientists who prioritize quality over quantity.
-  </p>
-  <p>
-    Whether you’re buying for yourself or gifting someone special, we promise to deliver something truly memorable.
-  </p>
-  <p><strong>Thank you for supporting us!</strong></p>
-</div>
-
-<div class="policy-buttons">
-  <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation & Refunds</button>
-  <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
-  <button onclick="location.href='{{ url_for('terms_page') }}'">Terms & Conditions</button>
-  <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
-</div>
-
-</body>
-</html>
+    <h3>Contact Us</h3>
+    <p>
+      📍 Address: A-205, Navajivan Flate near Asopalav Society Vatva, Ahmedabad GUJARAT-382440 <br>
+      📞 Phone: +91-8160597639 <br>
+      📧 Email: elementsofvita@gmail.com
+    </p>
+  </section>
+{% endblock %}

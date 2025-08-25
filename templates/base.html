@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}AyuHealth{% endblock %}</title>
+
+  <meta name="author" content="AyuHealth" />
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="logo">🌿 AyuHealth</div>
+    
+    <!-- Navbar -->
+    <nav class="navbar">
+      <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
+      <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
+      <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
+      <button onclick="location.href='{{ url_for('about_page') }}'">👩‍⚕️ About Us</button>
+      <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
+    </nav>
+
+    <!-- Profile / Login -->
+<div class="header-right">
+  {% if customer %}
+    <div class="profile-dropdown">
+      <div class="profile-toggle">
+        <img src="{{ url_for('static', filename='profile_icon.png') }}" alt="Profile" class="profile-icon">
+        <span class="customer-name">{{ customer.name }}</span>
+      </div>
+      <div class="dropdown-menu">
+        <button onclick="location.href='{{ url_for('auth.logout_customer') }}'">Logout</button>
+      </div>
+    </div>
+  {% else %}
+    <div class="auth-buttons">
+      <button onclick="location.href='{{ url_for('auth.login_customer') }}'">Login</button>
+      <button onclick="location.href='{{ url_for('auth.signup') }}'">Sign Up</button>
+    </div>
+  {% endif %}
+</div>
+
+
+  </header>
+
+  <!-- Page specific content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Policy Buttons -->
+  <footer>
+    <div class="policy-buttons">
+      <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation & Refunds</button>
+      <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
+      <button onclick="location.href='{{ url_for('terms_page') }}'">Terms & Conditions</button>
+      <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
+    </div>
+  </footer>
+</body>
+</html>
