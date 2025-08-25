@@ -91,6 +91,7 @@ def require_verification(f):
 @app.route("/home")
 @require_verification
 def home():
+    # Renders index.html which extends base.html
     return render_template("index.html", hottest_products=[])
 
 @app.route("/products")

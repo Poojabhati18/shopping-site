@@ -3,20 +3,6 @@
 {% block title %}About Us - Ayurvedic Store{% endblock %}
 
 {% block content %}
-  <div class="header-right">
-    {% if customer %}
-      <a href="{{ url_for('auth.logout_customer') }}" style="text-decoration:none; color:#fff;">
-        <img src="{{ url_for('static', filename='profile_icon.png') }}" 
-             alt="Profile" 
-             style="width:25px; vertical-align:middle; border-radius:50%;">
-        {{ customer.name }}
-      </a>
-    {% else %}
-      <a href="{{ url_for('auth.login_customer') }}">Login</a> |
-      <a href="{{ url_for('auth.signup') }}">Sign Up</a>
-    {% endif %}
-  </div>
-
   <section class="about-section">
     <h2>About Our Ayurvedic Store 🌿</h2>
     <p>

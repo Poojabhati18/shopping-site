@@ -3,20 +3,6 @@
 {% block title %}Your Cart - Ayurvedic Store{% endblock %}
 
 {% block content %}
-  <div class="header-right">
-    {% if customer %}
-      <a href="{{ url_for('auth.logout_customer') }}" style="text-decoration:none; color:#fff;">
-        <img src="{{ url_for('static', filename='profile_icon.png') }}" 
-             alt="Profile" 
-             style="width:25px; vertical-align:middle; border-radius:50%;">
-        {{ customer.name }}
-      </a>
-    {% else %}
-      <a href="{{ url_for('auth.login_customer') }}">Login</a> |
-      <a href="{{ url_for('auth.signup') }}">Sign Up</a>
-    {% endif %}
-  </div>
-
   <h2>Your Shopping Cart 🛒</h2>
 
   {% if cart %}
@@ -55,7 +41,7 @@
       <button type="submit" class="checkout-btn">Proceed to Checkout ✅</button>
     </form>
   {% else %}
-    <p>Your cart is empty. <a href="{{ url_for('products') }}">Browse Products</a></p>
+    <p>Your cart is empty. <a href="{{ url_for('products_page') }}">Browse Products</a></p>
   {% endif %}
 {% endblock %}
 

@@ -14,19 +14,4 @@
       Your journey to a healthier, more mindful lifestyle begins here.
     </p>
   </div>
-
-  <!-- Hottest Products Section -->
-  <div class="hottest-products-section">
-    <h2>🔥 Hottest Products</h2>
-    <div class="hottest-products-container">
-      {% for product in hottest_products %}
-        <div class="product-card">
-          <img src="{{ url_for('static', filename='images/' + product.image) }}" 
-               alt="{{ product.name }}" 
-               class="product-image">
-          <p class="product-name">{{ product.name }}</p>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
 {% endblock %}
