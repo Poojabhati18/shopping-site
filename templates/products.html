@@ -7,8 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 <meta name="theme-color" content="#4CAF50">
-  <style>
-:root{
+<style>
+  :root{
   --green-1:#3d5a40;
   --green-2:#5a7f65;
   --green-3:#2b4d3a;
@@ -16,6 +16,7 @@
   --leaf:#b0e57c;
   --text:#2e2e2e;
 }
+
 body {
   font-family: "Poppins", sans-serif;
   background: var(--bg);
@@ -23,311 +24,68 @@ body {
   padding: 0;
   color: var(--text);
 }
+
+/* Navbar */
 nav {
   display: flex;
+  align-items: center;
+  justify-content: space-between; /* spread left and right items */
   flex-wrap: wrap;
-  gap: 10px;
-  padding: 15px 20px;
-  background: var(--green-1);
+  gap: 12px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px 20px;
 }
-nav button {
-  background: var(--green-2);
+
+nav > button {
+  background: linear-gradient(135deg, #5a7f65, #2b4d3a);
   color: white;
   border: none;
-  padding: 10px 15px;
-  border-radius: 25px;
+  padding: 8px 16px;
+  border-radius: 20px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
-nav button:hover { background: var(--green-1); }
+nav > button:hover {
+  background: #3d5a40;
+}
 
+/* Controls (search + filters) */
 .controls {
   display: flex;
   gap: 10px;
-  max-width: 800px;   /* restrict total width */
+  max-width: 1000px; /* wider search area */
   margin: 20px auto;
   padding: 0 20px;
-  flex-wrap: wrap;    /* allow wrapping on small screens */
-  align-items: center; /* vertical alignment */
+  flex-wrap: wrap;
+  align-items: center;
 }
 
-.controls input, .controls select {
-  flex: 0 0 auto;      /* don't grow/shrink */
-  width: auto;         /* allow natural width */
+#searchBox {
+  flex: 1;           /* takes most space */
+  min-width: 400px;  /* ensures long search box */
   padding: 10px 15px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  background:#fff;
 }
 
-.container, #productList {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  max-width: 1100px;
-  margin: 0 auto 80px;
-  padding: 20px;
-}
-
-.product-card {
+#categoryBox, #priceBox {
+  flex: 0 0 150px;  /* smaller than search box */
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
   background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  overflow: hidden;
-  transition: transform 0.2s ease;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-.product-card:hover {
-  transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 12px 24px rgba(61, 90, 64, 0.25);
-  order: 2px solid var(--leaf);
-  z-index: 10;
 }
 
-.product-card img {
- width: 100%;
- aspect-ratio: 1 / 1;
- object-fit: cover;
- border-radius: 10px 10px 0 0;
-}
-
-.product-card h2, .product-card p, .product-card .price, .product-card .btn {
- margin: 8px 15px;
- text-align: center;
-}
-
-.product-card p {
-  margin: 5px 20px;
-  color: #555;
-}
-
-.price {
-  font-weight: bold;
-  color: var(--green-3);
-  margin: 10px 20px;
-}
-
-.btn, .add-to-cart, .toggle-reviews-btn {
-  background: linear-gradient(135deg, var(--green-2), var(--green-3));
-  color: #fff;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  margin: 5px 10px;
-}
-.btn:hover, .add-to-cart:hover, .toggle-reviews-btn:hover { background: var(--green-1); }
-
-.qty-selector {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin: 10px 0;
-}
-.qty-selector button {
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  font-weight: bold;
-  border:none;
-  background:#eee;
-  cursor:pointer;
-}
-.qty-selector button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-#cartCount.bump {
-  animation: bump 300ms ease;
-}
-@keyframes bump{
-  0%{ transform: scale(1); }
-  50%{ transform: scale(1.25); }
-  100%{ transform: scale(1); }
-}
-
-.reviews {
-  margin: 10px 20px;
-  padding: 10px 0 0;
-  border-top: 1px solid #e6e6e6;
-}
-.review-item {
-  margin-bottom: 10px;
-}
-.review-stars {
-  display: inline-block;
-  font-size: 1.1rem;
-  color: #f7d000;
-  margin-right: 8px;
-}
-.average-rating{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:10px;
-  font-weight:600;
-  color:#394d39;
-}
-.average-rating .avg-stars{
-  font-size:1.1rem;
-  letter-spacing:2px;
-}
-.average-rating small{ color:#666; font-weight:400; }
-
-.policy-links {
-  position: fixed;
-  bottom: 10px;
-  right: 20px;
-  display: flex;
-  flex-direction: row;
-  gap: 15px;
-  z-index: 999;
-}
-.policy-links a {
-  color: var(--green-1);
-  font-size: 0.85rem;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.policy-links a:hover {
-  color: var(--leaf);
-  text-decoration: underline;
-}
-
-.review-form {
-  background-color: #f4f7ed;
-  padding: 15px;
-  border-radius: 12px;
-  margin-top: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-.review-form textarea {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #cdd3c5;
-  background-color: #f0f6ed;
-  resize: none;
-  margin-bottom: 6px;
-  font-family: inherit;
-}
-.review-form .char-counter{
-  text-align:right;
-  font-size:.85rem;
-  color:#666;
-  margin-bottom:10px;
-}
-.review-form button[type="submit"] {
-  background-color: var(--green-2);
-  color: #fffdf6;
-  border: none;
-  border-radius: 12px;
-  padding: 10px;
-  width: 100%;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.review-form button[type="submit"]:hover { background-color: var(--green-1); }
-.review-form button[type="submit"][disabled]{ opacity:.7; cursor:not-allowed; }
-
-.star-selector {
-  user-select:none;
-  display:flex;
-  gap:6px;
-  margin-bottom:8px;
-}
-.star-selector span {
-  font-size: 1.8rem;
-  cursor: pointer;
-  color: #cdd3c5;
-  transition: transform 0.15s ease, color 0.2s ease;
-  display:inline-block;
-  line-height:1;
-}
-.star-selector span.selected, .star-selector span.hovered {
-  background: linear-gradient(90deg, #f7d000, #ffae00);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  transform: translateY(-1px) scale(1.05);
-}
-
-.toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fff;
-  border-radius: 12px;
-  padding: 10px 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-  font-weight: 500;
-  z-index: 2000;
-  animation: slideUp 0.25s ease, fadeOut 0.5s ease 2.6s forwards;
-}
-.toast.success { border-left: 5px solid var(--green-2); }
-.toast.error { border-left: 5px solid #c0392b; }
-.toast .icon { font-size:1.1rem; }
-
-@keyframes slideUp {
-  from { transform: translate(-50%, 20px); opacity: 0; }
-  to { transform: translate(-50%, 0); opacity: 1; }
-}
-@keyframes fadeOut { to { opacity: 0; transform: translate(-50%, 20px);} }
-
-.filter-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin: 20px 0;
-  flex-wrap: wrap;
-}
-
-.filter-buttons button {
-  background: linear-gradient(135deg, var(--green-2), var(--green-3));
-  color: #fff;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 30px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.filter-buttons button:hover {
-  background: linear-gradient(135deg, var(--green-3), var(--green-2));
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-}
-
-.filter-buttons button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(176, 229, 124, 0.5);
-}
-
-/* ==== Login / Signup / Profile Styles ==== */
+/* Profile / Auth Buttons on right */
 .header-right {
   display: flex;
-  align-items: center;
   gap: 10px;
-  font-size: 0.95rem;
+  align-items: center;
+  margin-left: auto; /* push to far right */
 }
 
-.auth-buttons {
-  display: flex;
-  gap: 10px;
-}
 .auth-buttons button {
   background: linear-gradient(135deg, var(--green-2), var(--green-3));
   color: #fff;
@@ -338,12 +96,12 @@ nav button:hover { background: var(--green-1); }
   font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.2s ease;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
 .auth-buttons button:hover {
   background: var(--green-1);
 }
 
+/* Profile dropdown */
 .profile-dropdown {
   position: relative;
   display: inline-block;
@@ -405,54 +163,319 @@ nav button:hover { background: var(--green-1); }
 .profile-dropdown:hover .dropdown-menu {
   display: block;
 }
-</style>
 
+/* Container & Product cards */
+.container, #productList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto 80px;
+  padding: 20px;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.product-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 12px 24px rgba(61, 90, 64, 0.25);
+  border: 2px solid var(--leaf);
+  z-index: 10;
+}
+.product-card img {
+ width: 100%;
+ aspect-ratio: 1 / 1;
+ object-fit: cover;
+ border-radius: 10px 10px 0 0;
+}
+.product-card h2, .product-card p, .product-card .price, .product-card .btn {
+ margin: 8px 15px;
+ text-align: center;
+}
+.product-card p {
+  margin: 5px 20px;
+  color: #555;
+}
+.price {
+  font-weight: bold;
+  color: var(--green-3);
+  margin: 10px 20px;
+}
+
+/* Buttons inside product cards */
+.btn, .add-to-cart, .toggle-reviews-btn {
+  background: linear-gradient(135deg, var(--green-2), var(--green-3));
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  margin: 5px 10px;
+}
+.btn:hover, .add-to-cart:hover, .toggle-reviews-btn:hover { 
+  background: var(--green-1); 
+}
+
+/* Quantity selector */
+.qty-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+.qty-selector button {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  font-weight: bold;
+  border:none;
+  background:#eee;
+  cursor:pointer;
+}
+.qty-selector button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+/* Cart animation */
+#cartCount.bump {
+  animation: bump 300ms ease;
+}
+@keyframes bump{
+  0%{ transform: scale(1); }
+  50%{ transform: scale(1.25); }
+  100%{ transform: scale(1); }
+}
+
+/* Reviews */
+.reviews {
+  margin: 10px 20px;
+  padding: 10px 0 0;
+  border-top: 1px solid #e6e6e6;
+}
+.review-item {
+  margin-bottom: 10px;
+}
+.review-stars {
+  display: inline-block;
+  font-size: 1.1rem;
+  color: #f7d000;
+  margin-right: 8px;
+}
+.average-rating{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:10px;
+  font-weight:600;
+  color:#394d39;
+}
+.average-rating .avg-stars{
+  font-size:1.1rem;
+  letter-spacing:2px;
+}
+.average-rating small{ color:#666; font-weight:400; }
+
+/* Policy links */
+.policy-links {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  z-index: 999;
+}
+.policy-links a {
+  color: var(--green-1);
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.policy-links a:hover {
+  color: var(--leaf);
+  text-decoration: underline;
+}
+
+/* Review form */
+.review-form {
+  background-color: #f4f7ed;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.review-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #cdd3c5;
+  background-color: #f0f6ed;
+  resize: none;
+  margin-bottom: 6px;
+  font-family: inherit;
+}
+.review-form .char-counter{
+  text-align:right;
+  font-size:.85rem;
+  color:#666;
+  margin-bottom:10px;
+}
+.review-form button[type="submit"] {
+  background-color: var(--green-2);
+  color: #fffdf6;
+  border: none;
+  border-radius: 12px;
+  padding: 10px;
+  width: 100%;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.review-form button[type="submit"]:hover { background-color: var(--green-1); }
+.review-form button[type="submit"][disabled]{ opacity:.7; cursor:not-allowed; }
+
+/* Star selector */
+.star-selector {
+  user-select:none;
+  display:flex;
+  gap:6px;
+  margin-bottom:8px;
+}
+.star-selector span {
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #cdd3c5;
+  transition: transform 0.15s ease, color 0.2s ease;
+  display:inline-block;
+  line-height:1;
+}
+.star-selector span.selected, .star-selector span.hovered {
+  background: linear-gradient(90deg, #f7d000, #ffae00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  transform: translateY(-1px) scale(1.05);
+}
+
+/* Toast notifications */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  font-weight: 500;
+  z-index: 2000;
+  animation: slideUp 0.25s ease, fadeOut 0.5s ease 2.6s forwards;
+}
+.toast.success { border-left: 5px solid var(--green-2); }
+.toast.error { border-left: 5px solid #c0392b; }
+.toast .icon { font-size:1.1rem; }
+
+@keyframes slideUp {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+@keyframes fadeOut { to { opacity: 0; transform: translate(-50%, 20px);} }
+
+/* Filter buttons */
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+.filter-buttons button {
+  background: linear-gradient(135deg, var(--green-2), var(--green-3));
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.filter-buttons button:hover {
+  background: linear-gradient(135deg, var(--green-3), var(--green-2));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+.filter-buttons button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(176, 229, 124, 0.5);
+}
+
+/* Login / Signup / Profile already handled above with .header-right */
+
+</style>
 </head>
 <body>
-  <nav>
+ <nav>
+  <!-- Left buttons -->
+  <div class="nav-left">
     <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
     <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
     <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart <span id="cartCount" style="background:red;color:white;padding:2px 8px;border-radius:50%;font-size:12px;">0</span></button>
     <button onclick="location.href='{{ url_for('about_page') }}'">👩‍⚕️ About Us</button>
     <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
-  </nav>
-
-  <div class="controls">
-<div class="controls">
-    <input type="text" id="searchBox" placeholder="Search products..." />
-
-    <select id="categoryBox">
-      <option value="all">All Categories</option>
-      <option value="wellness">Wellness</option>
-      <option value="medicinal">Medicinal</option>
-      <option value="personalcare">Personal Care</option>
-    </select>
-
-    <select id="priceBox">
-      <option value="default">Sort by Price</option>
-      <option value="low">Low to High</option>
-      <option value="high">High to Low</option>
-    </select>
   </div>
 
-<!-- Profile / Login -->
-<div class="header-right">
-  {% if customer %}
-    <div class="profile-dropdown">
-      <div class="profile-toggle">
-        <img src="{{ url_for('static', filename='profile_icon.png') }}" alt="Profile" class="profile-icon">
-        <span class="customer-name">{{ customer.name }}</span>
+  <!-- Right auth buttons -->
+  <div class="header-right">
+    {% if customer %}
+      <div class="profile-dropdown">
+        <div class="profile-toggle">
+          <img src="{{ url_for('static', filename='profile_icon.png') }}" alt="Profile" class="profile-icon">
+          <span class="customer-name">{{ customer.name }}</span>
+        </div>
+        <div class="dropdown-menu">
+          <button onclick="location.href='{{ url_for('auth.logout_customer') }}'">Logout</button>
+        </div>
       </div>
-      <div class="dropdown-menu">
-        <button onclick="location.href='{{ url_for('auth.logout_customer') }}'">Logout</button>
+    {% else %}
+      <div class="auth-buttons">
+        <button onclick="location.href='{{ url_for('auth.login_customer') }}'">Login</button>
+        <button onclick="location.href='{{ url_for('auth.signup') }}'">Sign Up</button>
       </div>
-    </div>
-  {% else %}
-    <div class="auth-buttons">
-      <button onclick="location.href='{{ url_for('auth.login_customer') }}'">Login</button>
-      <button onclick="location.href='{{ url_for('auth.signup') }}'">Sign Up</button>
-    </div>
-  {% endif %}
+    {% endif %}
+  </div>
+</nav>
+
+<div class="controls">
+  <input type="text" id="searchBox" placeholder="Search products..." />
+
+  <select id="categoryBox">
+    <option value="all">All Categories</option>
+    <option value="wellness">Wellness</option>
+    <option value="medicinal">Medicinal</option>
+    <option value="personalcare">Personal Care</option>
+  </select>
+
+  <select id="priceBox">
+    <option value="default">Sort by Price</option>
+    <option value="low">Low to High</option>
+    <option value="high">High to Low</option>
+  </select>
 </div>
 
   <div class="policy-links">

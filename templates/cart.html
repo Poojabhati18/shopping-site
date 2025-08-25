@@ -1,51 +1,215 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Cart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#4CAF50">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f6f1;
+      color: #2e2e2e;
+    }
 
-{% block title %}Your Cart - Ayurvedic Store{% endblock %}
+    header {
+      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+      color: white;
+      padding: 1.2rem 2rem;
+      text-align: center;
+      font-size: 1.6rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+    }
 
-{% block content %}
-  <h2>Your Shopping Cart 🛒</h2>
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 0;
+    }
 
-  {% if cart %}
-    <table class="cart-table">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Price (₹)</th>
-          <th>Quantity</th>
-          <th>Total (₹)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in cart %}
-        <tr data-id="{{ item.id }}">
-          <td>{{ item.name }}</td>
-          <td>{{ item.price }}</td>
-          <td>
-            <input type="number" class="qty" min="1" value="{{ item.quantity }}">
-          </td>
-          <td class="line-total">{{ item.price * item.quantity }}</td>
-          <td>
-            <button class="remove-btn">❌ Remove</button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    nav button {
+      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
 
-    <h3 class="cart-total">Grand Total: ₹<span id="grandTotal">
-      {{ cart | sum(attribute='price', start=0) }}
-    </span></h3>
+    nav button:hover {
+      background: #3d5a40;
+    }
 
-    <form action="{{ url_for('checkout') }}" method="POST">
-      <button type="submit" class="checkout-btn">Proceed to Checkout ✅</button>
-    </form>
-  {% else %}
-    <p>Your cart is empty. <a href="{{ url_for('products_page') }}">Browse Products</a></p>
-  {% endif %}
-{% endblock %}
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 1rem;
+    }
 
-{% block scripts %}
+    .cart-item {
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .cart-item img {
+      width: 100px;
+      height: 100px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    .item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .item-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #3d5a40;
+    }
+
+    .item-price {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #666;
+    }
+
+    .quantity-controls {
+      margin: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .quantity-controls button {
+      padding: 0.3rem 0.6rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #5a7f65;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .quantity-controls button:hover { background: #3d5a40; }
+
+    .remove-button {
+      margin-top: 0.5rem;
+      background-color: #c62828;
+      border: none;
+      color: white;
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      width: fit-content;
+      transition: background 0.2s;
+    }
+
+    .remove-button:hover { background-color: #8e1d1d; }
+
+    #cartTotal {
+      text-align: right;
+      font-size: 1.3rem;
+      margin-top: 2rem;
+      font-weight: 600;
+      color: #3d5a40;
+    }
+
+    .checkout-button {
+      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      float: right;
+      margin-top: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .checkout-button:hover {
+      background: #3d5a40;
+    }
+
+    @media (max-width: 600px) {
+      .cart-item { flex-direction: column; align-items: flex-start; }
+      .item-info { width: 100%; }
+      .checkout-button { width: 100%; float: none; }
+    }
+
+    .policy-buttons {
+      position: fixed;
+      bottom: 15px;
+      right: 20px;
+      display: flex;
+      gap: 12px;
+      z-index: 1000;
+    }
+
+    .policy-buttons button {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      padding: 6px 12px;
+      background-color: transparent;
+      color: #3d5a40;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .policy-buttons button:hover {
+      background: #b0e57c33;
+      color: #2b4d3a;
+    }
+  </style>
+</head>
+<body>
+
+<header>🌿 AyuHealth Cart</header>
+
+<nav>
+  <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
+  <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
+  <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
+  <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
+</nav>
+
+<div class="container">
+  <div id="cartContainer"></div>
+  <div id="cartTotal">Total: ₹0</div>
+  <button class="checkout-button" onclick="prepareCheckout()">Proceed to Checkout</button>
+</div>
+
+<div class="policy-buttons">
+  <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation & Refunds</button>
+  <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
+  <button onclick="location.href='{{ url_for('terms_page') }}'">Terms & Conditions</button>
+  <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
+</div>
+
 <script>
   const cartContainer = document.getElementById("cartContainer");
   const cartTotal = document.getElementById("cartTotal");
@@ -133,4 +297,6 @@
 
   renderCart();
 </script>
+</body>
+</html>
 {% endblock %}
