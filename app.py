@@ -262,7 +262,7 @@ def place_order():
                 "city": data.get("city"),
                 "pincode": data.get("pincode"),
             },
-            "products": data.get("product"),
+            "products": data.get("products"),
             "status": "pending",  # <-- use consistent field name
             "timestamp": firestore.SERVER_TIMESTAMP
         }
