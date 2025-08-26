@@ -145,17 +145,6 @@ def terms_page():
     return render_template("terms.html")
 
 # ================= HELPER =================
-def add_admin_notification(notification_type, message, related_id):
-    try:
-        db.collection("admin_notifications").add({
-            "type": notification_type,
-            "message": message,
-            "related_id": related_id,
-            "read": False,
-            "timestamp": datetime.now()
-        })
-    except Exception as e:
-        print("Error adding admin notification:", e)
 
 # ================= CHECKOUT & REVIEWS LOGIC =================
 # ================= REVIEWS API =================
@@ -225,16 +214,6 @@ def post_review(product_id):
             "timestamp": _firestore.SERVER_TIMESTAMP,
         }
         db.collection("reviews").add(payload)
-
-        # Optional: notify admin
-        try:
-            add_admin_notification(
-                "review_new",
-                f"New review for product {product_id} ({rating}★)",
-                related_id=str(product_id),
-            )
-        except Exception as _:
-            pass
 
         return jsonify({"success": True}), 200
     except Exception as e:
