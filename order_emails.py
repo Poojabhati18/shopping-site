@@ -75,15 +75,28 @@ def send_email(to, subject, html_body):
 
 # ---------- Main function to call ----------
 def notify_customer(order_data, status):
-    customer_name = order_data.get("customer_name", "Customer")
-    customer_email = order_data.get("customer_email")
-    product_summary = order_data.get("product_summary", "No products found")
-    
+    # 1️⃣ Extract customer info from nested dict
+    customer_info = order_data.get("customer", {})
+    customer_name = customer_info.get("name", "Customer")
+    customer_email = customer_info.get("email")
+
     if not customer_email:
         return False, "No customer email found"
 
-    cart_html = format_product_summary_as_html(product_summary)
+    # 2️⃣ Build product summary HTML from products array
+    products = order_data.get("products", [])
+    if not products:
+        products = [{"name": "No products found", "qty": 0, "price": 0}]
+
+    cart_html = ""
+    for p in products:
+        name = p.get("name", "Unknown")
+        qty = p.get("qty", 1)
+        price = p.get("price", 0)
+        cart_html += f"<tr><td>{name} (x{qty}) - ₹{qty*price}</td></tr>"
+
+    # 3️⃣ Build and send email
     html_body = build_order_email(customer_name, cart_html, status)
-    
     send_email(customer_email, f"Order Update from {SHOP_NAME}", html_body)
+
     return True, f"Email sent to {customer_email}"
