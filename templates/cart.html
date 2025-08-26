@@ -211,32 +211,27 @@ nav button:hover {
   box-shadow: none;
 }
 
-/* ================= POLICY BUTTONS ================= */
-.policy-buttons {
+/* ================= POLICY LINKS ================= */
+.policy-links {
   position: fixed;
   bottom: 15px;
   right: 20px;
   display: flex;
-  gap: 12px;
+  gap: 18px;
   z-index: 1000;
 }
-.policy-buttons button {
+
+.policy-links a {
   font-size: 0.85rem;
-  opacity: 0.8;
-  padding: 7px 14px;
-  background-color: transparent;
+  opacity: 0.85;
+  text-decoration: none;
   color: #2e7d32;
-  border-radius: 10px;
-  cursor: pointer;
-  border: 1px solid rgba(46,125,50,0.3);
-  backdrop-filter: blur(4px);
   transition: all 0.2s ease;
   white-space: nowrap;
 }
-.policy-buttons button:hover {
-  background: rgba(76,175,80,0.15);
+.policy-links a:hover {
   color: #1b5e20;
-  border-color: rgba(46,125,50,0.5);
+  text-decoration: underline;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -274,11 +269,11 @@ nav button:hover {
   <button class="checkout-button" onclick="prepareCheckout()">Proceed to Checkout</button>
 </div>
 
-<div class="policy-buttons">
-  <button onclick="location.href='{{ url_for('refund_page') }}'">Cancellation & Refunds</button>
-  <button onclick="location.href='{{ url_for('privacy_page') }}'">Privacy Policy</button>
-  <button onclick="location.href='{{ url_for('terms_page') }}'">Terms & Conditions</button>
-  <button onclick="location.href='{{ url_for('shipping_page') }}'">Shipping Policy</button>
+<div class="policy-links">
+  <a href="{{ url_for('refund_page') }}">Cancellation & Refunds</a>
+  <a href="{{ url_for('privacy_page') }}">Privacy Policy</a>
+  <a href="{{ url_for('terms_page') }}">Terms & Conditions</a>
+  <a href="{{ url_for('shipping_page') }}">Shipping Policy</a>
 </div>
 
 <script>
