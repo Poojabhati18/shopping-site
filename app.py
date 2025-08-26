@@ -158,8 +158,88 @@ def add_admin_notification(notification_type, message, related_id):
         print("Error adding admin notification:", e)
 
 # ================= CHECKOUT & REVIEWS LOGIC =================
-# Keep your existing place_order, reviews, admin dashboard, update_order routes here
-# These routes now use session['customer'] for logged-in users
+# ================= REVIEWS API =================
+from flask import abort
+from datetime import datetime
+from firebase_admin import firestore as _firestore
+
+def _serialize_review(doc):
+    data = doc.to_dict()
+    ts = data.get("timestamp")
+    # Firestore Timestamp -> ISO string
+    if ts and hasattr(ts, "to_datetime"):
+        data["timestamp"] = ts.to_datetime().isoformat()
+    elif isinstance(ts, datetime):
+        data["timestamp"] = ts.isoformat()
+    else:
+        # fallback if missing
+        data["timestamp"] = datetime.utcnow().isoformat()
+    # only expose fields the frontend expects
+    return {
+        "rating": int(data.get("rating", 0)),
+        "review": data.get("review", ""),
+        "timestamp": data["timestamp"],
+    }
+
+@app.route("/api/reviews/<product_id>", methods=["GET"])
+@require_verification
+def get_reviews(product_id):
+    try:
+        q = (
+            db.collection("reviews")
+              .where("productId", "==", str(product_id))
+              .order_by("timestamp", direction=_firestore.Query.DESCENDING)
+        )
+        reviews = [_serialize_review(doc) for doc in q.stream()]
+        return jsonify(reviews), 200
+    except Exception as e:
+        print("GET reviews error:", e)
+        return jsonify([]), 200  # fail soft so UI still works
+
+@app.route("/api/reviews/<product_id>", methods=["POST"])
+@require_verification
+def post_review(product_id):
+    # Optional: require logged-in customer to post
+    customer = session.get("customer")
+    # If you want to force login for reviews, uncomment:
+    # if not customer:
+    #     return jsonify({"success": False, "message": "Please log in to review."}), 401
+
+    data = request.get_json(silent=True) or {}
+    rating = int(data.get("rating") or 0)
+    review_text = (data.get("review") or "").strip()
+
+    # Validate exactly like your front-end
+    if rating < 1 or rating > 5 or len(review_text) < 10:
+        return jsonify({"success": False, "message": "Invalid rating or review too short."}), 400
+
+    try:
+        payload = {
+            "productId": str(product_id),
+            "rating": rating,
+            "review": review_text,
+            # store minimal author metadata if available
+            "authorId": customer.get("id") if isinstance(customer, dict) else None,
+            "authorName": customer.get("name") if isinstance(customer, dict) else None,
+            # Use server timestamp so ordering works reliably
+            "timestamp": _firestore.SERVER_TIMESTAMP,
+        }
+        db.collection("reviews").add(payload)
+
+        # Optional: notify admin
+        try:
+            add_admin_notification(
+                "review_new",
+                f"New review for product {product_id} ({rating}★)",
+                related_id=str(product_id),
+            )
+        except Exception as _:
+            pass
+
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print("POST review error:", e)
+        return jsonify({"success": False, "message": "Failed to save review."}), 500
 
 # ================= RUN APP =================
 if __name__ == "__main__":

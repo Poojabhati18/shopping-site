@@ -8,7 +8,7 @@
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <meta name="theme-color" content="#4CAF50">
   <style>
-    /* ================= BASE STYLES ================= */
+/* ================= BASE STYLES ================= */
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
@@ -17,12 +17,11 @@ body {
   color: #2e2e2e;
 }
 
-/* ================= HEADER / NAV ================= */
+/* ================= HEADER ================= */
 header {
   background: linear-gradient(135deg, #4CAF50, #2b4d3a);
   color: #fff;
   padding: 1.5rem 2rem;
-  text-align: center;
   font-size: 1.7rem;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -45,7 +44,6 @@ nav {
   justify-content: center;
   margin-top: 10px;
 }
-
 nav button {
   background: linear-gradient(135deg, #4CAF50, #2e7d32);
   color: white;
@@ -65,6 +63,10 @@ nav button:hover {
 }
 
 /* ================= AUTH BUTTONS ================= */
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
 .auth-buttons button {
   background: linear-gradient(135deg, #4CAF50, #2e7d32);
   color: white;
@@ -74,7 +76,6 @@ nav button:hover {
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  margin-left: 10px;
   box-shadow: 0 3px 10px rgba(76,175,80,0.4);
   transition: all 0.3s ease;
 }
@@ -109,7 +110,6 @@ nav button:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 22px rgba(76,175,80,0.25);
 }
-
 .cart-item img {
   width: 100px;
   height: 100px;
@@ -220,7 +220,6 @@ nav button:hover {
   gap: 18px;
   z-index: 1000;
 }
-
 .policy-links a {
   font-size: 0.85rem;
   opacity: 0.85;
@@ -260,13 +259,14 @@ nav button:hover {
   <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
   <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
   <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
+  <button onclick="location.href='{{ url_for('about_page') }}'">👩‍⚕️ About Us</button>
   <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
 </nav>
 
 <div class="container">
   <div id="cartContainer"></div>
   <div id="cartTotal">Total: ₹0</div>
-  <button class="checkout-button" onclick="prepareCheckout()">Proceed to Checkout</button>
+  <button class="checkout-button">Proceed to Checkout</button>
 </div>
 
 <div class="policy-links">
