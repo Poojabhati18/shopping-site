@@ -262,6 +262,38 @@ a { text-decoration: none; color: inherit; }
   color: gold;
 }
 
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.filter-buttons button {
+  background: linear-gradient(135deg, var(--green-2), var(--green-3));
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.filter-buttons button:hover {
+  background: linear-gradient(135deg, var(--green-3), var(--green-2));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+
+.filter-buttons button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(176, 229, 124, 0.5);
+}
+
 </style>
 </head>
 <body>
@@ -279,6 +311,23 @@ a { text-decoration: none; color: inherit; }
     <a href="{{ url_for('about_page') }}">👩‍⚕️ About Us</a>
     <a href="{{ url_for('contact_page') }}">📞 Contact Us</a>
   </nav>
+
+<div class="controls">
+    <input type="text" id="searchBox" placeholder="Search products..." />
+   <!-- Category Dropdown -->
+<select id="categoryBox">
+  <option value="all">All Categories</option>
+  <option value="wellness">Wellness</option>
+  <option value="medicinal">Medicinal</option>
+</select>
+
+<!-- Price Sort Dropdown -->
+<select id="priceBox">
+  <option value="default">Sort by Price</option>
+  <option value="low">Low to High</option>
+  <option value="high">High to Low</option>
+</select>
+  </div>
 
   <div class="header-right">
     {% if customer %}
@@ -298,10 +347,6 @@ a { text-decoration: none; color: inherit; }
       </div>
     {% endif %}
   </div>
-</header>
-
-<!-- ===== PRODUCT LIST ===== -->
-<div id="productList" class="products-container"></div>
 
 <!-- ===== POLICY LINKS ===== -->
 <div class="policy-links">
@@ -310,6 +355,11 @@ a { text-decoration: none; color: inherit; }
   <a href="{{ url_for('terms_page') }}">Terms & Conditions</a>
   <a href="{{ url_for('shipping_page') }}">Shipping Policy</a>
 </div>
+
+</header>
+
+<!-- ===== PRODUCT LIST ===== -->
+<div id="productList" class="products-container"></div>
 
 <script>
 let products = {{ products|tojson }};
