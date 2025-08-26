@@ -267,22 +267,8 @@ a { text-decoration: none; color: inherit; }
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin: 20px auto;
+  margin: 10px auto;
   flex-wrap: wrap;
-}
-.filter-buttons button {
-  background: linear-gradient(135deg, #4caf50, #2e7d32);
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.filter-buttons button:hover {
-  background: linear-gradient(135deg, #66bb6a, #388e3c);
-  transform: translateY(-2px);
 }
 
 /* ===== POLICY LINKS ===== */
@@ -322,23 +308,6 @@ a { text-decoration: none; color: inherit; }
     <a href="{{ url_for('contact_page') }}">📞 Contact Us</a>
   </nav>
 
-<div class="controls">
-    <input type="text" id="searchBox" placeholder="Search products..." />
-   <!-- Category Dropdown -->
-<select id="categoryBox">
-  <option value="all">All Categories</option>
-  <option value="wellness">Wellness</option>
-  <option value="medicinal">Medicinal</option>
-</select>
-
-<!-- Price Sort Dropdown -->
-<select id="priceBox">
-  <option value="default">Sort by Price</option>
-  <option value="low">Low to High</option>
-  <option value="high">High to Low</option>
-</select>
-  </div>
-
   <div class="header-right">
     {% if customer %}
       <div class="profile-dropdown">
@@ -358,23 +327,41 @@ a { text-decoration: none; color: inherit; }
     {% endif %}
   </div>
 
-<!-- ===== FILTER BUTTONS ===== -->
-<div class="filter-buttons">
-  <button onclick="categoryBox.value='all'; applyFilters()">All</button>
-  <button onclick="categoryBox.value='wellness'; applyFilters()">Wellness</button>
-  <button onclick="categoryBox.value='medicinal'; applyFilters()">Medicinal</button>
-  <button onclick="priceBox.value='low'; applyFilters()">Price: Low → High</button>
-  <button onclick="priceBox.value='high'; applyFilters()">Price: High → Low</button>
-</div>
-
-<!-- ===== POLICY LINKS ===== -->
-<div class="policy-links">
-  <a href="{{ url_for('refund_page') }}">Cancellation & Refunds</a> |
-  <a href="{{ url_for('privacy_page') }}">Privacy Policy</a> |
-  <a href="{{ url_for('terms_page') }}">Terms & Conditions</a> |
-  <a href="{{ url_for('shipping_page') }}">Shipping Policy</a>
-</div>
+  <!-- ===== POLICY LINKS ===== -->
+  <div class="policy-links">
+    <a href="{{ url_for('refund_page') }}">Cancellation & Refunds</a>
+    <a href="{{ url_for('privacy_page') }}">Privacy Policy</a>
+    <a href="{{ url_for('terms_page') }}">Terms & Conditions</a>
+    <a href="{{ url_for('shipping_page') }}">Shipping Policy</a>
+  </div>
 </header>
+
+<!-- ===== FILTER CONTROLS ===== -->
+<div class="controls">
+  <!-- Search Box -->
+  <input type="text" id="searchBox" placeholder="Search products..." />
+
+  <!-- Category Buttons -->
+  <div class="filter-buttons">
+    <button onclick="categoryBox.value='all'; applyFilters()">All</button>
+    <button onclick="categoryBox.value='wellness'; applyFilters()">Wellness</button>
+    <button onclick="categoryBox.value='medicinal'; applyFilters()">Medicinal</button>
+  </div>
+
+  <!-- Price Dropdown -->
+  <select id="priceBox">
+    <option value="default">Sort by Price</option>
+    <option value="low">Low to High</option>
+    <option value="high">High to Low</option>
+  </select>
+
+  <!-- Hidden dropdown for category -->
+  <select id="categoryBox" style="display:none;">
+    <option value="all">All</option>
+    <option value="wellness">Wellness</option>
+    <option value="medicinal">Medicinal</option>
+  </select>
+</div>
 
 <!-- ===== PRODUCT LIST ===== -->
 <div id="productList" class="products-container"></div>
