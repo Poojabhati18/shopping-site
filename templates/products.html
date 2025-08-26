@@ -251,6 +251,17 @@ a { text-decoration: none; color: inherit; }
 .review-list .review-item:last-child {
   border-bottom: none;
 }
+
+.star-selector span {
+  cursor: pointer;
+  font-size: 1.2em;
+  color: #ccc;
+}
+.star-selector span.selected,
+.star-selector span.hovered {
+  color: gold;
+}
+
 </style>
 </head>
 <body>
@@ -471,12 +482,23 @@ function attachReviewEvents(card, product){
   const counter = form.querySelector(".char-counter");
   const submitBtn = form.querySelector("button[type='submit']");
 
-  stars.forEach(s=>{
-    s.addEventListener("click",()=>{
-      hiddenRating.value=s.dataset.value;
-      stars.forEach(st=>st.classList.toggle("selected",st.dataset.value<=s.dataset.value));
-    });
+  stars.forEach(s => {
+  s.addEventListener("click", () => {
+    const val = Number(s.dataset.value);
+    hiddenRating.value = val;
+    stars.forEach(st => st.classList.toggle("selected", Number(st.dataset.value) <= val));
   });
+
+  // Optional: hover effect
+  s.addEventListener("mouseover", () => {
+    const val = Number(s.dataset.value);
+    stars.forEach(st => st.classList.toggle("hovered", Number(st.dataset.value) <= val));
+  });
+  s.addEventListener("mouseout", () => {
+    stars.forEach(st => st.classList.remove("hovered"));
+  });
+});
+
 
   textarea.addEventListener("input",()=>counter.textContent=`${textarea.value.length}/200`);
 
