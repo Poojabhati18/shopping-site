@@ -59,132 +59,134 @@
 
 <div class="toast" id="toast"></div>
 
-<script type="text/javascript" src="https://cdn.emailjs.com/sdk/3.12.0/email.min.js"></script>
-<script type="text/javascript">
-  emailjs.init("xpG24aRhhXMkfUo8c"); // replace with your EmailJS public key
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+emailjs.init("xpG24aRhhXMkfUo8c"); // public key
 
-  let gujaratPincodes = [];
+let gujaratPincodes = [];
 
-  // Load pincodes once when page loads
-  async function loadPincodes() {
-    const res = await fetch('/static/gujarat_pincodes.json');
-    gujaratPincodes = await res.json();
+// Load pincodes once when page loads
+async function loadPincodes() {
+  const res = await fetch('/static/gujarat_pincodes.json');
+  gujaratPincodes = await res.json();
+}
+
+// Toast helper
+function showToast(msg, success=true){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.background = success ? '#2e7d32' : '#c62828';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// Populate cart summary from localStorage
+function populateCartSummary() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const cartItemsText = document.getElementById("cartItemsText");
+  const cartTotalEl = document.getElementById("cartTotal");
+  const productSummaryTextarea = document.getElementById("productSummary");
+  const submitBtn = document.getElementById("submitBtn");
+
+  if (cart.length === 0) {
+    cartItemsText.textContent = "Your cart is empty.";
+    cartTotalEl.textContent = "0";
+    productSummaryTextarea.value = "";
+    submitBtn.disabled = true;
+    return;
   }
 
-  function showToast(msg, success=true){
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.style.background = success ? '#2e7d32' : '#c62828';
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-  }
+  let total = 0;
+  const summaryLines = cart.map(item => {
+    const qty = Number(item.qty) || 1;
+    const price = Number(item.price) || 0;
+    total += qty * price;
+    return `${item.name} (x${qty}) - ₹${qty*price}`;
+  });
 
-  function populateCartSummary() {
+  cartItemsText.textContent = summaryLines.join("\n");
+  cartTotalEl.textContent = total;
+  productSummaryTextarea.value = summaryLines.join("\n");
+  submitBtn.disabled = false;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadPincodes();
+  populateCartSummary();
+
+  const form = document.getElementById("checkoutForm");
+  const submitBtn = document.getElementById("submitBtn");
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const cartItemsText = document.getElementById("cartItemsText");
-    const cartTotalEl = document.getElementById("cartTotal");
-    const productSummaryTextarea = document.getElementById("productSummary");
-    const submitBtn = document.getElementById("submitBtn");
-
-    if (cart.length === 0) {
-      cartItemsText.textContent = "Your cart is empty.";
-      cartTotalEl.textContent = "0";
-      productSummaryTextarea.value = "";
-      submitBtn.disabled = true;
+    if(cart.length === 0){
+      showToast("Your cart is empty", false);
       return;
     }
 
-    let total = 0;
-    const summaryLines = cart.map(item => {
-      const qty = Number(item.qty) || 1;
-      const price = Number(item.price) || 0;
-      total += qty * price;
-      return `${item.name} (x${qty}) - ₹${qty*price}`;
-    });
+    const enteredPincode = document.getElementById("pincode").value.trim();
+    if (!gujaratPincodes.includes(enteredPincode)) {
+      showToast("Sorry, we only deliver to Gujarat pincodes.", false);
+      return;
+    }
 
-    cartItemsText.textContent = summaryLines.join("\n");
-    cartTotalEl.textContent = total;
-    productSummaryTextarea.value = summaryLines.join("\n");
-    submitBtn.disabled = false;
-  }
+    const payload = {
+      name: document.getElementById("name").value,
+      address: document.getElementById("address").value,
+      city: document.getElementById("city").value,
+      pincode: enteredPincode,
+      phone: document.getElementById("phone").value,
+      email: document.getElementById("email").value,
+      productSummary: document.getElementById("productSummary").value
+    };
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    await loadPincodes();
-    populateCartSummary();
+    // Disable button while processing
+    submitBtn.disabled = true;
+    const originalText = submitBtn.innerText;
+    submitBtn.innerText = "Placing Order...";
 
-    const form = document.getElementById("checkoutForm");
-    const submitBtn = document.getElementById("submitBtn");
-
-    form.addEventListener("submit", async e => {
-      e.preventDefault();
-
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      if(cart.length === 0){
-        showToast("Your cart is empty", false);
-        return;
-      }
-
-      const enteredPincode = document.getElementById("pincode").value.trim();
-      if (!gujaratPincodes.includes(enteredPincode)) {
-        showToast("Sorry, we only deliver to Gujarat pincodes.", false);
-        return;
-      }
-
-      const payload = {
-        name: document.getElementById("name").value,
-        address: document.getElementById("address").value,
-        city: document.getElementById("city").value,
-        pincode: enteredPincode,
-        phone: document.getElementById("phone").value,
-        email: document.getElementById("email").value,
-        product: document.getElementById("productSummary").value
+    try {
+      // 1️⃣ Send email via EmailJS
+      const emailParams = {
+        customer_name: payload.name,
+        customer_email: payload.email,
+        customer_phone: payload.phone,
+        address: `${payload.address}, ${payload.city} - ${payload.pincode}`,
+        product_summary: payload.productSummary
       };
 
-      // Disable button and show feedback
-      submitBtn.disabled = true;
-      const originalText = submitBtn.innerText;
-      submitBtn.innerText = "Placing Order...";
+      await emailjs.send("service_1h3efc8", "template_mkn17v7", emailParams);
 
-      try {
-        // ✅ Send Email using EmailJS
-        await emailjs.send("service_1h3efc8", "template_mkn17v7", {
-          customer_name: payload.name,
-          customer_email: payload.email,
-          customer_phone: payload.phone,
-          customer_address: `${payload.address}, ${payload.city}, ${payload.pincode}`,
-          order_summary: payload.product,
-          order_total: document.getElementById("cartTotal").textContent
-        });
+      // 2️⃣ Optionally, send to your backend too
+      const res = await fetch("/place_order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-        // ✅ Send order to backend (optional)
-        const res = await fetch("/place_order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
+      const data = await res.json();
 
-        const data = await res.json();
-
-        if(data.success){
-          showToast("Order placed & email sent successfully!");
-          localStorage.removeItem("cart");
-          populateCartSummary();
-          form.reset();
-          setTimeout(()=> { window.location.href = '/'; }, 2000);
-        } else {
-          showToast("Error placing order: " + data.message, false);
-          submitBtn.disabled = false;
-          submitBtn.innerText = originalText;
-        }
-
-      } catch(err) {
-        console.error("Order or EmailJS error:", err);
-        showToast("Order placed but email may have failed.", false);
+      if(data.success){
+        showToast("Order placed successfully!");
+        localStorage.removeItem("cart");
+        populateCartSummary();
+        form.reset();
+        setTimeout(()=> { window.location.href = '/'; }, 2000);
+      } else {
+        showToast("Error placing order: " + data.message, false);
         submitBtn.disabled = false;
         submitBtn.innerText = originalText;
       }
-    });
+    } catch(err) {
+      console.error(err);
+      showToast("Server or email error. Try again later.", false);
+      submitBtn.disabled = false;
+      submitBtn.innerText = originalText;
+    }
   });
+});
 </script>
 
 </body>
