@@ -25,7 +25,7 @@
                 <th>Customer</th>
                 <th>Email</th>
                 <th>Address</th>
-                <th>Product</th>
+                <th>Products</th>
                 <th>Status</th>
                 <th>Date</th>
                 <th>Action</th>
@@ -34,14 +34,20 @@
         <tbody>
             {% for order in orders %}
             <tr>
-                <td>{{ order.customer_name }}</td>
-                <td>{{ order.customer_email }}</td>
-                <td>{{ order.address }}</td>
-                <td><pre>{{ order.product_summary }}</pre></td>
-                <td>{{ order.order_status }}</td>
-                <td>{{ order.date_ordered.strftime("%Y-%m-%d %H:%M") if order.date_ordered }}</td>
+                <td>{{ order.customer.name }}</td>
+                <td>{{ order.customer.email }}</td>
+                <td>{{ order.customer.address }}, {{ order.customer.city }} - {{ order.customer.pincode }}</td>
+                <td>
+                    <pre>{{ order.products | tojson(indent=2) }}</pre>
+                </td>
+                <td>{{ order.status }}</td>
+                <td>
+                    {% if order.timestamp %}
+                        {{ order.timestamp.strftime("%Y-%m-%d %H:%M") }}
+                    {% endif %}
+                </td>
                 
-                {% if order.order_status != "Completed" %}
+                {% if order.status != "Completed" %}
                 <td>
                     <!-- Cancel -->
                     <form action="{{ url_for('update_order', order_id=order.id, status='Cancelled') }}" method="POST">

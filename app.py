@@ -263,17 +263,17 @@ def place_order():
                 "pincode": data.get("pincode"),
             },
             "products": data.get("product"),
-            "status": "pending",
+            "status": "pending",  # <-- use consistent field name
             "timestamp": firestore.SERVER_TIMESTAMP
         }
 
         db.collection("orders").add(order_data)
 
-        # Optional email
+        # Optional: notify customer by email
         try:
             notify_customer(customer.get("email"), order_data)
-        except Exception:
-            pass
+        except Exception as e:
+            print("Email notify error:", e)
 
         return jsonify({"success": True, "message": "Order placed successfully"}), 200
 
@@ -291,7 +291,7 @@ def admin_dashboard():
     orders = []
     try:
         orders_ref = db.collection("orders").order_by(
-            "date_ordered", direction=firestore.Query.DESCENDING
+            "timestamp", direction=firestore.Query.DESCENDING
         )
         for doc in orders_ref.stream():
             try:
@@ -308,7 +308,7 @@ def admin_dashboard():
     notifications = []
     try:
         notifications_ref = db.collection("admin_notifications").order_by(
-            "timestamp", direction=db._client.Query.DESCENDING
+            "timestamp", direction=firestore.Query.DESCENDING
         )
         for n in notifications_ref.stream():
             try:
@@ -333,15 +333,20 @@ def update_order(order_id, status):
 
     order_data = order.to_dict()
 
-    if status == "Cancelled":
-        order_ref.delete()
+    if status.lower() == "cancelled":
+        # delete or just update status? safer: update status instead of delete
+        order_ref.update({"status": "cancelled"})
     else:
-        order_ref.update({"order_status": status})
+        order_ref.update({"status": status})
 
-    # Send email
-    success, msg = notify_customer(order_data, status)
+    # Notify customer
+    try:
+        success, msg = notify_customer(order_data, status)
+    except Exception as e:
+        print("Notify error:", e)
+        success, msg = True, "Order updated but email failed."
+
     return jsonify({"success": success, "message": msg})
-
 
 # ================= RUN APP =================
 if __name__ == "__main__":
