@@ -262,38 +262,48 @@ a { text-decoration: none; color: inherit; }
   color: gold;
 }
 
+/* ===== FILTER BUTTONS ===== */
 .filter-buttons {
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin: 20px 0;
+  margin: 20px auto;
   flex-wrap: wrap;
 }
-
 .filter-buttons button {
-  background: linear-gradient(135deg, var(--green-2), var(--green-3));
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
   color: #fff;
   border: none;
-  padding: 12px 25px;
-  border-radius: 30px;
+  padding: 10px 20px;
+  border-radius: 25px;
   font-weight: 600;
-  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.25s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-
 .filter-buttons button:hover {
-  background: linear-gradient(135deg, var(--green-3), var(--green-2));
+  background: linear-gradient(135deg, #66bb6a, #388e3c);
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
 }
 
-.filter-buttons button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(176, 229, 124, 0.5);
+/* ===== POLICY LINKS ===== */
+.policy-links {
+  position: fixed;
+  bottom: 15px;
+  right: 20px;
+  font-size: 0.85rem;
+  color: #2e2e2e;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-
+.policy-links a {
+  color: #2e2e2e;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+.policy-links a:hover {
+  color: #388e3c;
+}
 </style>
 </head>
 <body>
@@ -348,14 +358,22 @@ a { text-decoration: none; color: inherit; }
     {% endif %}
   </div>
 
-<!-- ===== POLICY LINKS ===== -->
-<div class="policy-links">
-  <a href="{{ url_for('refund_page') }}">Cancellation & Refunds</a>
-  <a href="{{ url_for('privacy_page') }}">Privacy Policy</a>
-  <a href="{{ url_for('terms_page') }}">Terms & Conditions</a>
-  <a href="{{ url_for('shipping_page') }}">Shipping Policy</a>
+<!-- ===== FILTER BUTTONS ===== -->
+<div class="filter-buttons">
+  <button onclick="categoryBox.value='all'; applyFilters()">All</button>
+  <button onclick="categoryBox.value='wellness'; applyFilters()">Wellness</button>
+  <button onclick="categoryBox.value='medicinal'; applyFilters()">Medicinal</button>
+  <button onclick="priceBox.value='low'; applyFilters()">Price: Low → High</button>
+  <button onclick="priceBox.value='high'; applyFilters()">Price: High → Low</button>
 </div>
 
+<!-- ===== POLICY LINKS ===== -->
+<div class="policy-links">
+  <a href="{{ url_for('refund_page') }}">Cancellation & Refunds</a> |
+  <a href="{{ url_for('privacy_page') }}">Privacy Policy</a> |
+  <a href="{{ url_for('terms_page') }}">Terms & Conditions</a> |
+  <a href="{{ url_for('shipping_page') }}">Shipping Policy</a>
+</div>
 </header>
 
 <!-- ===== PRODUCT LIST ===== -->
