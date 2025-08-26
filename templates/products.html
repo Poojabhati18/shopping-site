@@ -262,13 +262,34 @@ a { text-decoration: none; color: inherit; }
   color: gold;
 }
 
-/* ===== FILTER BUTTONS ===== */
-.filter-buttons {
+/* ===== FILTER CONTROLS ===== */
+.controls {
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin: 10px auto;
   flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.controls input, .controls select {
+  padding: 10px 16px;
+  border-radius: 25px;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.controls input {
+  border: 1px solid #ccc;
+}
+
+.controls select {
+  background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+  color: #fff;
 }
 
 /* ===== POLICY LINKS ===== */
@@ -341,25 +362,18 @@ a { text-decoration: none; color: inherit; }
   <!-- Search Box -->
   <input type="text" id="searchBox" placeholder="Search products..." />
 
-  <!-- Category Buttons -->
-  <div class="filter-buttons">
-    <button onclick="categoryBox.value='all'; applyFilters()">All</button>
-    <button onclick="categoryBox.value='wellness'; applyFilters()">Wellness</button>
-    <button onclick="categoryBox.value='medicinal'; applyFilters()">Medicinal</button>
-  </div>
+  <!-- Category Dropdown -->
+  <select id="categoryBox">
+    <option value="all">All Categories</option>
+    <option value="wellness">Wellness</option>
+    <option value="medicinal">Medicinal</option>
+  </select>
 
   <!-- Price Dropdown -->
   <select id="priceBox">
     <option value="default">Sort by Price</option>
     <option value="low">Low to High</option>
     <option value="high">High to Low</option>
-  </select>
-
-  <!-- Hidden dropdown for category -->
-  <select id="categoryBox" style="display:none;">
-    <option value="all">All</option>
-    <option value="wellness">Wellness</option>
-    <option value="medicinal">Medicinal</option>
   </select>
 </div>
 
