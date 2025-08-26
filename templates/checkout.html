@@ -148,14 +148,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     submitBtn.innerText = "Placing Order...";
 
     try {
-      // 1️⃣ Send email via EmailJS
-      const emailParams = {
-        customer_name: payload.name,
-        customer_email: payload.email,
-        customer_phone: payload.phone,
-        address: `${payload.address}, ${payload.city} - ${payload.pincode}`,
-        product_summary: payload.productSummary
-      };
+  // 1️⃣ Send email via EmailJS
+  const emailParams = {
+    name: payload.name,
+    email: payload.email,
+    phone: payload.phone,
+    address: payload.address,
+    city: payload.city,       // 👈 added
+    pincode: payload.pincode, // 👈 added
+    productSummary: payload.productSummary
+  };
 
       await emailjs.send("service_1h3efc8", "template_mkn17v7", emailParams);
 
