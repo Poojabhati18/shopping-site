@@ -271,7 +271,7 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 3px 8px rgba(0,0,0,0.15);
 }
 
-/* Custom Dropdowns */
+/* ===== CUSTOM DROPDOWN ===== */
 .custom-dropdown {
   position: relative;
   display: inline-block;
@@ -287,6 +287,7 @@ a { text-decoration: none; color: inherit; }
   cursor: pointer;
   box-shadow: 0 3px 8px rgba(0,0,0,0.15);
   transition: all 0.2s ease;
+  position: relative;
 }
 .custom-dropdown button::after {
   content: "\\/";
@@ -296,6 +297,7 @@ a { text-decoration: none; color: inherit; }
   top: 50%;
   transform: translateY(-50%);
   color: #fff;
+  pointer-events: none;
 }
 .custom-dropdown:hover button {
   background: #3d5a40;
@@ -323,6 +325,9 @@ a { text-decoration: none; color: inherit; }
   background: #f1f1f1;
   color: #2b4d3a;
 }
+/* JS toggle support */
+.custom-dropdown ul.show { display: block; }
+/* Hover fallback */
 .custom-dropdown:hover ul { display: block; }
 
 /* ===== POLICY LINKS ===== */
@@ -424,37 +429,69 @@ let filteredProducts = [...products];
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ====== Utility Functions ====== */
-  function debounce(fn, delay=300) {
-    let t;
-    return (...args) => {
-      clearTimeout(t);
-      t = setTimeout(() => fn(...args), delay);
-    };
-  }
+/* ====== Utility Functions ====== */
+function debounce(fn, delay=300) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), delay);
+  };
+}
 
-  function showToast(msg, type="success") {
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.style.cssText = `
-      position: fixed; bottom: 20px; right: 20px; padding: 12px 20px;
-      border-radius: 6px; color: #fff; font-weight: bold; z-index: 9999;
-      background-color: ${type==="success"?"#28a745":"#dc3545"}; opacity:0; transition:opacity 0.3s;
-    `;
-    toast.innerHTML = (type==="success"?"✅ ":"⚠️ ") + msg;
-    document.body.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = 1; }, 50);
-    setTimeout(() => { toast.style.opacity = 0; setTimeout(() => toast.remove(), 300); }, 3000);
-  }
+function showToast(msg, type="success") {
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.style.cssText = `
+    position: fixed; bottom: 20px; right: 20px; padding: 12px 20px;
+    border-radius: 6px; color: #fff; font-weight: bold; z-index: 9999;
+    background-color: ${type==="success"?"#28a745":"#dc3545"}; opacity:0; transition:opacity 0.3s;
+  `;
+  toast.innerHTML = (type==="success"?"✅ ":"⚠️ ") + msg;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = 1; }, 50);
+  setTimeout(() => { toast.style.opacity = 0; setTimeout(() => toast.remove(), 300); }, 3000);
+}
 
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const total = cart.reduce((s, i) => s + i.qty, 0);
-    const el = document.getElementById("cartCount");
-    if (!el) return;
-    el.textContent = total;
-    el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
-  }
+function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  const el = document.getElementById("cartCount");
+  if (!el) return;
+  el.textContent = total;
+  el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
+}
+
+/* ====== CUSTOM DROPDOWN JS ====== */
+const dropdowns = document.querySelectorAll('.custom-dropdown');
+
+dropdowns.forEach(dropdown => {
+  const button = dropdown.querySelector('button');
+  const menu = dropdown.querySelector('ul');
+  const items = menu.querySelectorAll('li');
+
+  // Toggle dropdown on button click
+  button.addEventListener('click', () => {
+    menu.classList.toggle('show');
+  });
+
+  // Handle option selection
+  items.forEach(item => {
+    item.addEventListener('click', () => {
+      button.textContent = item.textContent; // update button text
+      menu.classList.remove('show'); // close menu
+      const selectedValue = item.dataset.value;
+      console.log('Selected:', selectedValue);
+      applyFilters(); // trigger filtering if needed
+    });
+  });
+
+  // Close dropdown if clicked outside
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target)) {
+      menu.classList.remove('show');
+    }
+  });
+});
 
 /* ====== Render Products (updated) ====== */
 function renderProducts() {
@@ -468,7 +505,6 @@ function renderProducts() {
     card.className = "product-card";
     card.dataset.id = product.id;
 
-    // image: add loading and decoding, and a CSS class for sizing if you want
     card.innerHTML = `
       <img src="${product.image_url}" alt="${product.name}" loading="lazy" decoding="async" class="product-img">
       <h2>${product.name}</h2>
@@ -507,12 +543,10 @@ function renderProducts() {
     container.appendChild(card);
     attachProductEvents(card, product);
     attachReviewEvents(card, product);
-    // NOTE: do NOT call ensureReviewsLoaded here for every product —
-    // load reviews only when the user opens the review panel.
   });
 }
 
-  /* ====== Product Events (updated) ====== */
+/* ====== Product Events ====== */
 function attachProductEvents(card, product) {
   const addBtn = card.querySelector(".add-to-cart");
   const plusBtn = card.querySelector(".plus");
@@ -523,7 +557,7 @@ function attachProductEvents(card, product) {
   const reviewSection = card.querySelector(".reviews");
 
   let qty = 1;
-  let reviewsLoaded = false; // ensure we load reviews only once per card
+  let reviewsLoaded = false;
 
   plusBtn?.addEventListener("click", () => { qty++; qtyEl.textContent = qty; });
   minusBtn?.addEventListener("click", () => { if(qty>1) qty--; qtyEl.textContent = qty; });
@@ -539,18 +573,14 @@ function attachProductEvents(card, product) {
     qty = 1; qtyEl.textContent = qty;
   });
 
-  // Description Button
   descBtn?.addEventListener("click", () => showDescriptionModal(product));
 
-  // Review toggle: load reviews on first open
   reviewBtn?.addEventListener("click", async () => {
     if (reviewSection.style.display === "none") {
       reviewSection.style.display = "block";
       reviewBtn.textContent = "Hide Reviews";
       if (!reviewsLoaded) {
-        try {
-          await ensureReviewsLoaded(card, product.id);
-        } catch (e) { console.error("Failed to load reviews:", e); }
+        try { await ensureReviewsLoaded(card, product.id); } catch(e){ console.error(e); }
         reviewsLoaded = true;
       }
     } else {
@@ -560,7 +590,7 @@ function attachProductEvents(card, product) {
   });
 }
 
-  /* ====== Reviews Fetch + Render Logic ====== */
+/* ====== Reviews Logic ====== */
 const reviewCache = new Map();
 
 async function fetchReviews(productId){
@@ -598,22 +628,17 @@ function attachReviewEvents(card, product){
   const submitBtn = form.querySelector("button[type='submit']");
 
   stars.forEach(s => {
-  s.addEventListener("click", () => {
-    const val = Number(s.dataset.value);
-    hiddenRating.value = val;
-    stars.forEach(st => st.classList.toggle("selected", Number(st.dataset.value) <= val));
+    s.addEventListener("click", () => {
+      const val = Number(s.dataset.value);
+      hiddenRating.value = val;
+      stars.forEach(st => st.classList.toggle("selected", Number(st.dataset.value) <= val));
+    });
+    s.addEventListener("mouseover", () => {
+      const val = Number(s.dataset.value);
+      stars.forEach(st => st.classList.toggle("hovered", Number(st.dataset.value) <= val));
+    });
+    s.addEventListener("mouseout", () => stars.forEach(st => st.classList.remove("hovered")));
   });
-
-  // Optional: hover effect
-  s.addEventListener("mouseover", () => {
-    const val = Number(s.dataset.value);
-    stars.forEach(st => st.classList.toggle("hovered", Number(st.dataset.value) <= val));
-  });
-  s.addEventListener("mouseout", () => {
-    stars.forEach(st => st.classList.remove("hovered"));
-  });
-});
-
 
   textarea.addEventListener("input",()=>counter.textContent=`${textarea.value.length}/200`);
 
@@ -632,15 +657,11 @@ function attachReviewEvents(card, product){
       const data = await res.json();
       if(data.success){
         showToast("Review submitted!","success");
-        form.reset();
-        hiddenRating.value=0;
-        counter.textContent="0/200";
+        form.reset(); hiddenRating.value=0; counter.textContent="0/200";
         stars.forEach(st=>st.classList.remove("selected"));
         reviewCache.delete(product.id);
         await ensureReviewsLoaded(card, product.id);
-      } else {
-        showToast(data.message,"error");
-      }
+      } else { showToast(data.message,"error"); }
     } catch(e){ console.error(e); showToast("Submit failed","error"); }
     finally{ submitBtn.disabled=false; }
   });
@@ -656,30 +677,30 @@ async function ensureReviewsLoaded(card, productId){
   renderReviews(reviewCache.get(productId), container, avgContainer);
 }
 
-  /* ====== Description Modal ====== */
-  function showDescriptionModal(product) {
-    const modal = document.createElement("div");
-    modal.style.cssText = `
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;
-      z-index: 9999; padding: 20px;
-    `;
+/* ====== Description Modal ====== */
+function showDescriptionModal(product) {
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;
+    z-index: 9999; padding: 20px;
+  `;
 
-    modal.innerHTML = `
-      <div style="background:#fff;padding:20px;border-radius:12px;max-width:500px;width:100%;position:relative;">
-        <h2>${product.name}</h2>
-        <p>${product.description || "No description available."}</p>
-        <p class="price">₹${product.price}</p>
-        <button id="closeModal" class="btn" style="position:absolute;top:10px;right:10px;">X</button>
-      </div>
-    `;
-    document.body.appendChild(modal);
+  modal.innerHTML = `
+    <div style="background:#fff;padding:20px;border-radius:12px;max-width:500px;width:100%;position:relative;">
+      <h2>${product.name}</h2>
+      <p>${product.description || "No description available."}</p>
+      <p class="price">₹${product.price}</p>
+      <button id="closeModal" class="btn" style="position:absolute;top:10px;right:10px;">X</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
 
-    modal.querySelector("#closeModal").addEventListener("click", ()=>modal.remove());
-    modal.addEventListener("click", e => { if(e.target===modal) modal.remove(); });
-  }
+  modal.querySelector("#closeModal").addEventListener("click", ()=>modal.remove());
+  modal.addEventListener("click", e => { if(e.target===modal) modal.remove(); });
+}
 
-  /* ====== Filters: Search + Category + Price ====== */
+/* ====== Filters: Search + Category + Price ====== */
 const searchBox = document.getElementById("searchBox");
 const categoryBox = document.getElementById("categoryBox");
 const priceBox = document.getElementById("priceBox");
@@ -687,17 +708,15 @@ const priceBox = document.getElementById("priceBox");
 function applyFilters() {
   let tempProducts = [...products];
 
-  // ====== Category filter ======
   const categoryVal = categoryBox?.value || "all";
   if (categoryVal !== "all") {
     tempProducts = tempProducts.filter(p =>
       Array.isArray(p.categories)
-        ? p.categories.includes(categoryVal)   // ✅ supports multiple categories
-        : p.category === categoryVal           // ✅ fallback if product has single category
+        ? p.categories.includes(categoryVal)
+        : p.category === categoryVal
     );
   }
 
-  // ====== Search filter ======
   const searchTerm = searchBox?.value.trim().toLowerCase() || "";
   if (searchTerm !== "") {
     tempProducts = tempProducts.filter(p =>
@@ -706,7 +725,6 @@ function applyFilters() {
     );
   }
 
-  // ====== Price filter ======
   const priceVal = priceBox?.value || "default";
   if (priceVal === "low") tempProducts.sort((a, b) => a.price - b.price);
   else if (priceVal === "high") tempProducts.sort((a, b) => b.price - a.price);
@@ -715,14 +733,15 @@ function applyFilters() {
   renderProducts();
 }
 
-// ====== Event Listeners ======
+/* ====== Event Listeners ====== */
 searchBox?.addEventListener("input", debounce(applyFilters, 300));
 categoryBox?.addEventListener("change", applyFilters);
 priceBox?.addEventListener("change", applyFilters);
 
-  /* ====== Init ====== */
-  renderProducts();
-  updateCartCount();
+/* ====== Init ====== */
+renderProducts();
+updateCartCount();
+
 });
 </script>
 
