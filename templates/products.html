@@ -147,7 +147,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 .product-card {
-  background: #ffffff; /* changed from green to white */
+  background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 3px 12px rgba(0,0,0,0.08);
   padding: 15px;
@@ -155,7 +155,7 @@ a { text-decoration: none; color: inherit; }
   flex-direction: column;
   align-items: center;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-  color: #2e2e2e; /* dark text for contrast on white */
+  color: #2e2e2e;
 }
 
 .product-card:hover {
@@ -177,16 +177,15 @@ a { text-decoration: none; color: inherit; }
 
 .product-card h2 {
   font-size: 1.1rem;
-  color: #2e2e2e; /* darker text */
+  color: #2e2e2e;
   font-weight: 600;
   margin: 12px 0 8px;
   text-align: center;
-  text-shadow: none; /* remove shadow on white background */
 }
 
 .product-card .price {
   font-weight: bold;
-  color: #388e3c; /* keep green for price to highlight */
+  color: #388e3c;
   margin-bottom: 10px;
   text-align: center;
 }
@@ -205,7 +204,6 @@ a { text-decoration: none; color: inherit; }
   transition: all 0.3s ease;
   box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
 }
-
 .product-card button:hover {
   background: linear-gradient(135deg, #66bb6a, #388e3c);
   box-shadow: 0 0 14px rgba(76, 175, 80, 0.9);
@@ -222,7 +220,6 @@ a { text-decoration: none; color: inherit; }
   margin-top: 4px;
   transition: all 0.3s ease;
 }
-
 .toggle-reviews-btn:hover {
   background: #fb8c00;
   transform: translateY(-2px);
@@ -239,31 +236,20 @@ a { text-decoration: none; color: inherit; }
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-
-.average-rating {
-  font-size: 0.9rem;
-  margin-bottom: 6px;
-}
-
+.average-rating { font-size: 0.9rem; margin-bottom: 6px; }
 .review-list .review-item {
   padding: 6px 0;
   border-bottom: 1px solid #d0e6d0;
   font-size: 0.85rem;
 }
-
-.review-list .review-item:last-child {
-  border-bottom: none;
-}
-
+.review-list .review-item:last-child { border-bottom: none; }
 .star-selector span {
   cursor: pointer;
   font-size: 1.2em;
   color: #ccc;
 }
 .star-selector span.selected,
-.star-selector span.hovered {
-  color: gold;
-}
+.star-selector span.hovered { color: gold; }
 
 /* ===== FILTER CONTROLS ===== */
 .controls {
@@ -274,51 +260,70 @@ a { text-decoration: none; color: inherit; }
   margin: 20px 0;
 }
 
-.controls input, .controls select {
-  padding: 10px 16px;
-  border-radius: 25px;
-  border: none;
-  font-size: 0.95rem;
-  font-weight: 600;
-  outline: none;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-  transition: all 0.2s ease;
-}
-
+/* Search Box */
 .controls input {
-  border: 1px solid #ccc;
-}
-
-.controls select {
   padding: 10px 16px;
   border-radius: 25px;
-  border: none;
+  border: 1px solid #ccc;
   font-size: 0.95rem;
   font-weight: 600;
   outline: none;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* Custom Dropdowns */
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.custom-dropdown button {
+  background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+  color: #fff;
+  border: none;
+  padding: 10px 36px 10px 16px;
+  border-radius: 25px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
   box-shadow: 0 3px 8px rgba(0,0,0,0.15);
   transition: all 0.2s ease;
-  background: linear-gradient(135deg, #5a7f65, #2b4d3a);
-  color: #fff;       /* text color inside select */
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
 }
-
-/* Option styling */
-.controls select option {
-  background-color: #5a7f65;  /* dark green for dropdown options */
-  color: #fff;                /* white text */
-  padding: 8px 12px;
-}
-
-/* Hover effect for options (works in most modern browsers) */
-.controls select option:hover {
-  background-color: #4caf50;
+.custom-dropdown button::after {
+  content: "\\/";
+  font-size: 0.7rem;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   color: #fff;
 }
+.custom-dropdown:hover button {
+  background: #3d5a40;
+}
+.custom-dropdown ul {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  min-width: 180px;
+  z-index: 100;
+  padding: 6px 0;
+}
+.custom-dropdown ul li {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #2e2e2e;
+  transition: background 0.2s ease;
+}
+.custom-dropdown ul li:hover {
+  background: #f1f1f1;
+  color: #2b4d3a;
+}
+.custom-dropdown:hover ul { display: block; }
 
 /* ===== POLICY LINKS ===== */
 .policy-links {
@@ -336,9 +341,7 @@ a { text-decoration: none; color: inherit; }
   text-decoration: underline;
   transition: color 0.2s ease;
 }
-.policy-links a:hover {
-  color: #388e3c;
-}
+.policy-links a:hover { color: #388e3c; }
 </style>
 </head>
 <body>
@@ -387,23 +390,29 @@ a { text-decoration: none; color: inherit; }
 
 <!-- ===== FILTER CONTROLS ===== -->
 <div class="controls">
-  <!-- Search Box -->
+  <!-- Search -->
   <input type="text" id="searchBox" placeholder="Search products..." />
 
   <!-- Category Dropdown -->
-  <select id="categoryBox">
-    <option value="all">All Categories</option>
-    <option value="wellness">Wellness</option>
-    <option value="medicinal">Medicinal</option>
-    <option value="personlacare">Personal Care</option>
-  </select>
+  <div class="custom-dropdown">
+    <button>All Categories</button>
+    <ul>
+      <li data-value="all">All Categories</li>
+      <li data-value="wellness">Wellness</li>
+      <li data-value="medicinal">Medicinal</li>
+      <li data-value="personalcare">Personal Care</li>
+    </ul>
+  </div>
 
   <!-- Price Dropdown -->
-  <select id="priceBox">
-    <option value="default">Sort by Price</option>
-    <option value="low">Low to High</option>
-    <option value="high">High to Low</option>
-  </select>
+  <div class="custom-dropdown">
+    <button>Sort by Price</button>
+    <ul>
+      <li data-value="default">Default</li>
+      <li data-value="low">Low to High</li>
+      <li data-value="high">High to Low</li>
+    </ul>
+  </div>
 </div>
 
 <!-- ===== PRODUCT LIST ===== -->

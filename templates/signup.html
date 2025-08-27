@@ -27,29 +27,10 @@
     .checkbox-container input { margin-right: 8px; }
     .checkbox-container a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
     .checkbox-container a:hover { text-decoration: underline; }
-
-    /* Password field with eye icon */
-    .input-group {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .input-group input {
-      flex: 1;
-      padding-right: 40px;
-    }
-    .input-group button.toggle-password {
-      position: absolute;
-      right: 10px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 1.2rem;
-      color: #666;
-    }
-    .input-group button.toggle-password:hover {
-      color: #2b4d3a;
-    }
+    .input-group { position: relative; display: flex; align-items: center; }
+    .input-group input { flex: 1; padding-right: 40px; }
+    .input-group button.toggle-password { position: absolute; right: 10px; background: transparent; border: none; cursor: pointer; font-size: 1.2rem; color: #666; }
+    .input-group button.toggle-password:hover { color: #2b4d3a; }
   </style>
 </head>
 <body>
@@ -69,8 +50,8 @@
       <div class="error-msg">{{ error }}</div>
     {% endif %}
     <form method="POST" action="{{ url_for('auth.signup') }}">
-      <input type="text" name="name" placeholder="Full Name" required>
-      <input type="email" name="email" placeholder="Email" required>
+      <input type="text" id="username" name="name" placeholder="Full Name" required>
+      <input type="email" id="email" name="email" placeholder="Email" required>
       
       <!-- Password with eye -->
       <div class="input-group">
@@ -101,10 +82,10 @@
   </div>
 
 <script>
+// Toggle password visibility
 function togglePassword(fieldId, btn) {
   const input = document.getElementById(fieldId);
   const icon = btn.querySelector("i");
-
   if (input.type === "password") {
     input.type = "text";
     icon.classList.remove("fa-eye");
@@ -115,6 +96,52 @@ function togglePassword(fieldId, btn) {
     icon.classList.add("fa-eye");
   }
 }
+
+// Live username availability check
+const nameInput = document.getElementById('username');
+const emailInput = document.getElementById('email');
+const errorDiv = document.querySelector('.error-msg');
+
+nameInput.addEventListener('blur', async () => {
+  const username = nameInput.value.trim();
+  if (!username) return;
+  try {
+    const res = await fetch('{{ url_for("auth.check_username") }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
+    const data = await res.json();
+    if (!data.available) {
+      errorDiv.textContent = data.message;
+    } else {
+      errorDiv.textContent = '';
+    }
+  } catch (err) {
+    console.error('Username check error:', err);
+  }
+});
+
+// Live email availability check
+emailInput.addEventListener('blur', async () => {
+  const email = emailInput.value.trim();
+  if (!email) return;
+  try {
+    const res = await fetch('{{ url_for("auth.check_email") }}', { // We'll need a /check_email route
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if (!data.available) {
+      errorDiv.textContent = data.message;
+    } else {
+      errorDiv.textContent = '';
+    }
+  } catch (err) {
+    console.error('Email check error:', err);
+  }
+});
 </script>
 
 </body>

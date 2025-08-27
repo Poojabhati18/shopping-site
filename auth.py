@@ -27,18 +27,33 @@ def login_required(f):
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
+        name = request.form.get('name').strip()
+        email = request.form.get('email').strip().lower()
         password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
         agree = request.form.get('agree')
 
-        if not all([name, email, password, agree]):
+        if not all([name, email, password, confirm_password, agree]):
             return render_template('signup.html', error="Please fill all fields and agree to terms")
 
-        # Check if user already exists
-        existing_users = db.collection('customers').where('email', '==', email).get()
-        if existing_users:
+        # ✅ Validate email format
+        email_regex = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
+        if not re.match(email_regex, email):
+            return render_template('signup.html', error="Invalid email address. Please enter a valid one.")
+
+        # ✅ Check if email already exists
+        existing_email = db.collection('customers').where('email', '==', email).get()
+        if existing_email:
             return render_template('signup.html', error="Email already registered. Please login.")
+
+        # ✅ Check if username already exists
+        existing_name = db.collection('customers').where('name', '==', name).get()
+        if existing_name:
+            return render_template('signup.html', error="Username already taken. Please choose another.")
+
+        # ✅ Check password match
+        if password != confirm_password:
+            return render_template('signup.html', error="Passwords do not match.")
 
         # Hash password
         hashed_password = generate_password_hash(password)
@@ -53,10 +68,41 @@ def signup():
         })
 
         # Redirect to login page after signup
+        flash("Account created successfully! Please log in.", "success")
         return redirect(url_for('auth.login_customer'))
 
     # GET request renders signup page
     return render_template('signup.html')
+
+# ================= USERNAME CHECK =================
+@auth.route('/check_username', methods=['POST'])
+def check_username():
+    data = request.get_json()
+    username = data.get('username', '').strip()
+
+    if not username:
+        return jsonify({'available': False, 'message': 'Username cannot be empty'})
+
+    existing_name = db.collection('customers').where('name', '==', username).get()
+    if existing_name:
+        return jsonify({'available': False, 'message': 'Username already taken'})
+    
+    return jsonify({'available': True, 'message': 'Username available'})
+
+# ================= EMAIL CHECK =================
+@auth.route('/check_email', methods=['POST'])
+def check_email():
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
+
+    if not email:
+        return jsonify({'available': False, 'message': 'Email cannot be empty'})
+
+    existing_email = db.collection('customers').where('email', '==', email).get()
+    if existing_email:
+        return jsonify({'available': False, 'message': 'Email already registered'})
+
+    return jsonify({'available': True, 'message': 'Email is available'})
 
 # ================= LOGIN =================
 @auth.route('/loginC', methods=['GET', 'POST'])
