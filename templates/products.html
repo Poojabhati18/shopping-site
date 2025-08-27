@@ -147,15 +147,15 @@ a { text-decoration: none; color: inherit; }
 }
 
 .product-card {
-  background: linear-gradient(135deg, #a5d6a7, #66bb6a); /* subtle green gradient */
+  background: #ffffff; /* changed from green to white */
   border-radius: 12px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
   padding: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-  color: #fff; /* white text for contrast */
+  color: #2e2e2e; /* dark text for contrast on white */
 }
 
 .product-card:hover {
@@ -176,17 +176,17 @@ a { text-decoration: none; color: inherit; }
 }
 
 .product-card h2 {
-  font-size: 1.1rem;            /* slightly larger */
-  color: #ffffff;               /* white text for contrast */
-  font-weight: 600;             /* bolder heading */
-  margin: 12px 0 8px;           /* a little more spacing */
+  font-size: 1.1rem;
+  color: #2e2e2e; /* darker text */
+  font-weight: 600;
+  margin: 12px 0 8px;
   text-align: center;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.3); /* subtle shadow for readability */
+  text-shadow: none; /* remove shadow on white background */
 }
 
 .product-card .price {
   font-weight: bold;
-  color: #388e3c;
+  color: #388e3c; /* keep green for price to highlight */
   margin-bottom: 10px;
   text-align: center;
 }
@@ -395,6 +395,7 @@ a { text-decoration: none; color: inherit; }
     <option value="all">All Categories</option>
     <option value="wellness">Wellness</option>
     <option value="medicinal">Medicinal</option>
+    <option value="personlacare">Personal Care</option>
   </select>
 
   <!-- Price Dropdown -->
@@ -446,8 +447,8 @@ document.addEventListener("DOMContentLoaded", () => {
     el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
   }
 
-  /* ====== Render Products ====== */
-  function renderProducts() {
+/* ====== Render Products (updated) ====== */
+function renderProducts() {
   const container = document.getElementById("productList");
   if (!container) return;
 
@@ -458,8 +459,9 @@ document.addEventListener("DOMContentLoaded", () => {
     card.className = "product-card";
     card.dataset.id = product.id;
 
+    // image: add loading and decoding, and a CSS class for sizing if you want
     card.innerHTML = `
-      <img src="${product.image_url}" alt="${product.name}">
+      <img src="${product.image_url}" alt="${product.name}" loading="lazy" decoding="async" class="product-img">
       <h2>${product.name}</h2>
       <p class="price">₹${product.price}</p>
       <div class="qty-selector">
@@ -496,13 +498,13 @@ document.addEventListener("DOMContentLoaded", () => {
     container.appendChild(card);
     attachProductEvents(card, product);
     attachReviewEvents(card, product);
-    ensureReviewsLoaded(card, product.id);
+    // NOTE: do NOT call ensureReviewsLoaded here for every product —
+    // load reviews only when the user opens the review panel.
   });
 }
 
-
-  /* ====== Product Events ====== */
-  function attachProductEvents(card, product) {
+  /* ====== Product Events (updated) ====== */
+function attachProductEvents(card, product) {
   const addBtn = card.querySelector(".add-to-cart");
   const plusBtn = card.querySelector(".plus");
   const minusBtn = card.querySelector(".minus");
@@ -512,6 +514,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const reviewSection = card.querySelector(".reviews");
 
   let qty = 1;
+  let reviewsLoaded = false; // ensure we load reviews only once per card
 
   plusBtn?.addEventListener("click", () => { qty++; qtyEl.textContent = qty; });
   minusBtn?.addEventListener("click", () => { if(qty>1) qty--; qtyEl.textContent = qty; });
@@ -527,17 +530,23 @@ document.addEventListener("DOMContentLoaded", () => {
     qty = 1; qtyEl.textContent = qty;
   });
 
-  // ✅ Description Button
+  // Description Button
   descBtn?.addEventListener("click", () => showDescriptionModal(product));
 
-  // ✅ Review toggle
-  reviewBtn?.addEventListener("click", () => {
-    if(reviewSection.style.display === "none"){
-        reviewSection.style.display = "block";
-        reviewBtn.textContent = "Hide Reviews";
+  // Review toggle: load reviews on first open
+  reviewBtn?.addEventListener("click", async () => {
+    if (reviewSection.style.display === "none") {
+      reviewSection.style.display = "block";
+      reviewBtn.textContent = "Hide Reviews";
+      if (!reviewsLoaded) {
+        try {
+          await ensureReviewsLoaded(card, product.id);
+        } catch (e) { console.error("Failed to load reviews:", e); }
+        reviewsLoaded = true;
+      }
     } else {
-        reviewSection.style.display = "none";
-        reviewBtn.textContent = "Show Reviews";
+      reviewSection.style.display = "none";
+      reviewBtn.textContent = "Show Reviews";
     }
   });
 }
