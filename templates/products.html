@@ -399,25 +399,25 @@ a { text-decoration: none; color: inherit; }
   <input type="text" id="searchBox" placeholder="Search products..." />
 
   <!-- Category Dropdown -->
-  <div class="custom-dropdown">
-    <button>All Categories</button>
-    <ul>
-      <li data-value="all">All Categories</li>
-      <li data-value="wellness">Wellness</li>
-      <li data-value="medicinal">Medicinal</li>
-      <li data-value="personalcare">Personal Care</li>
-    </ul>
-  </div>
+<div class="custom-dropdown category-dropdown">
+  <button>All Categories</button>
+  <ul>
+    <li data-value="all">All Categories</li>
+    <li data-value="wellness">Wellness</li>
+    <li data-value="medicinal">Medicinal</li>
+    <li data-value="personalcare">Personal Care</li>
+  </ul>
+</div>
 
-  <!-- Price Dropdown -->
-  <div class="custom-dropdown">
-    <button>Sort by Price</button>
-    <ul>
-      <li data-value="default">Default</li>
-      <li data-value="low">Low to High</li>
-      <li data-value="high">High to Low</li>
-    </ul>
-  </div>
+<!-- Price Dropdown -->
+<div class="custom-dropdown price-dropdown">
+  <button>Sort by Price</button>
+  <ul>
+    <li data-value="default">Default</li>
+    <li data-value="low">Low to High</li>
+    <li data-value="high">High to Low</li>
+  </ul>
+</div>
 </div>
 
 <!-- ===== PRODUCT LIST ===== -->
@@ -475,15 +475,18 @@ dropdowns.forEach(dropdown => {
   });
 
   // Handle option selection
-  items.forEach(item => {
-    item.addEventListener('click', () => {
-      button.textContent = item.textContent; // update button text
-      menu.classList.remove('show'); // close menu
-      const selectedValue = item.dataset.value;
-      console.log('Selected:', selectedValue);
-      applyFilters(); // trigger filtering if needed
-    });
+items.forEach(item => {
+  item.addEventListener('click', () => {
+    button.textContent = item.textContent; 
+    menu.classList.remove('show'); 
+
+    const selectedValue = item.dataset.value;
+    dropdown.dataset.selected = selectedValue; // store selected value
+
+    console.log('Selected:', selectedValue);
+    applyFilters();
   });
+});
 
   // Close dropdown if clicked outside
   document.addEventListener('click', (e) => {
@@ -708,7 +711,8 @@ const priceBox = document.getElementById("priceBox");
 function applyFilters() {
   let tempProducts = [...products];
 
-  const categoryVal = categoryBox?.value || "all";
+  // Category filter
+  const categoryVal = document.querySelector(".custom-dropdown.category-dropdown")?.dataset.selected || "all";
   if (categoryVal !== "all") {
     tempProducts = tempProducts.filter(p =>
       Array.isArray(p.categories)
@@ -717,6 +721,7 @@ function applyFilters() {
     );
   }
 
+  // Search filter
   const searchTerm = searchBox?.value.trim().toLowerCase() || "";
   if (searchTerm !== "") {
     tempProducts = tempProducts.filter(p =>
@@ -725,7 +730,8 @@ function applyFilters() {
     );
   }
 
-  const priceVal = priceBox?.value || "default";
+  // Price sort
+  const priceVal = document.querySelector(".custom-dropdown.price-dropdown")?.dataset.selected || "default";
   if (priceVal === "low") tempProducts.sort((a, b) => a.price - b.price);
   else if (priceVal === "high") tempProducts.sort((a, b) => b.price - a.price);
 

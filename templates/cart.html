@@ -426,18 +426,18 @@ header h1 {
       const itemElement = document.createElement("div");
       itemElement.className = "cart-item";
       itemElement.innerHTML = `
-        <img src="${item.image}" alt="${item.name}">
-        <div class="item-info">
-          <div class="item-name">${item.name}</div>
-          <div class="item-price">₹${price} x ${quantity} = ₹${itemTotal}</div>
-          <div class="quantity-controls">
-            <button onclick="changeQuantity(${index}, -1)">–</button>
-            ${quantity}
-            <button onclick="changeQuantity(${index}, 1)">+</button>
-          </div>
-          <button class="remove-button" onclick="removeItem(${index})">Remove</button>
-        </div>
-      `;
+  <img src="${item.image}" alt="${item.name}">
+  <div class="cart-details">
+    <h3>${item.name}</h3>
+    <div class="price">₹${price} x ${quantity} = ₹${itemTotal}</div>
+  </div>
+  <div class="cart-actions">
+    <button onclick="changeQuantity(${index}, -1)">–</button>
+    <span>${quantity}</span>
+    <button onclick="changeQuantity(${index}, 1)">+</button>
+    <button onclick="removeItem(${index})">Remove</button>
+  </div>
+`;
       cartContainer.appendChild(itemElement);
     });
 

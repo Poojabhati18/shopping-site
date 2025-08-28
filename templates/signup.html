@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sign Up | AyuHealth</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <!-- Font Awesome for eye icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -16,10 +15,11 @@
     nav button:hover { background: #3d5a40; }
     .content { max-width: 400px; margin: 50px auto; background: #fff; padding: 30px; border-radius: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); text-align: center; }
     .content h2 { font-size: 2rem; color: #3d5a40; margin-bottom: 20px; }
-    .content input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 12px; border: 1px solid #ccc; font-size: 1rem; }
+    .content input { width: 100%; padding: 10px; margin: 10px 0 4px 0; border-radius: 12px; border: 1px solid #ccc; font-size: 1rem; }
     .content button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin-top: 10px; transition: all 0.2s ease; }
     .content button:hover { background: #3d5a40; }
-    .error-msg { color: red; margin-bottom: 10px; font-size: 0.9rem; }
+    .error-msg { color: red; font-size: 0.85rem; margin: 2px 0 8px 0; text-align: left; }
+    .server-error { color: red; margin-bottom: 10px; font-size: 0.9rem; text-align: center; }
     .login-link { margin-top: 15px; font-size: 0.95rem; }
     .login-link a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
     .login-link a:hover { text-decoration: underline; }
@@ -47,11 +47,17 @@
   <div class="content">
     <h2>Create Account</h2>
     {% if error %}
-      <div class="error-msg">{{ error }}</div>
+      <div class="server-error">{{ error }}</div>
     {% endif %}
     <form method="POST" action="{{ url_for('auth.signup') }}">
+      
+      <!-- Username -->
       <input type="text" id="username" name="name" placeholder="Full Name" required>
+      <div id="username-error" class="error-msg"></div>
+
+      <!-- Email -->
       <input type="email" id="email" name="email" placeholder="Email" required>
+      <div id="email-error" class="error-msg"></div>
       
       <!-- Password with eye -->
       <div class="input-group">
@@ -100,7 +106,8 @@ function togglePassword(fieldId, btn) {
 // Live username availability check
 const nameInput = document.getElementById('username');
 const emailInput = document.getElementById('email');
-const errorDiv = document.querySelector('.error-msg');
+const usernameError = document.getElementById('username-error');
+const emailError = document.getElementById('email-error');
 
 nameInput.addEventListener('blur', async () => {
   const username = nameInput.value.trim();
@@ -112,34 +119,34 @@ nameInput.addEventListener('blur', async () => {
       body: JSON.stringify({ username })
     });
     const data = await res.json();
-    if (!data.available) {
-      errorDiv.textContent = data.message;
-    } else {
-      errorDiv.textContent = '';
-    }
+    usernameError.textContent = data.available ? '' : data.message;
   } catch (err) {
-    console.error('Username check error:', err);
+    usernameError.textContent = 'Error checking username.';
   }
 });
 
-// Live email availability check
+// Live email availability + basic format check
 emailInput.addEventListener('blur', async () => {
   const email = emailInput.value.trim();
   if (!email) return;
+
+  // Quick frontend email format check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    emailError.textContent = 'Invalid email format.';
+    return;
+  }
+
   try {
-    const res = await fetch('{{ url_for("auth.check_email") }}', { // We'll need a /check_email route
+    const res = await fetch('{{ url_for("auth.check_email") }}', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email })
     });
     const data = await res.json();
-    if (!data.available) {
-      errorDiv.textContent = data.message;
-    } else {
-      errorDiv.textContent = '';
-    }
+    emailError.textContent = data.available ? '' : data.message;
   } catch (err) {
-    console.error('Email check error:', err);
+    emailError.textContent = 'Error checking email.';
   }
 });
 </script>
