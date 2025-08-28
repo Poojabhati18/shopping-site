@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <meta name="theme-color" content="#4CAF50">
-  <style>
+<style>
    /* ===== GLOBAL RESET ===== */
 * {
   margin: 0;
@@ -262,7 +262,6 @@ header h1 {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Individual cart items */
 .cart-item {
   display: flex;
   align-items: center;
@@ -325,13 +324,13 @@ header h1 {
   box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
   transition: all 0.3s ease;
 }
+
 .cart-actions button:hover {
   background: linear-gradient(135deg, #66bb6a, #388e3c);
   box-shadow: 0 0 12px rgba(76,175,80,0.9);
   transform: translateY(-2px);
 }
 
-/* Cart total */
 #cartTotal {
   font-size: 1.2rem;
   font-weight: 600;
@@ -340,7 +339,6 @@ header h1 {
   color: #2b4d3a;
 }
 
-/* Checkout button */
 .checkout-button {
   display: block;
   margin-left: auto;
@@ -363,7 +361,67 @@ header h1 {
   transform: translateY(-2px);
 }
 
-  </style>
+/* ===== NAV CONTAINER ===== */
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px;
+}
+
+/* ===== NAV BAR ===== */
+.nav-bar {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.nav-bar button,
+.auth-buttons button {
+  background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 25px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+
+.nav-bar button:hover,
+.auth-buttons button:hover {
+  background: #3d5a40;
+}
+
+/* ===== AUTH BUTTONS ===== */
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* ===== POLICY FOOTER ===== */
+.policy-footer {
+  text-align: right;
+  margin: 40px 20px 20px 0;
+  font-size: 0.85rem;
+  color: #2e2e2e;
+  font-weight: 500;
+}
+
+.policy-footer a {
+  color: #2b4d3a;
+  margin-left: 12px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.policy-footer a:hover {
+  color: #4caf50;
+}
+</style>
 </head>
 <body>
 
@@ -379,7 +437,7 @@ header h1 {
   </div>
 </header>
 
-<nav>
+<nav class="nav-bar">
   <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
   <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
   <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
@@ -393,12 +451,12 @@ header h1 {
   <button class="checkout-button" onclick="prepareCheckout()">Proceed to Checkout</button>
 </div>
 
-<div class="policy-links">
+<footer class="policy-footer">
   <a href="{{ url_for('refund_page') }}">Cancellation & Refunds</a>
   <a href="{{ url_for('privacy_page') }}">Privacy Policy</a>
   <a href="{{ url_for('terms_page') }}">Terms & Conditions</a>
   <a href="{{ url_for('shipping_page') }}">Shipping Policy</a>
-</div>
+</footer>
 
 <script>
   const cartContainer = document.getElementById("cartContainer");
@@ -441,7 +499,7 @@ header h1 {
       cartContainer.appendChild(itemElement);
     });
 
-    cartTotal.textContent = `Total: ₹${total}`;
+    cartTotal.textContent = `Total: ₹${total.toLocaleString()}`;
     updateCheckoutButton();
   }
 
@@ -467,7 +525,9 @@ header h1 {
   }
 
   function prepareCheckout() {
-    const orderDetails = cart.map(item => `${item.name} (₹${item.price} x ${item.qty}) = ₹${item.price * item.qty}`).join('\n');
+    const orderDetails = cart.map(item => 
+  `${item.name} (₹${Number(item.price).toLocaleString()} x ${item.qty}) = ₹${(item.price*item.qty).toLocaleString()}`
+).join('\n');
     const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     localStorage.setItem("orderDetails", orderDetails);
     localStorage.setItem("orderTotal", totalPrice);
