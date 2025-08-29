@@ -28,8 +28,8 @@
     .checkbox-container a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
     .checkbox-container a:hover { text-decoration: underline; }
     .input-group { position: relative; display: flex; align-items: center; }
-    .input-group input { flex: 1; padding-right: 45px; }
-    .input-group button.toggle-password { position: absolute; right: 12px; background: transparent; border: none; cursor: pointer; font-size: 1.1rem; color: #5a7f65; transition: color 0.2s ease; }
+    .input-group input { flex: 1; padding-right: 40px; }
+    .input-group button.toggle-password { position: absolute; right: 10px; background: transparent; border: none; cursor: pointer; font-size: 1.2rem; color: #666; }
     .input-group button.toggle-password:hover { color: #2b4d3a; }
   </style>
 </head>
@@ -47,7 +47,6 @@
   <div class="content">
     <h2>Login</h2>
 
-    <!-- Flash messages for verification or general info -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -75,7 +74,6 @@
       <button type="submit">Login</button>
     </form>
 
-    <!-- Resend verification form if user not verified -->
     {% if message and unverified_email %}
       <form method="POST" action="{{ url_for('auth.resend_verification') }}">
         <input type="hidden" name="email" value="{{ unverified_email }}">

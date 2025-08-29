@@ -3,28 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sign Up | AyuHealth</title>
+  <title>Login | AyuHealth</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   <style>
     body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background-color: #f9f6f1; color: #2e2e2e; }
-    header { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; padding: 20px 0; text-align: center; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; }
+    header { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; padding: 20px 0; text-align: center; font-size: 1.7rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; letter-spacing: 1px; }
     nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 15px 10px; margin-top: 10px; }
-    nav button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: white; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; transition: all 0.2s ease; font-size: 0.95rem; }
-    nav button:hover { background: #3d5a40; }
-    .content { max-width: 400px; margin: 50px auto; background: #fff; padding: 30px; border-radius: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); text-align: center; }
+    nav button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: white; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    nav button:hover { background: #3d5a40; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    .content { max-width: 420px; margin: 60px auto; background: #fff; padding: 35px 30px; border-radius: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); text-align: center; }
     .content h2 { font-size: 2rem; color: #3d5a40; margin-bottom: 20px; }
-    .content input { width: 100%; padding: 10px; margin: 10px 0 4px 0; border-radius: 12px; border: 1px solid #ccc; font-size: 1rem; }
-    .content button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin-top: 10px; transition: all 0.2s ease; }
-    .content button:hover { background: #3d5a40; }
-    .error-msg { color: red; font-size: 0.85rem; margin: 2px 0 8px 0; text-align: left; }
-    .server-error { color: red; margin-bottom: 10px; font-size: 0.9rem; text-align: center; }
+    .content input { width: 100%; padding: 12px 14px; margin: 12px 0; border-radius: 12px; border: 1px solid #ccc; font-size: 1rem; transition: border 0.2s ease, box-shadow 0.2s ease; }
+    .content input:focus { outline: none; border-color: #5a7f65; box-shadow: 0 0 6px rgba(90,127,101,0.3); }
+    .content button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-size: 1rem; font-weight: 500; margin-top: 15px; transition: all 0.3s ease; width: 100%; }
+    .content button:hover { background: #3d5a40; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+    .error-msg { color: red; margin-bottom: 10px; font-size: 0.9rem; }
     .flash-message { background: #e6f7e6; color: #2b4d3a; padding: 10px; border: 1px solid #a3d9a5; border-radius: 8px; margin-bottom: 15px; font-size: 0.95rem; }
-    .login-link { margin-top: 15px; font-size: 0.95rem; }
-    .login-link a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
-    .login-link a:hover { text-decoration: underline; }
-    .checkbox-container { display: flex; align-items: center; font-size: 0.9rem; margin: 10px 0; text-align: left; }
+    .signup-link { margin-top: 20px; font-size: 0.95rem; }
+    .signup-link a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
+    .signup-link a:hover { text-decoration: underline; }
+    .checkbox-container { display: flex; align-items: center; font-size: 0.9rem; margin: 15px 0; text-align: left; }
     .checkbox-container input { margin-right: 8px; }
     .checkbox-container a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
     .checkbox-container a:hover { text-decoration: underline; }
@@ -46,9 +45,8 @@
   </nav>
 
   <div class="content">
-    <h2>Create Account</h2>
+    <h2>Login</h2>
 
-    <!-- Server-side flash messages (for email verification notice, etc.) -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -58,49 +56,39 @@
     {% endwith %}
 
     {% if error %}
-      <div class="server-error">{{ error }}</div>
+      <div class="error-msg">{{ error }}</div>
     {% endif %}
 
-    <form method="POST" action="{{ url_for('auth.signup') }}">
-      
-      <!-- Username -->
-      <input type="text" id="username" name="name" placeholder="Full Name" required>
-      <div id="username-error" class="error-msg"></div>
-
-      <!-- Email -->
-      <input type="email" id="email" name="email" placeholder="Email" required>
-      <div id="email-error" class="error-msg"></div>
-      
-      <!-- Password with eye -->
+    <form method="POST" action="{{ url_for('auth.login_customer') }}">
+      <input type="email" name="email" placeholder="Email" required>
       <div class="input-group">
         <input type="password" id="password" name="password" placeholder="Password" required>
         <button type="button" class="toggle-password" onclick="togglePassword('password', this)">
           <i class="fa-solid fa-eye"></i>
         </button>
       </div>
-
-      <!-- Confirm Password with eye -->
-      <div class="input-group">
-        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
-        <button type="button" class="toggle-password" onclick="togglePassword('confirm_password', this)">
-          <i class="fa-solid fa-eye"></i>
-        </button>
-      </div>
-      
       <div class="checkbox-container">
         <input type="checkbox" name="agree" required>
-        <span>By creating this account, I agree to the <a href="{{ url_for('privacy_page') }}">Privacy Policy</a> and <a href="{{ url_for('terms_page') }}">Terms & Conditions</a>.</span>
+        <span>By logging in, I agree to the <a href="{{ url_for('privacy_page') }}">Privacy Policy</a> and <a href="{{ url_for('terms_page') }}">Terms & Conditions</a>.</span>
       </div>
-
-      <button type="submit">Sign Up</button>
+      <button type="submit">Login</button>
     </form>
-    <div class="login-link">
-      Already have an account? <a href="{{ url_for('auth.login_customer') }}">Log in here</a>
+
+    {% if message and unverified_email %}
+      <form method="POST" action="{{ url_for('auth.resend_verification') }}">
+        <input type="hidden" name="email" value="{{ unverified_email }}">
+        <button type="submit" style="margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:#5a7f65; color:white; cursor:pointer; width:100%;">
+          Resend Verification Email
+        </button>
+      </form>
+    {% endif %}
+
+    <div class="signup-link">
+      Don’t have an account yet? <a href="{{ url_for('auth.signup') }}">Create it here</a>
     </div>
   </div>
 
 <script>
-// Toggle password visibility
 function togglePassword(fieldId, btn) {
   const input = document.getElementById(fieldId);
   const icon = btn.querySelector("i");
@@ -114,52 +102,6 @@ function togglePassword(fieldId, btn) {
     icon.classList.add("fa-eye");
   }
 }
-
-// Live username availability check
-const nameInput = document.getElementById('username');
-const emailInput = document.getElementById('email');
-const usernameError = document.getElementById('username-error');
-const emailError = document.getElementById('email-error');
-
-nameInput.addEventListener('blur', async () => {
-  const username = nameInput.value.trim();
-  if (!username) return;
-  try {
-    const res = await fetch('{{ url_for("auth.check_username") }}', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username })
-    });
-    const data = await res.json();
-    usernameError.textContent = data.available ? '' : data.message;
-  } catch (err) {
-    usernameError.textContent = 'Error checking username.';
-  }
-});
-
-// Live email availability + basic format check
-emailInput.addEventListener('blur', async () => {
-  const email = emailInput.value.trim();
-  if (!email) return;
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    emailError.textContent = 'Invalid email format.';
-    return;
-  }
-
-  try {
-    const res = await fetch('{{ url_for("auth.check_email") }}', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-    const data = await res.json();
-    emailError.textContent = data.available ? '' : data.message;
-  } catch (err) {
-    emailError.textContent = 'Error checking email.';
-  }
-});
 </script>
 
 </body>
