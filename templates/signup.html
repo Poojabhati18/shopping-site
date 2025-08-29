@@ -20,6 +20,7 @@
     .content button:hover { background: #3d5a40; }
     .error-msg { color: red; font-size: 0.85rem; margin: 2px 0 8px 0; text-align: left; }
     .server-error { color: red; margin-bottom: 10px; font-size: 0.9rem; text-align: center; }
+    .flash-message { background: #e6f7e6; color: #2b4d3a; padding: 10px; border: 1px solid #a3d9a5; border-radius: 8px; margin-bottom: 15px; font-size: 0.95rem; }
     .login-link { margin-top: 15px; font-size: 0.95rem; }
     .login-link a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
     .login-link a:hover { text-decoration: underline; }
@@ -46,9 +47,20 @@
 
   <div class="content">
     <h2>Create Account</h2>
+
+    <!-- Server-side flash messages (for email verification notice, etc.) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     {% if error %}
       <div class="server-error">{{ error }}</div>
     {% endif %}
+
     <form method="POST" action="{{ url_for('auth.signup') }}">
       
       <!-- Username -->
@@ -130,7 +142,6 @@ emailInput.addEventListener('blur', async () => {
   const email = emailInput.value.trim();
   if (!email) return;
 
-  // Quick frontend email format check
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     emailError.textContent = 'Invalid email format.';

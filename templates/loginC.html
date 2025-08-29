@@ -5,199 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login | AyuHealth</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Global */
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f6f1;
-      color: #2e2e2e;
-    }
-
-    header {
-      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
-      color: #fff;
-      padding: 20px 0;
-      text-align: center;
-      font-size: 1.7rem;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      border-bottom-left-radius: 18px;
-      border-bottom-right-radius: 18px;
-      letter-spacing: 1px;
-    }
-
-    /* Nav */
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      padding: 15px 10px;
-      margin-top: 10px;
-    }
-
-    nav button {
-      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 0.95rem;
-      font-weight: 500;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    nav button:hover {
-      background: #3d5a40;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    /* Content Box */
-    .content {
-      max-width: 420px;
-      margin: 60px auto;
-      background: #fff;
-      padding: 35px 30px;
-      border-radius: 18px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-      text-align: center;
-    }
-
-    .content h2 {
-      font-size: 2rem;
-      color: #3d5a40;
-      margin-bottom: 20px;
-    }
-
-    /* Inputs */
-    .content input {
-      width: 100%;
-      padding: 12px 14px;
-      margin: 12px 0;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      transition: border 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .content input:focus {
-      outline: none;
-      border-color: #5a7f65;
-      box-shadow: 0 0 6px rgba(90,127,101,0.3);
-    }
-
-    /* Buttons */
-    .content button {
-      background: linear-gradient(135deg, #5a7f65, #2b4d3a);
-      color: #fff;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 25px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 500;
-      margin-top: 15px;
-      transition: all 0.3s ease;
-      width: 100%;
-    }
-
-    .content button:hover {
-      background: #3d5a40;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-    }
-
-    /* Error */
-    .error-msg {
-      color: red;
-      margin-bottom: 10px;
-      font-size: 0.9rem;
-    }
-
-    /* Signup link */
-    .signup-link {
-      margin-top: 20px;
-      font-size: 0.95rem;
-    }
-
-    .signup-link a {
-      color: #2b4d3a;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .signup-link a:hover {
-      text-decoration: underline;
-    }
-
-    /* Checkbox */
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      font-size: 0.9rem;
-      margin: 15px 0;
-      text-align: left;
-    }
-
-    .checkbox-container input {
-      margin-right: 8px;
-    }
-
-    .checkbox-container a {
-      color: #2b4d3a;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .checkbox-container a:hover {
-      text-decoration: underline;
-    }
-
-    /* Password input with eye button */
-    .input-group {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-group input {
-      flex: 1;
-      padding-right: 45px; /* space for eye button */
-    }
-
-    .input-group button.toggle-password {
-      position: absolute;
-      right: 12px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 1.1rem;
-      color: #5a7f65;
-      transition: color 0.2s ease;
-    }
-
-    .input-group button.toggle-password:hover {
-      color: #2b4d3a;
-    }
-
-    /* Responsive */
-    @media (max-width: 500px) {
-      nav {
-        gap: 8px;
-      }
-      .content {
-        margin: 40px 15px;
-        padding: 25px 20px;
-      }
-      .content h2 {
-        font-size: 1.6rem;
-      }
-    }
+    body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background-color: #f9f6f1; color: #2e2e2e; }
+    header { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; padding: 20px 0; text-align: center; font-size: 1.7rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; letter-spacing: 1px; }
+    nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 15px 10px; margin-top: 10px; }
+    nav button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: white; border: none; padding: 10px 18px; border-radius: 25px; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    nav button:hover { background: #3d5a40; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    .content { max-width: 420px; margin: 60px auto; background: #fff; padding: 35px 30px; border-radius: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); text-align: center; }
+    .content h2 { font-size: 2rem; color: #3d5a40; margin-bottom: 20px; }
+    .content input { width: 100%; padding: 12px 14px; margin: 12px 0; border-radius: 12px; border: 1px solid #ccc; font-size: 1rem; transition: border 0.2s ease, box-shadow 0.2s ease; }
+    .content input:focus { outline: none; border-color: #5a7f65; box-shadow: 0 0 6px rgba(90,127,101,0.3); }
+    .content button { background: linear-gradient(135deg, #5a7f65, #2b4d3a); color: #fff; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-size: 1rem; font-weight: 500; margin-top: 15px; transition: all 0.3s ease; width: 100%; }
+    .content button:hover { background: #3d5a40; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+    .error-msg { color: red; margin-bottom: 10px; font-size: 0.9rem; }
+    .flash-message { background: #e6f7e6; color: #2b4d3a; padding: 10px; border: 1px solid #a3d9a5; border-radius: 8px; margin-bottom: 15px; font-size: 0.95rem; }
+    .signup-link { margin-top: 20px; font-size: 0.95rem; }
+    .signup-link a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
+    .signup-link a:hover { text-decoration: underline; }
+    .checkbox-container { display: flex; align-items: center; font-size: 0.9rem; margin: 15px 0; text-align: left; }
+    .checkbox-container input { margin-right: 8px; }
+    .checkbox-container a { color: #2b4d3a; text-decoration: none; font-weight: 600; }
+    .checkbox-container a:hover { text-decoration: underline; }
+    .input-group { position: relative; display: flex; align-items: center; }
+    .input-group input { flex: 1; padding-right: 45px; }
+    .input-group button.toggle-password { position: absolute; right: 12px; background: transparent; border: none; cursor: pointer; font-size: 1.1rem; color: #5a7f65; transition: color 0.2s ease; }
+    .input-group button.toggle-password:hover { color: #2b4d3a; }
   </style>
 </head>
 <body>
@@ -213,37 +46,63 @@
 
   <div class="content">
     <h2>Login</h2>
+
+    <!-- Flash messages for verification or general info -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     {% if error %}
       <div class="error-msg">{{ error }}</div>
     {% endif %}
-   <form method="POST" action="{{ url_for('auth.login_customer') }}">
-      <input type="email" name="email" placeholder="Email" required>
 
-      <!-- Password field with eye button -->
+    <form method="POST" action="{{ url_for('auth.login_customer') }}">
+      <input type="email" name="email" placeholder="Email" required>
       <div class="input-group">
         <input type="password" id="password" name="password" placeholder="Password" required>
         <button type="button" class="toggle-password" onclick="togglePassword('password', this)">
-        <i class="fa-solid fa-eye"></i>
+          <i class="fa-solid fa-eye"></i>
         </button>
       </div>
-      
       <div class="checkbox-container">
         <input type="checkbox" name="agree" required>
         <span>By logging in, I agree to the <a href="{{ url_for('privacy_page') }}">Privacy Policy</a> and <a href="{{ url_for('terms_page') }}">Terms & Conditions</a>.</span>
       </div>
-
       <button type="submit">Login</button>
     </form>
+
+    <!-- Resend verification form if user not verified -->
+    {% if message and unverified_email %}
+      <form method="POST" action="{{ url_for('auth.resend_verification') }}">
+        <input type="hidden" name="email" value="{{ unverified_email }}">
+        <button type="submit" style="margin-top:10px; padding:10px 15px; border:none; border-radius:8px; background:#5a7f65; color:white; cursor:pointer; width:100%;">
+          Resend Verification Email
+        </button>
+      </form>
+    {% endif %}
+
     <div class="signup-link">
       Don’t have an account yet? <a href="{{ url_for('auth.signup') }}">Create it here</a>
     </div>
   </div>
 
 <script>
-function togglePassword() {
-  const passwordInput = document.getElementById('password');
-  const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-  passwordInput.setAttribute('type', type);
+function togglePassword(fieldId, btn) {
+  const input = document.getElementById(fieldId);
+  const icon = btn.querySelector("i");
+  if (input.type === "password") {
+    input.type = "text";
+    icon.classList.remove("fa-eye");
+    icon.classList.add("fa-eye-slash");
+  } else {
+    input.type = "password";
+    icon.classList.remove("fa-eye-slash");
+    icon.classList.add("fa-eye");
+  }
 }
 </script>
 
