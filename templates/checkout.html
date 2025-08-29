@@ -115,8 +115,8 @@
   async function sendEmail(payload) {
     try {
       const emailParams = {
-        from_name: payload.name,
-        from_email: payload.email,
+        name: payload.name,
+        email: payload.email,
         phone: payload.phone,
         address: payload.address,
         city: payload.city,
