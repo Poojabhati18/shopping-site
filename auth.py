@@ -186,13 +186,15 @@ def resend_verification():
         flash("Email already verified. You can log in.", "info")
         return redirect(url_for('auth.login_customer'))
 
-    token = get_serializer().dumps(email, salt="email-confirm")
+    # Use the same serializer as signup
+    token = s.dumps(email, salt="email-confirm")
     verify_url = url_for('auth.verify_email', token=token, _external=True)
 
+    # Send email using the same mail instance as signup
     msg = Message("Verify Your Email - AyuHealth", recipients=[email])
     msg.body = f"Hello {user_data['name']},\n\nPlease click the link to verify your account:\n{verify_url}\n\nIf you didn’t request this, ignore this email."
     try:
-        current_app.extensions['mail'].send(msg)
+        mail.send(msg)
         flash("Verification email resent! Please check your inbox.", "info")
     except Exception as e:
         print("Email send error:", e)

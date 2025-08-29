@@ -20,7 +20,7 @@ body {
 }
 a { text-decoration: none; color: inherit; }
 
-/* ===== NAV BAR + HEADER ===== */
+/* ===== HEADER ===== */
 .site-header {
   position: relative;
   display: flex;
@@ -34,20 +34,15 @@ a { text-decoration: none; color: inherit; }
   border-bottom-left-radius: 18px;
   border-bottom-right-radius: 18px;
 }
+.logo { font-weight: 600; }
 
-.logo {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #fff; /* stays white inside header */
-}
-
-/* NAVBAR LINKS */
-.navbar, .nav-bar {
+/* ===== NAVBAR ===== */
+.navbar {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
-.navbar a, .nav-bar button {
+.navbar a, .navbar button {
   background: linear-gradient(135deg, #5a7f65, #2b4d3a);
   color: white;
   border: none;
@@ -56,10 +51,8 @@ a { text-decoration: none; color: inherit; }
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.9rem;
-  font-weight: 600;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
 }
-.navbar a:hover, .nav-bar button:hover {
+.navbar a:hover, .navbar button:hover {
   background: #3d5a40;
 }
 
@@ -70,6 +63,58 @@ a { text-decoration: none; color: inherit; }
   gap: 10px;
   font-size: 0.95rem;
 }
+
+/* ===== PROFILE DROPDOWN ===== */
+.profile-dropdown {
+  position: relative;
+  display: inline-block;
+}
+.profile-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #5a7f65, #2b4d3a);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.profile-toggle:hover { background: #3d5a40; }
+.profile-toggle img { width: 25px; height: 25px; border-radius: 50%; }
+.customer-name { font-weight: 600; }
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  min-width: 140px;
+  z-index: 1000;
+  text-align: left;
+  padding: 8px 0;
+}
+.dropdown-menu a, .dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  color: #2e2e2e;
+  text-decoration: none;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.dropdown-menu a:hover, .dropdown-menu button:hover {
+  background: #f1f1f1;
+  color: #2b4d3a;
+}
+.profile-dropdown:hover .dropdown-menu { display: block; }
 
 /* ===== AUTH BUTTONS ===== */
 .auth-buttons {
@@ -85,7 +130,7 @@ a { text-decoration: none; color: inherit; }
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
 .auth-buttons button:hover { background: #3d5a40; }
@@ -214,26 +259,36 @@ a { text-decoration: none; color: inherit; }
 </head>
 <body>
 
-  <!-- NAVIGATION BAR -->
-  <header class="nav-container">
-    <div class="logo">🌿 AyuHealth Cart</div>
+  <!-- ===== NAVIGATION ===== -->
+<header class="site-header">
+  <div class="logo">🌿 Ayurvedic Store</div>
+  <nav class="navbar">
+    <a href="{{ url_for('home') }}">🏠 Home</a>
+    <a href="{{ url_for('products_page') }}">🛍️ Products</a>
+    <a href="{{ url_for('cart_page') }}">🛒 Cart</a>
+    <a href="{{ url_for('about_page') }}">👩‍⚕️ About Us</a>
+    <a href="{{ url_for('contact_page') }}">📞 Contact Us</a>
+  </nav>
 
-    <nav class="nav-bar">
-      <button onclick="location.href='{{ url_for('home') }}'">🏠 Home</button>
-      <button onclick="location.href='{{ url_for('products_page') }}'">🛍️ Products</button>
-      <button onclick="location.href='{{ url_for('cart_page') }}'">🛒 Cart</button>
-      <button onclick="location.href='{{ url_for('about_page') }}'">👩‍⚕️ About Us</button>
-      <button onclick="location.href='{{ url_for('contact_page') }}'">📞 Contact Us</button>
-    </nav>
-
-    <div class="auth-buttons">
-      {% if customer %}
-        <button onclick="location.href='{{ url_for('auth.logout_customer') }}'">Logout</button>
-      {% else %}
+  <div class="header-right">
+    {% if customer %}
+      <div class="profile-dropdown">
+        <div class="profile-toggle">
+          <img src="{{ url_for('static', filename='profile_icon.png') }}" alt="Profile">
+          <span class="customer-name">{{ customer.name }}</span>
+        </div>
+        <div class="dropdown-menu">
+          <button onclick="location.href='{{ url_for('auth.logout_customer') }}'">Logout</button>
+        </div>
+      </div>
+    {% else %}
+      <div class="auth-buttons">
         <button onclick="location.href='{{ url_for('auth.login_customer') }}'">Login</button>
         <button onclick="location.href='{{ url_for('auth.signup') }}'">Sign Up</button>
-      {% endif %}
-    </div>
+      </div>
+    {% endif %}
+  </div>
+
   </header>
 
   <!-- CART CONTENT -->
