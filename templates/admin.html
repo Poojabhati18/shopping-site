@@ -41,20 +41,20 @@
                 <td>{{ order.customer.email }}</td>
                 <td>{{ order.customer.address }}, {{ order.customer.city }} - {{ order.customer.pincode }}</td>
                 <td>
-                    <ul>
-                        {% set grand_total = 0 %}
-                        {% for product in order.products %}
-                            {% set line_total = product.quantity * product.price %}
-                            {% set grand_total = grand_total + line_total %}
-                            <li>
-                                {{ product.name }} (x{{ product.quantity }}) – 
-                                ₹{{ product.price }} each | 
-                                Total: ₹{{ line_total }}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    <span class="total">Grand Total: ₹{{ grand_total }}</span>
-                </td>
+    <ul>
+        {% set grand_total = 0 %}
+        {% for product in order.products %}
+            {% set line_total = product["quantity"] * product["price"] %}
+            {% set grand_total = grand_total + line_total %}
+            <li>
+                {{ product["name"] }} (x{{ product["quantity"] }}) – 
+                ₹{{ product["price"] }} each | 
+                Total: ₹{{ line_total }}
+            </li>
+        {% endfor %}
+    </ul>
+    <span class="total">Grand Total: ₹{{ grand_total }}</span>
+</td>
                 <td>{{ order.status }}</td>
                 <td>
                     {% if order.timestamp %}
