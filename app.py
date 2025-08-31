@@ -255,12 +255,13 @@ def place_order():
 
     try:
         customer_email = customer.get("email")
+        today = datetime.now(timezone.utc).date()
 
         # Only enforce daily restriction for non-owner
         if customer_email != OWNER_EMAIL:
-            today = datetime.now(timezone.utc).date()
             orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
-            for order in orders_ref.stream():
+            existing_orders = orders_ref.stream()
+            for order in existing_orders:
                 order_data_check = order.to_dict()
                 if "timestamp" in order_data_check:
                     order_date = order_data_check["timestamp"].astimezone(timezone.utc).date()
@@ -280,7 +281,7 @@ def place_order():
                 "city": data.get("city"),
                 "pincode": data.get("pincode"),
             },
-            "products": data.get("products"),
+            "products": data.get("products", []),
             "status": "pending",
             "timestamp": firestore.SERVER_TIMESTAMP
         }
@@ -289,21 +290,22 @@ def place_order():
         db.collection("orders").add(order_data)
 
         # ===== Email Notification =====
-         try:
-            if isinstance(order_data, dict):
+        try:
+            if isinstance(order_data, dict) and isinstance(order_data.get("customer"), dict):
                 notify_customer(customer_email, order_data)
             else:
-                print("Email notify skipped: order_data is not a dict")
+                print("Email notify skipped: order_data or customer info is invalid")
         except Exception as e:
             print("Email notify error:", e)
 
-        # ===== WhatsApp Notification to Boss =====
+        # ===== WhatsApp Notification =====
         try:
-            products = order_data['products']
+            products = order_data.get('products', [])
             products_text_lines = []
+
             for p in products:
                 name = p.get('name', 'Unknown')
-                qty = int(p.get('quantity', 1))  # make sure this matches your key
+                qty = int(p.get('quantity', 1))
                 price = float(p.get('price', 0))
                 total = qty * price
                 products_text_lines.append(f"{name} | Qty: {qty} | Price: ₹{price} | Total: ₹{total}")
@@ -324,8 +326,8 @@ def place_order():
 """
 
             twilio_client.messages.create(
-                from_=WHATSAPP_FROM,  # Twilio WhatsApp number
-                to=WHATSAPP_TO,       # verified WhatsApp number
+                from_=WHATSAPP_FROM,
+                to=WHATSAPP_TO,
                 body=message_text
             )
         except Exception as e:
