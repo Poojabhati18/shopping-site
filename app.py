@@ -256,12 +256,11 @@ def place_order():
     try:
         customer_email = customer.get("email")
 
-        # Daily restriction for non-owner
+        # Only enforce daily restriction for non-owner
         if customer_email != OWNER_EMAIL:
             today = datetime.now(timezone.utc).date()
             orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
-            existing_orders = orders_ref.stream()
-            for order in existing_orders:
+            for order in orders_ref.stream():
                 order_data_check = order.to_dict()
                 if "timestamp" in order_data_check:
                     order_date = order_data_check["timestamp"].astimezone(timezone.utc).date()
@@ -304,7 +303,7 @@ def place_order():
             products_text_lines = []
             for p in products:
                 name = p.get('name', 'Unknown')
-                qty = int(p.get('qty', p.get('quantity', 1)))  # handle both keys
+                qty = int(p.get('quantity', 1))  # make sure this matches your key
                 price = float(p.get('price', 0))
                 total = qty * price
                 products_text_lines.append(f"{name} | Qty: {qty} | Price: ₹{price} | Total: ₹{total}")
@@ -325,8 +324,8 @@ def place_order():
 """
 
             twilio_client.messages.create(
-                from_=WHATSAPP_FROM,
-                to=WHATSAPP_TO,
+                from_=WHATSAPP_FROM,  # Twilio WhatsApp number
+                to=WHATSAPP_TO,       # verified WhatsApp number
                 body=message_text
             )
         except Exception as e:
@@ -337,30 +336,6 @@ def place_order():
     except Exception as e:
         print("Place order error:", e)
         return jsonify({"success": False, "message": "Failed to place order"}), 500
-
-# ================= Update / Cancel Order =================
-@app.route("/update_order/<order_id>/<status>", methods=["POST"])
-def update_order(order_id, status):
-    order_ref = db.collection("orders").document(order_id)
-    order = order_ref.get()
-    if not order.exists:
-        return jsonify({"success": False, "error": "Order not found"}), 404
-
-    order_data = order.to_dict()
-
-    if status.lower() == "cancelled":
-       order_ref.delete()   # <--- this removes the order from Firebase
-    else:
-       order_ref.update({"status": status})
-
-    # Notify customer
-    try:
-        success, msg = notify_customer(order_data, status)
-    except Exception as e:
-        print("Notify error:", e)
-        success, msg = True, "Order updated but email failed."
-
-    return jsonify({"success": success, "message": msg})
 
 # ================= ADMIN DASHBOARD =================
 @app.route('/admin')
