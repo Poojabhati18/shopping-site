@@ -10,11 +10,20 @@ from firebase_admin import firestore
 from firebase_config import db  # Your Firebase config
 from order_emails import notify_customer  # Your email helper
 from auth import auth  # <-- Import the auth blueprint
+from twilio.rest import Client
 
 # ================= LOAD ENV =================
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
+
+# ================= TWILIO CONFIG =================
+ACCOUNT_SID = os.getenv("ACCOUNT_SID")
+AUTH_TOKEN = os.getenv("AUTH_TOKEN")
+WHATSAPP_TO = os.getenv("WHATSAPP_TO")  # your WhatsApp number like whatsapp:+91XXXXXXXXXX
+WHATSAPP_FROM = "whatsapp:+14155238886"  # Twilio sandbox number
+
+twilio_client = Client(ACCOUNT_SID, AUTH_TOKEN)
 
 # ================= FLASK-MAIL CONFIG =================
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -231,11 +240,6 @@ def post_review(product_id):
         print("POST review error:", e)
         return jsonify({"success": False, "message": "Failed to save review."}), 500
 
-from datetime import datetime, timezone
-
-import os
-from datetime import datetime, timezone
-
 OWNER_EMAIL = os.environ.get("EMAIL_USER")  # reads your email from env
 
 @app.route("/place_order", methods=["POST"])
@@ -284,59 +288,39 @@ def place_order():
 
         db.collection("orders").add(order_data)
 
-        # Optional: notify customer
+        # ✅ Notify customer by email
         try:
             notify_customer(customer_email, order_data)
         except Exception as e:
             print("Email notify error:", e)
+
+        # ✅ WhatsApp Boss Notification
+        try:
+            message_text = f"""
+📦 *New Order Alert!*
+👤 Name: {order_data['customer']['name']}
+📧 Email: {order_data['customer']['email']}
+📞 Phone: {order_data['customer']['phone']}
+🏙️ City: {order_data['customer']['city']}
+📮 Pincode: {order_data['customer']['pincode']}
+🏠 Address: {order_data['customer']['address']}
+
+🛍️ Products:
+{json.dumps(order_data['products'], indent=2, ensure_ascii=False)}
+"""
+            twilio_client.messages.create(
+                from_=WHATSAPP_FROM,
+                to=WHATSAPP_TO,
+                body=message_text
+            )
+        except Exception as e:
+            print("WhatsApp notify error:", e)
 
         return jsonify({"success": True, "message": "Order placed successfully"}), 200
 
     except Exception as e:
         print("Place order error:", e)
         return jsonify({"success": False, "message": "Failed to place order"}), 500
-
-# ================= ADMIN DASHBOARD =================
-@app.route('/admin')
-def admin_dashboard():
-    if not session.get("admin"):
-        return redirect(url_for("login"))
-
-    # Fetch orders
-    orders = []
-    try:
-        orders_ref = db.collection("orders").order_by(
-            "timestamp", direction=firestore.Query.DESCENDING
-        )
-        for doc in orders_ref.stream():
-            try:
-                order_data = doc.to_dict()
-                order_data["id"] = doc.id
-                orders.append(order_data)
-            except Exception as e:
-                print("Error processing order:", e)
-    except Exception as e:
-        print("Firebase fetch error:", e)
-        orders = []
-
-    # Fetch notifications
-    notifications = []
-    try:
-        notifications_ref = db.collection("admin_notifications").order_by(
-            "timestamp", direction=firestore.Query.DESCENDING
-        )
-        for n in notifications_ref.stream():
-            try:
-                notif = n.to_dict()
-                notif["id"] = n.id
-                notifications.append(notif)
-            except Exception as e:
-                print("Error processing notification:", e)
-    except Exception as e:
-        print("Firebase notifications error:", e)
-        notifications = []
-
-    return render_template("admin.html", orders=orders, notifications=notifications)
 
 # ================= Update / Cancel Order =================
 @app.route("/update_order/<order_id>/<status>", methods=["POST"])
