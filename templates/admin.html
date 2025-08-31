@@ -44,17 +44,19 @@
     <ul>
         {% set grand_total = 0 %}
         {% for product in order.products %}
-            {% set line_total = product["quantity"] * product["price"] %}
+            {% set line_total = product.get("quantity", 0) * product.get("price", 0) %}
             {% set grand_total = grand_total + line_total %}
             <li>
-                {{ product["name"] }} (x{{ product["quantity"] }}) – 
-                ₹{{ product["price"] }} each | 
+                {{ product.get("name", "Unknown") }} 
+                (x{{ product.get("quantity", 0) }}) – 
+                ₹{{ product.get("price", 0) }} each | 
                 Total: ₹{{ line_total }}
             </li>
         {% endfor %}
     </ul>
     <span class="total">Grand Total: ₹{{ grand_total }}</span>
 </td>
+
                 <td>{{ order.status }}</td>
                 <td>
                     {% if order.timestamp %}
