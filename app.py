@@ -256,7 +256,7 @@ def place_order():
     try:
         customer_email = customer.get("email")
 
-        # Only enforce daily restriction for non-owner
+        # Daily restriction for non-owner
         if customer_email != OWNER_EMAIL:
             today = datetime.now(timezone.utc).date()
             orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
@@ -290,7 +290,7 @@ def place_order():
         db.collection("orders").add(order_data)
 
         # ===== Email Notification =====
-        try:
+         try:
             if isinstance(order_data, dict):
                 notify_customer(customer_email, order_data)
             else:
@@ -299,19 +299,19 @@ def place_order():
             print("Email notify error:", e)
 
         # ===== WhatsApp Notification to Boss =====
-try:
-    products = order_data['products']
-    products_text_lines = []
-    for p in products:
-        name = p.get('name', 'Unknown')
-        qty = int(p.get('qty', 1))
-        price = float(p.get('price', 0))
-        total = qty * price
-        products_text_lines.append(f"{name} | Qty: {qty} | Price: ₹{price} | Total: ₹{total}")
+        try:
+            products = order_data['products']
+            products_text_lines = []
+            for p in products:
+                name = p.get('name', 'Unknown')
+                qty = int(p.get('qty', p.get('quantity', 1)))  # handle both keys
+                price = float(p.get('price', 0))
+                total = qty * price
+                products_text_lines.append(f"{name} | Qty: {qty} | Price: ₹{price} | Total: ₹{total}")
 
-    products_text = "\n".join(products_text_lines)
+            products_text = "\n".join(products_text_lines)
 
-    message_text = f"""
+            message_text = f"""
 📦 *New Order Alert!*
 👤 Name: {order_data['customer'].get('name')}
 📧 Email: {order_data['customer'].get('email')}
@@ -324,13 +324,13 @@ try:
 {products_text}
 """
 
-    twilio_client.messages.create(
-        from_=WHATSAPP_FROM,  # must be Twilio WhatsApp number
-        to=WHATSAPP_TO,       # your verified WhatsApp number
-        body=message_text
-    )
-except Exception as e:
-    print("WhatsApp notify error:", e)
+            twilio_client.messages.create(
+                from_=WHATSAPP_FROM,
+                to=WHATSAPP_TO,
+                body=message_text
+            )
+        except Exception as e:
+            print("WhatsApp notify error:", e)
 
         return jsonify({"success": True, "message": "Order placed successfully"}), 200
 
