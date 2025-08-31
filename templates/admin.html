@@ -36,26 +36,30 @@
         </thead>
         <tbody>
             {% for order in orders %}
-            <tr>
-                <td>{{ order.customer.name }}</td>
-                <td>{{ order.customer.email }}</td>
-                <td>{{ order.customer.address }}, {{ order.customer.city }} - {{ order.customer.pincode }}</td>
-                <td>
-    <ul>
-        {% set grand_total = 0 %}
-        {% for product in order.products %}
-            {% set line_total = product.get("quantity", 0) * product.get("price", 0) %}
-            {% set grand_total = grand_total + line_total %}
-            <li>
-                {{ product.get("name", "Unknown") }} 
-                (x{{ product.get("quantity", 0) }}) – 
-                ₹{{ product.get("price", 0) }} each | 
-                Total: ₹{{ line_total }}
-            </li>
-        {% endfor %}
-    </ul>
-    <span class="total">Grand Total: ₹{{ grand_total }}</span>
-</td>
+<tr>
+    <td>{{ order.customer.name }}</td>
+    <td>{{ order.customer.email }}</td>
+    <td>{{ order.customer.address }}, {{ order.customer.city }} - {{ order.customer.pincode }}</td>
+    <td>
+        <ul style="list-style-type:none; padding-left:0;">
+            {% set grand_total = 0 %}
+            {% for product in order.products %}
+                {% set qty = product.get("qty", 0) %}
+                {% set price = product.get("price", 0) %}
+                {% set line_total = qty * price %}
+                {% set grand_total = grand_total + line_total %}
+                <li>
+                    📦 {{ product.get("name", "Unknown") }} 
+                    | Quantity: {{ qty }} 
+                    | Price: ₹{{ price }} 
+                    | Total: ₹{{ line_total }}
+                </li>
+            {% endfor %}
+        </ul>
+        <strong>💰 Grand Total: ₹{{ grand_total }}</strong>
+    </td>
+</tr>
+{% endfor %}
 
                 <td>{{ order.status }}</td>
                 <td>

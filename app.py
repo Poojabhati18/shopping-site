@@ -299,8 +299,19 @@ def place_order():
             print("Email notify error:", e)
 
         # ===== WhatsApp Notification to Boss =====
-        try:
-            message_text = f"""
+try:
+    products = order_data['products']
+    products_text_lines = []
+    for p in products:
+        name = p.get('name', 'Unknown')
+        qty = int(p.get('qty', 1))
+        price = float(p.get('price', 0))
+        total = qty * price
+        products_text_lines.append(f"{name} | Qty: {qty} | Price: ₹{price} | Total: ₹{total}")
+
+    products_text = "\n".join(products_text_lines)
+
+    message_text = f"""
 📦 *New Order Alert!*
 👤 Name: {order_data['customer'].get('name')}
 📧 Email: {order_data['customer'].get('email')}
@@ -310,15 +321,16 @@ def place_order():
 🏠 Address: {order_data['customer'].get('address')}
 
 🛍️ Products:
-{json.dumps(order_data['products'], indent=2, ensure_ascii=False)}
+{products_text}
 """
-            twilio_client.messages.create(
-                from_=WHATSAPP_FROM,  # must be Twilio WhatsApp number
-                to=WHATSAPP_TO,       # your verified WhatsApp number
-                body=message_text
-            )
-        except Exception as e:
-            print("WhatsApp notify error:", e)
+
+    twilio_client.messages.create(
+        from_=WHATSAPP_FROM,  # must be Twilio WhatsApp number
+        to=WHATSAPP_TO,       # your verified WhatsApp number
+        body=message_text
+    )
+except Exception as e:
+    print("WhatsApp notify error:", e)
 
         return jsonify({"success": True, "message": "Order placed successfully"}), 200
 
@@ -349,6 +361,29 @@ def update_order(order_id, status):
         success, msg = True, "Order updated but email failed."
 
     return jsonify({"success": success, "message": msg})
+
+# ================= ADMIN DASHBOARD =================
+@app.route('/admin')
+def admin_dashboard():
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+
+    # Fetch orders
+    orders = []
+    try:
+        orders_ref = db.collection("orders").order_by(
+            "date_ordered", direction=firestore.Query.DESCENDING
+        )
+        for doc in orders_ref.stream():
+            try:
+                order_data = doc.to_dict()
+                order_data["id"] = doc.id
+                orders.append(order_data)
+            except Exception as e:
+                print("Error processing order:", e)
+    except Exception as e:
+        print("Firebase fetch error:", e)
+        orders = []
 
 # ================= RUN APP =================
 if __name__ == "__main__":
