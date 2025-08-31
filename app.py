@@ -255,23 +255,23 @@ def place_order():
 
     try:
         customer_email = customer.get("email")
-        
+
         # Only enforce daily restriction for non-owner
         if customer_email != OWNER_EMAIL:
             today = datetime.now(timezone.utc).date()
             orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
             existing_orders = orders_ref.stream()
             for order in existing_orders:
-                order_data = order.to_dict()
-                if "timestamp" in order_data:
-                    order_date = order_data["timestamp"].astimezone(timezone.utc).date()
+                order_data_check = order.to_dict()
+                if "timestamp" in order_data_check:
+                    order_date = order_data_check["timestamp"].astimezone(timezone.utc).date()
                     if order_date == today:
                         return jsonify({
                             "success": False,
                             "message": "You can only place one order per day."
                         }), 400
 
-        # Place new order
+        # Create order dict
         order_data = {
             "customer": {
                 "name": data.get("name"),
@@ -286,31 +286,35 @@ def place_order():
             "timestamp": firestore.SERVER_TIMESTAMP
         }
 
+        # Save order to Firestore
         db.collection("orders").add(order_data)
 
-        # ✅ Notify customer by email
+        # ===== Email Notification =====
         try:
-            notify_customer(customer_email, order_data)
+            if isinstance(order_data, dict):
+                notify_customer(customer_email, order_data)
+            else:
+                print("Email notify skipped: order_data is not a dict")
         except Exception as e:
             print("Email notify error:", e)
 
-        # ✅ WhatsApp Boss Notification
+        # ===== WhatsApp Notification to Boss =====
         try:
             message_text = f"""
 📦 *New Order Alert!*
-👤 Name: {order_data['customer']['name']}
-📧 Email: {order_data['customer']['email']}
-📞 Phone: {order_data['customer']['phone']}
-🏙️ City: {order_data['customer']['city']}
-📮 Pincode: {order_data['customer']['pincode']}
-🏠 Address: {order_data['customer']['address']}
+👤 Name: {order_data['customer'].get('name')}
+📧 Email: {order_data['customer'].get('email')}
+📞 Phone: {order_data['customer'].get('phone')}
+🏙️ City: {order_data['customer'].get('city')}
+📮 Pincode: {order_data['customer'].get('pincode')}
+🏠 Address: {order_data['customer'].get('address')}
 
 🛍️ Products:
 {json.dumps(order_data['products'], indent=2, ensure_ascii=False)}
 """
             twilio_client.messages.create(
-                from_=WHATSAPP_FROM,
-                to=WHATSAPP_TO,
+                from_=WHATSAPP_FROM,  # must be Twilio WhatsApp number
+                to=WHATSAPP_TO,       # your verified WhatsApp number
                 body=message_text
             )
         except Exception as e:
