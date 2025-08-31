@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 from flask_mail import Mail, Message 
 import os, json, ssl, smtplib, requests
-from datetime import datetime
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -231,6 +231,13 @@ def post_review(product_id):
         print("POST review error:", e)
         return jsonify({"success": False, "message": "Failed to save review."}), 500
 
+from datetime import datetime, timezone
+
+import os
+from datetime import datetime, timezone
+
+OWNER_EMAIL = os.environ.get("EMAIL_USER")  # reads your email from env
+
 @app.route("/place_order", methods=["POST"])
 @require_verification
 def place_order():
@@ -243,25 +250,43 @@ def place_order():
         return jsonify({"success": False, "message": "Invalid data"}), 400
 
     try:
+        customer_email = customer.get("email")
+        
+        # Only enforce daily restriction for non-owner
+        if customer_email != OWNER_EMAIL:
+            today = datetime.now(timezone.utc).date()
+            orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
+            existing_orders = orders_ref.stream()
+            for order in existing_orders:
+                order_data = order.to_dict()
+                if "timestamp" in order_data:
+                    order_date = order_data["timestamp"].astimezone(timezone.utc).date()
+                    if order_date == today:
+                        return jsonify({
+                            "success": False,
+                            "message": "You can only place one order per day."
+                        }), 400
+
+        # Place new order
         order_data = {
             "customer": {
                 "name": data.get("name"),
-                "email": data.get("email"),
+                "email": customer_email,
                 "phone": data.get("phone"),
                 "address": data.get("address"),
                 "city": data.get("city"),
                 "pincode": data.get("pincode"),
             },
             "products": data.get("products"),
-            "status": "pending",  # <-- use consistent field name
+            "status": "pending",
             "timestamp": firestore.SERVER_TIMESTAMP
         }
 
         db.collection("orders").add(order_data)
 
-        # Optional: notify customer by email
+        # Optional: notify customer
         try:
-            notify_customer(customer.get("email"), order_data)
+            notify_customer(customer_email, order_data)
         except Exception as e:
             print("Email notify error:", e)
 
@@ -324,10 +349,9 @@ def update_order(order_id, status):
     order_data = order.to_dict()
 
     if status.lower() == "cancelled":
-        # delete or just update status? safer: update status instead of delete
-        order_ref.update({"status": "cancelled"})
+       order_ref.delete()   # <--- this removes the order from Firebase
     else:
-        order_ref.update({"status": status})
+       order_ref.update({"status": status})
 
     # Notify customer
     try:
