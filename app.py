@@ -353,12 +353,19 @@ def admin_dashboard():
         for doc in orders_ref.stream():
             order_data = doc.to_dict()
             order_data["id"] = doc.id
+
+            # ✅ Add this part (convert timestamp for template)
+            ts = order_data.get("timestamp")
+            if ts and hasattr(ts, "to_datetime"):
+                order_data["created_at"] = ts.to_datetime().strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                order_data["created_at"] = "—"
+
             orders.append(order_data)
     except Exception as e:
         print("Firebase fetch error:", e)
 
     return render_template("admin.html", orders=orders)
-
 
 @app.route("/orders/<order_id>/confirm", methods=["POST"])
 def confirm_order(order_id):
