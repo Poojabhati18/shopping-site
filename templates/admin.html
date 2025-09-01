@@ -121,14 +121,14 @@
                     {% if o.products %}
                         <ul>
                         {% for p in o.products %}
-                            <li>{{ p.name }} × {{ p.quantity }}</li>
+                            <li>{{ p.name }} × {{ p.qty if p.qty else 1 }}</li>
                         {% endfor %}
                         </ul>
                     {% else %}
                         —
                     {% endif %}
                 </td>
-                <td>{{ o.get('currency','₹') }}{{ o.get('total','0.00') }}</td>
+                <td>{{ o.get('currency','₹') }}{{o.total }}</td>
                 <td>{{ o.created_at }}</td>
                 <td>
                     <span class="pill {{ o.status|lower }}">

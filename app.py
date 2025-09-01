@@ -361,6 +361,13 @@ def admin_dashboard():
             else:
                 order_data["created_at"] = "—"
 
+             total = 0
+            for p in order_data.get("products", []):
+                price = float(p.get("price", 0))
+                qty = int(p.get("qty", 1))
+                total += price * qty
+            order_data["total"] = "%.2f" % total
+
             orders.append(order_data)
     except Exception as e:
         print("Firebase fetch error:", e)
