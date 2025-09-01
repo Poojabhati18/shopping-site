@@ -1,77 +1,143 @@
 <!doctype html>
-.flash { padding: 12px 14px; border-radius: 10px; margin: 10px 0; }
-.flash.success { background: #113b1b; color: #bbf7d0; }
-.flash.warning { background: #3b2f11; color: #fde68a; }
-.flash.danger { background: #3b1111; color: #fecaca; }
-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
-th, td { border-bottom: 1px solid #1f2937; padding: 10px; text-align: left; vertical-align: top; }
-th { background: #0f172a; position: sticky; top: 0; }
-.btn { padding: 8px 12px; border: 0; border-radius: 10px; cursor: pointer; font-weight: 600; }
-.btn-confirm { background: #16a34a; color: #031006; }
-.btn-cancel { background: #b91c1c; color: #fff; }
-.row { background: #0f172a; }
-.pill { background: #1f2937; padding: 2px 8px; border-radius: 9999px; font-size: 12px; }
-code { background: #111827; padding: 2px 4px; border-radius: 6px; }
-</style>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a0f1c;
+            color: #f0f0f0;
+            margin: 20px;
+        }
+
+        h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flash {
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .flash.success { background: #113b1b; color: #bbf7d0; }
+        .flash.warning { background: #3b2f11; color: #fde68a; }
+        .flash.danger { background: #3b1111; color: #fecaca; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #1f2937;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #0f172a;
+            position: sticky;
+            top: 0;
+            color: #f0f0f0;
+        }
+
+        tr.row {
+            background: #0f172a;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-confirm { background: #16a34a; color: #031006; }
+        .btn-cancel { background: #b91c1c; color: #fff; }
+
+        .pill {
+            background: #1f2937;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 12px;
+        }
+
+        code {
+            background: #111827;
+            padding: 2px 4px;
+            border-radius: 6px;
+            font-family: monospace;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 16px;
+        }
+    </style>
 </head>
 <body>
-<h1>Pending Orders <span class="pill">{{ orders|length }}</span></h1>
+    <h1>Pending Orders <span class="pill">{{ orders|length }}</span></h1>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-{% for category, message in messages %}
-<div class="flash {{ category }}">{{ message }}</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-
-
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>Customer</th>
-<th>Items</th>
-<th>Total</th>
-<th>Created</th>
-<th>Actions</th>
-</tr>
-</thead>
-<tbody>
-{% for o in orders %}
-<tr class="row">
-<td><code>{{ o.id }}</code></td>
-<td>
-<div><strong>{{ o.get('customer_name', '—') }}</strong></div>
-<div>{{ o.get('customer_email', '—') }}</div>
-</td>
-<td>
-{% if o.get('items') %}
-<ul style="margin:0; padding-left: 16px;">
-{% for it in o.items %}
-<li>{{ it.get('name','Item') }} × {{ it.get('qty',1) }}</li>
-{% endfor %}
-</ul>
-{% else %}
-—
-{% endif %}
-</td>
-<td>{{ o.get('currency','₹') }}{{ o.get('total','0.00') }}</td>
-<td>{{ o.get('created_at') }}</td>
-<td>
-<form action="{{ url_for('confirm_order', order_id=o.id) }}" method="post" style="display:inline-block;">
-<input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-<button class="btn btn-confirm" type="submit">Confirm</button>
-</form>
-<form action="{{ url_for('cancel_order', order_id=o.id) }}" method="post" style="display:inline-block; margin-left:8px;">
-<input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-<button class="btn btn-cancel" type="submit">Cancel</button>
-</form>
-</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in orders %}
+            <tr class="row">
+                <td><code>{{ o.id }}</code></td>
+                <td>
+                    <div><strong>{{ o.get('customer_name', '—') }}</strong></div>
+                    <div>{{ o.get('customer_email', '—') }}</div>
+                </td>
+                <td>
+                    {% if o.get('items') %}
+                        <ul>
+                        {% for it in o.items %}
+                            <li>{{ it.get('name','Item') }} × {{ it.get('qty',1) }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ o.get('currency','₹') }}{{ o.get('total','0.00') }}</td>
+                <td>{{ o.get('created_at') }}</td>
+                <td>
+                    <form action="{{ url_for('confirm_order', order_id=o.id) }}" method="post" style="display:inline-block;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+                        <button class="btn btn-confirm" type="submit">Confirm</button>
+                    </form>
+                    <form action="{{ url_for('cancel_order', order_id=o.id) }}" method="post" style="display:inline-block; margin-left:8px;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+                        <button class="btn btn-cancel" type="submit">Cancel</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
