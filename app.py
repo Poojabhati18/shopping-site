@@ -377,10 +377,13 @@ def confirm_order(order_id):
         ref.update({"status": "confirmed"})
 
     try:
-    success, msg = notify_customer(order, "Completed")
-    flash("Order confirmed and email sent." if success else f"Email failed: {msg}", "success" if success else "danger")
+        success, msg = notify_customer(order, "Completed")
+        flash(
+            "Order confirmed and email sent." if success else f"Email failed: {msg}",
+            "success" if success else "danger"
+            )
     except Exception as e:
-    flash(f"Order confirmed but email failed: {e}", "danger")
+        flash(f"Order confirmed but email failed: {e}", "danger")
 
     except Exception as e:
         flash(f"Error confirming order: {e}", "danger")
