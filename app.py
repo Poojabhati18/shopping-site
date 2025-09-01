@@ -376,14 +376,15 @@ def confirm_order(order_id):
         order["status"] = "confirmed"
         ref.update({"status": "confirmed"})
 
-    try:
-        success, msg = notify_customer(order, "Completed")
-        flash(
-            "Order confirmed and email sent." if success else f"Email failed: {msg}",
-            "success" if success else "danger"
+        # Notify customer via email
+        try:
+            success, msg = notify_customer(order, "Completed")
+            flash(
+                "Order confirmed and email sent." if success else f"Email failed: {msg}",
+                "success" if success else "danger"
             )
-    except Exception as e:
-        flash(f"Order confirmed but email failed: {e}", "danger")
+        except Exception as e:
+            flash(f"Order confirmed but email failed: {e}", "danger")
 
     except Exception as e:
         flash(f"Error confirming order: {e}", "danger")
@@ -401,22 +402,26 @@ def cancel_order(order_id):
         doc = ref.get()
         if not doc.exists:
             flash("Order not found.", "warning")
-        return redirect(url_for("admin_dashboard"))
+            return redirect(url_for("admin_dashboard"))
 
         order = doc.to_dict()
         ref.delete()
 
-    try:
-    success, msg = notify_customer(order, "Cancelled")
-    flash("Order cancelled and email sent." if success else f"Email failed: {msg}", "success" if success else "danger")
-    except Exception as e:
-    flash(f"Order cancelled but email failed: {e}", "danger")
-
+        # Notify customer via email
+        try:
+            success, msg = notify_customer(order, "Cancelled")
+            flash(
+                "Order cancelled and email sent." if success else f"Email failed: {msg}",
+                "success" if success else "danger"
+            )
+        except Exception as e:
+            flash(f"Order cancelled but email failed: {e}", "danger")
 
     except Exception as e:
         flash(f"Error cancelling order: {e}", "danger")
 
     return redirect(url_for("admin_dashboard"))
+
 
 # ================= RUN APP =================
 if __name__ == "__main__":
