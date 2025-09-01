@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session 
 from flask_mail import Mail, Message 
 import os, json, ssl, smtplib, requests
 from datetime import datetime, timezone
@@ -275,7 +275,7 @@ def place_order():
         order_data = {
             "customer": {
                 "name": data.get("name"),
-                "email": customer_email,
+                "email": data.get("email"),
                 "phone": data.get("phone"),
                 "address": data.get("address"),
                 "city": data.get("city"),
@@ -292,7 +292,7 @@ def place_order():
         # ===== Email Notification =====
         try:
             if isinstance(order_data, dict) and isinstance(order_data.get("customer"), dict):
-                notify_customer(customer_email, order_data)
+                notify_customer(order_data["customer"]["email"], order_data)
             else:
                 print("Email notify skipped: order_data or customer info is invalid")
         except Exception as e:
@@ -345,22 +345,75 @@ def admin_dashboard():
     if not session.get("admin"):
         return redirect(url_for("login"))
 
-    # Fetch orders
     orders = []
     try:
         orders_ref = db.collection("orders").order_by(
-            "date_ordered", direction=firestore.Query.DESCENDING
+            "timestamp", direction=firestore.Query.DESCENDING
         )
         for doc in orders_ref.stream():
-            try:
-                order_data = doc.to_dict()
-                order_data["id"] = doc.id
-                orders.append(order_data)
-            except Exception as e:
-                print("Error processing order:", e)
+            order_data = doc.to_dict()
+            order_data["id"] = doc.id
+            orders.append(order_data)
     except Exception as e:
         print("Firebase fetch error:", e)
-        orders = []
+
+    return render_template("admin.html", orders=orders)
+
+
+@app.route("/orders/<order_id>/confirm", methods=["POST"])
+def confirm_order(order_id):
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+
+    try:
+        ref = db.collection("orders").document(order_id)
+        doc = ref.get()
+        if not doc.exists:
+            flash("Order not found.", "warning")
+            return redirect(url_for("admin_dashboard"))
+
+        order = doc.to_dict()
+        order["status"] = "confirmed"
+        ref.update({"status": "confirmed"})
+
+    try:
+    success, msg = notify_customer(order, "Completed")
+    flash("Order confirmed and email sent." if success else f"Email failed: {msg}", "success" if success else "danger")
+    except Exception as e:
+    flash(f"Order confirmed but email failed: {e}", "danger")
+
+    except Exception as e:
+        flash(f"Error confirming order: {e}", "danger")
+
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/orders/<order_id>/cancel", methods=["POST"])
+def cancel_order(order_id):
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+
+    try:
+        ref = db.collection("orders").document(order_id)
+        doc = ref.get()
+        if not doc.exists:
+            flash("Order not found.", "warning")
+        return redirect(url_for("admin_dashboard"))
+
+        order = doc.to_dict()
+        ref.delete()
+
+    try:
+    success, msg = notify_customer(order, "Cancelled")
+    flash("Order cancelled and email sent." if success else f"Email failed: {msg}", "success" if success else "danger")
+    except Exception as e:
+    flash(f"Order cancelled but email failed: {e}", "danger")
+
+
+    except Exception as e:
+        flash(f"Error cancelling order: {e}", "danger")
+
+    return redirect(url_for("admin_dashboard"))
 
 # ================= RUN APP =================
 if __name__ == "__main__":

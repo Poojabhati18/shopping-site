@@ -1,94 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; background:#f5f5f5; margin:20px; }
-        h1 { text-align:center; }
-        table { width:100%; border-collapse: collapse; background:#fff; }
-        th, td { border:1px solid #ddd; padding:10px; text-align:left; vertical-align:top; }
-        th { background:#333; color:#fff; }
-        tr:nth-child(even) { background:#f9f9f9; }
-        .btn { padding:5px 10px; margin:2px; text-decoration:none; border-radius:4px; cursor:pointer; }
-        .pending { background:#ff9800; color:white; border:none; }
-        .completed { background:#4caf50; color:white; border:none; }
-        .cancelled { background:#f44336; color:white; border:none; }
-        form { display:inline; }
-        ul { margin:0; padding-left:18px; }
-        li { margin-bottom:5px; }
-        .total { font-weight:bold; margin-top:8px; display:block; }
-    </style>
+<!doctype html>
+.flash { padding: 12px 14px; border-radius: 10px; margin: 10px 0; }
+.flash.success { background: #113b1b; color: #bbf7d0; }
+.flash.warning { background: #3b2f11; color: #fde68a; }
+.flash.danger { background: #3b1111; color: #fecaca; }
+table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+th, td { border-bottom: 1px solid #1f2937; padding: 10px; text-align: left; vertical-align: top; }
+th { background: #0f172a; position: sticky; top: 0; }
+.btn { padding: 8px 12px; border: 0; border-radius: 10px; cursor: pointer; font-weight: 600; }
+.btn-confirm { background: #16a34a; color: #031006; }
+.btn-cancel { background: #b91c1c; color: #fff; }
+.row { background: #0f172a; }
+.pill { background: #1f2937; padding: 2px 8px; border-radius: 9999px; font-size: 12px; }
+code { background: #111827; padding: 2px 4px; border-radius: 6px; }
+</style>
 </head>
 <body>
-    <h1>📋 Orders Dashboard</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Customer</th>
-                <th>Email</th>
-                <th>Address</th>
-                <th>Products</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
+<h1>Pending Orders <span class="pill">{{ orders|length }}</span></h1>
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="flash {{ category }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+
+<table>
+<thead>
 <tr>
-    <td>{{ order.customer.name }}</td>
-    <td>{{ order.customer.email }}</td>
-    <td>{{ order.customer.address }}, {{ order.customer.city }} - {{ order.customer.pincode }}</td>
-    <td>
-        <ul style="list-style-type:none; padding-left:0;">
-            {% set grand_total = 0 %}
-            {% for product in order.products %}
-                {% set qty = product.get("qty", 0) %}
-                {% set price = product.get("price", 0) %}
-                {% set line_total = qty * price %}
-                {% set grand_total = grand_total + line_total %}
-                <li>
-                    📦 {{ product.get("name", "Unknown") }} 
-                    | Quantity: {{ qty }} 
-                    | Price: ₹{{ price }} 
-                    | Total: ₹{{ line_total }}
-                </li>
-            {% endfor %}
-        </ul>
-        <strong>💰 Grand Total: ₹{{ grand_total }}</strong>
-    </td>
+<th>ID</th>
+<th>Customer</th>
+<th>Items</th>
+<th>Total</th>
+<th>Created</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody>
+{% for o in orders %}
+<tr class="row">
+<td><code>{{ o.id }}</code></td>
+<td>
+<div><strong>{{ o.get('customer_name', '—') }}</strong></div>
+<div>{{ o.get('customer_email', '—') }}</div>
+</td>
+<td>
+{% if o.get('items') %}
+<ul style="margin:0; padding-left: 16px;">
+{% for it in o.items %}
+<li>{{ it.get('name','Item') }} × {{ it.get('qty',1) }}</li>
+{% endfor %}
+</ul>
+{% else %}
+—
+{% endif %}
+</td>
+<td>{{ o.get('currency','₹') }}{{ o.get('total','0.00') }}</td>
+<td>{{ o.get('created_at') }}</td>
+<td>
+<form action="{{ url_for('confirm_order', order_id=o.id) }}" method="post" style="display:inline-block;">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+<button class="btn btn-confirm" type="submit">Confirm</button>
+</form>
+<form action="{{ url_for('cancel_order', order_id=o.id) }}" method="post" style="display:inline-block; margin-left:8px;">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+<button class="btn btn-cancel" type="submit">Cancel</button>
+</form>
+</td>
 </tr>
 {% endfor %}
-
-                <td>{{ order.status }}</td>
-                <td>
-                    {% if order.timestamp %}
-                        {{ order.timestamp.strftime("%Y-%m-%d %H:%M") }}
-                    {% endif %}
-                </td>
-                
-                <td>
-                    <!-- Cancel -->
-                    <form action="{{ url_for('update_order', order_id=order.id, status='Cancelled') }}" method="POST">
-                        <button class="btn cancelled" type="submit">Cancel</button>
-                    </form>
-
-                    <!-- Complete -->
-                    <form action="{{ url_for('update_order', order_id=order.id, status='Completed') }}" method="POST">
-                        <button class="btn completed" type="submit">Complete</button>
-                    </form>
-
-                    <!-- Pending -->
-                    <form action="{{ url_for('update_order', order_id=order.id, status='Pending') }}" method="POST">
-                        <button class="btn pending" type="submit">Pending</button>
-                    </form>
-                </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="7" style="text-align:center;">No orders found</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+</tbody>
+</table>
 </body>
 </html>
