@@ -102,7 +102,7 @@
       const qty = Number(item.qty) || 1;
       const price = Number(item.price) || 0;
       total += qty * price;
-      return `${item.name} (x${qty}) - ₹${qty*price}`;
+      return `${item.name} (x${qty}) - ₹${qty * price}`;
     });
 
     cartItemsText.textContent = summaryLines.join("\n");
@@ -150,7 +150,7 @@
       e.preventDefault();
 
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      if(cart.length === 0){
+      if (cart.length === 0) {
         showToast("Your cart is empty", false);
         return;
       }
@@ -196,22 +196,29 @@
         const data = await res.json();
 
         // ✅ Handle both success and order-limit responses
-if(data.success){
-  showToast(data.message || "Order placed successfully!");
-  localStorage.removeItem("cart");
-  populateCartSummary();
-  form.reset();
-  setTimeout(()=> { window.location.href = '/'; }, 2000);
-} else {
-  // Specific check for daily limit
-  if(data.message && data.message.includes("one order every 24 hours")){
-    showToast("Sorry, for now we only take one order per day.", false);
-  } else {
-    showToast(data.message || "Order could not be placed.", false);
-  }
-  submitBtn.disabled = false;
-  submitBtn.innerText = originalText;
-}
+        if (data.success) {
+          showToast(data.message || "Order placed successfully!");
+          localStorage.removeItem("cart");
+          populateCartSummary();
+          form.reset();
+          setTimeout(() => { window.location.href = '/'; }, 2000);
+        } else {
+          // Specific check for daily limit
+          if (data.message && data.message.includes("one order every 24 hours")) {
+            showToast("Sorry, for now we only take one order per day.", false);
+          } else {
+            showToast(data.message || "Order could not be placed.", false);
+          }
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalText;
+        }
+
+      } catch (err) {
+        console.error("❌ Order placement failed", err);
+        showToast("Something went wrong. Please try again.", false);
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalText;
+      }
     });
   });
 </script>
