@@ -262,19 +262,31 @@ def place_order():
 
         # Only enforce 24-hour restriction for non-owner
         if customer_email != OWNER_EMAIL:
-            # Query orders in the last 24 hours
+            # Fetch all orders for this customer
             orders_ref = db.collection("orders") \
-                           .where("customer.email", "==", customer_email) \
-                           .where("timestamp", ">=", twenty_four_hours_ago)
+                           .where("customer.email", "==", customer_email)
             existing_orders = list(orders_ref.stream())
 
-            if existing_orders:
-                return jsonify({
-                    "success": False,
-                    "message": "You can only place one order every 24 hours."
-                }), 400
+            # Check manually in Python for last 24 hours
+            for order in existing_orders:
+                ts = order.to_dict().get("timestamp")
+                if ts is None:
+                    continue
+                # Convert Firestore Timestamp -> datetime
+                if hasattr(ts, "to_datetime"):
+                    order_time = ts.to_datetime().astimezone(timezone.utc)
+                elif isinstance(ts, datetime):
+                    order_time = ts.astimezone(timezone.utc)
+                else:
+                    continue  # skip invalid timestamps
 
-        # ✅ Create order
+                if order_time >= twenty_four_hours_ago:
+                    return jsonify({
+                        "success": False,
+                        "message": "You can only place one order every 24 hours."
+                    }), 400
+
+        # ✅ Create order with SERVER_TIMESTAMP
         order_data = {
             "customer": {
                 "name": data.get("name"),
@@ -286,7 +298,7 @@ def place_order():
             },
             "products": data.get("products", []),
             "status": "pending",
-            "timestamp": datetime.now(timezone.utc)  # Store UTC datetime
+            "timestamp": firestore.SERVER_TIMESTAMP  # store proper Firestore Timestamp
         }
 
         db.collection("orders").add(order_data)
