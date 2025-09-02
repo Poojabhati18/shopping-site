@@ -275,7 +275,7 @@ def place_order():
                     continue  # skip invalid/missing timestamps
 
                 # Check if last order is within 24 hours
-                if order_time > twenty_four_hours_ago:
+                if now - order_time < timedelta(hours=24):
                     return jsonify({
                         "success": False,
                         "message": "You can only place one order every 24 hours."
