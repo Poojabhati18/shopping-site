@@ -272,7 +272,7 @@ def place_order():
                 elif isinstance(ts, datetime):
                     order_date = ts.astimezone(timezone.utc).date()
                 else:
-                    continue  # Skip if timestamp missing (newly created order, still syncing)
+                    continue  # Skip if timestamp missing
 
                 if order_date == today:
                     return jsonify({
@@ -280,7 +280,7 @@ def place_order():
                         "message": "You can only place one order per day."
                     }), 400
 
-        # Create order dict
+        # ✅ Create order only after validation
         order_data = {
             "customer": {
                 "name": data.get("name"),
@@ -295,12 +295,14 @@ def place_order():
             "timestamp": firestore.SERVER_TIMESTAMP
         }
 
-        # Save order to Firestore
         db.collection("orders").add(order_data)
 
         return jsonify({"success": True, "message": "Order placed successfully"}), 200
 
     except Exception as e:
+        # Log the full exception so we know why Render returns 500
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "message": f"Error placing order: {str(e)}"}), 500
 
         # ===== Email Notification =====
