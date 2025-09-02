@@ -11,7 +11,6 @@ from firebase_config import db  # Your Firebase config
 from order_emails import notify_customer  # Your email helper
 from auth import auth  # <-- Import the auth blueprint
 from twilio.rest import Client
-from google.cloud.firestore import Timestamp
 
 # ================= LOAD ENV =================
 load_dotenv()
@@ -263,9 +262,10 @@ def place_order():
 
         # Only enforce 24-hour restriction for non-owner
         if customer_email != OWNER_EMAIL:
+            # Query orders in the last 24 hours
             orders_ref = db.collection("orders") \
                            .where("customer.email", "==", customer_email) \
-                           .where("timestamp", ">=", Timestamp.from_datetime(twenty_four_hours_ago))
+                           .where("timestamp", ">=", twenty_four_hours_ago)
             existing_orders = list(orders_ref.stream())
 
             if existing_orders:
@@ -286,7 +286,7 @@ def place_order():
             },
             "products": data.get("products", []),
             "status": "pending",
-            "timestamp": firestore.SERVER_TIMESTAMP
+            "timestamp": datetime.now(timezone.utc)  # Store UTC datetime
         }
 
         db.collection("orders").add(order_data)
