@@ -242,8 +242,6 @@ def post_review(product_id):
 
 OWNER_EMAIL = os.environ.get("EMAIL_USER")  # reads your email from env
 
-from datetime import timedelta
-
 @app.route("/place_order", methods=["POST"])
 @require_verification
 def place_order():
@@ -263,8 +261,7 @@ def place_order():
         # Only enforce 24-hour restriction for non-owner
         if customer_email != OWNER_EMAIL:
             # Fetch all orders for this customer
-            orders_ref = db.collection("orders") \
-                           .where("customer.email", "==", customer_email)
+            orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
             existing_orders = list(orders_ref.stream())
 
             # Check manually in Python for last 24 hours
@@ -286,7 +283,8 @@ def place_order():
                         "message": "You can only place one order every 24 hours."
                     }), 400
 
-        # ✅ Create order with SERVER_TIMESTAMP
+        # ✅ Create order
+        now_utc = datetime.now(timezone.utc)
         order_data = {
             "customer": {
                 "name": data.get("name"),
@@ -298,8 +296,7 @@ def place_order():
             },
             "products": data.get("products", []),
             "status": "pending",
-            now_utc = datetime.now(timezone.utc)
-"timestamp": now_utc  # store proper Firestore Timestamp
+            "timestamp": now_utc
         }
 
         db.collection("orders").add(order_data)
@@ -313,7 +310,8 @@ def place_order():
         # ===== WhatsApp Notification =====
         try:
             products_text = "\n".join([
-                f"{p.get('name', 'Unknown')} | Qty: {int(p.get('quantity', 1))} | Price: ₹{float(p.get('price',0))} | Total: ₹{int(p.get('quantity',1))*float(p.get('price',0))}"
+                f"{p.get('name', 'Unknown')} | Qty: {int(p.get('quantity', 1))} | "
+                f"Price: ₹{float(p.get('price',0))} | Total: ₹{int(p.get('quantity',1))*float(p.get('price',0))}"
                 for p in order_data.get('products', [])
             ])
             message_text = f"""
