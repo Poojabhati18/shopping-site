@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash 
 from flask_mail import Mail, Message 
 import os, json, ssl, smtplib, requests
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -242,6 +242,8 @@ def post_review(product_id):
 
 OWNER_EMAIL = os.environ.get("EMAIL_USER")  # reads your email from env
 
+from datetime import timedelta
+
 @app.route("/place_order", methods=["POST"])
 @require_verification
 def place_order():
@@ -255,9 +257,10 @@ def place_order():
 
     try:
         customer_email = customer.get("email")
-        today = datetime.now(timezone.utc).date()
+        now_utc = datetime.now(timezone.utc)
+        twenty_four_hours_ago = now_utc - timedelta(hours=24)
 
-        # Check daily limit for non-owner
+        # Only enforce 24-hour restriction for non-owner
         if customer_email != OWNER_EMAIL:
             orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
             existing_orders = orders_ref.stream()
@@ -265,18 +268,20 @@ def place_order():
             for order in existing_orders:
                 ts = order.to_dict().get("timestamp")
                 if ts and hasattr(ts, "to_datetime"):
-                    order_date = ts.to_datetime().astimezone(timezone.utc).date()
+                    order_time = ts.to_datetime().astimezone(timezone.utc)
                 elif isinstance(ts, datetime):
-                    order_date = ts.astimezone(timezone.utc).date()
+                    order_time = ts.astimezone(timezone.utc)
                 else:
-                    continue
-                if order_date == today:
+                    continue  # skip invalid/missing timestamps
+
+                # Check if last order is within 24 hours
+                if order_time > twenty_four_hours_ago:
                     return jsonify({
                         "success": False,
-                        "message": "You can only place one order per day."
+                        "message": "You can only place one order every 24 hours."
                     }), 400
 
-        # Create order
+        # ✅ Create order
         order_data = {
             "customer": {
                 "name": data.get("name"),
@@ -291,8 +296,14 @@ def place_order():
             "timestamp": firestore.SERVER_TIMESTAMP
         }
 
-        # Save order
         db.collection("orders").add(order_data)
+
+        return jsonify({"success": True, "message": "Order placed successfully"}), 200
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "message": f"Error placing order: {str(e)}"}), 500
 
         # ===== Email Notification =====
         try:
@@ -348,6 +359,17 @@ def admin_dashboard():
             order_data = doc.to_dict()
             order_data["id"] = doc.id
 
+            # Ensure customer and products exist
+            order_data["customer"] = order_data.get("customer", {})
+            order_data["products"] = order_data.get("products", [])
+
+            # Calculate total safely
+            order_data["total"] = sum(
+                float(p.get("price", 0)) * int(p.get("qty", p.get("quantity", 1)))
+                for p in order_data["products"]
+            )
+
+            # Convert Firestore timestamp safely
             ts = order_data.get("timestamp")
             try:
                 if ts and hasattr(ts, "to_datetime"):

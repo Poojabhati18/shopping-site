@@ -114,35 +114,33 @@
             <tr class="row">
                 <td><code>{{ o.id }}</code></td>
                 <td>
-                    <div><strong>{{ o.customer.name if o.customer else '—' }}</strong></div>
-                    <div>{{ o.customer.email if o.customer else '—' }}</div>
+                    <div><strong>{{ o.customer['name'] if o.customer else '—' }}</strong></div>
+                    <div>{{ o.customer['email'] if o.customer else '—' }}</div>
                 </td>
                 <td>
                     {% if o.products %}
                         <ul>
                         {% for p in o.products %}
-                            <li>{{ p.name }} × {{ p.qty if p.qty else 1 }}</li>
+                            <li>{{ p.get('name','Unknown') }} × {{ p.get('qty', p.get('quantity',1)) }}</li>
                         {% endfor %}
                         </ul>
                     {% else %}
                         —
                     {% endif %}
                 </td>
-                <td>{{ o.get('currency','₹') }}{{ "{:,.2f}".format(o.total | float) }}</td>
-                <td>{{ o.created_at }}</td>
+                <td>{{ o.get('currency','₹') }}{{ "{:,.2f}".format(o.get('total',0) | float) }}</td>
+                <td>{{ o.get('created_at','—') }}</td>
                 <td>
-                    <span class="pill {{ o.status|lower }}">
-                        {{ o.status|capitalize }}
+                    <span class="pill {{ o.get('status','pending')|lower }}">
+                        {{ o.get('status','Pending')|capitalize }}
                     </span>
                 </td>
                 <td>
-                    {% if o.status == "pending" %}
+                    {% if o.get('status','pending') == "pending" %}
                         <form action="{{ url_for('confirm_order', order_id=o.id) }}" method="post" style="display:inline-block;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
                             <button class="btn btn-confirm" type="submit">Confirm</button>
                         </form>
                         <form action="{{ url_for('cancel_order', order_id=o.id) }}" method="post" style="display:inline-block; margin-left:8px;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
                             <button class="btn btn-cancel" type="submit">Cancel</button>
                         </form>
                     {% else %}
