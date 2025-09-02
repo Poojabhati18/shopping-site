@@ -257,30 +257,26 @@ def place_order():
         customer_email = customer.get("email")
         today = datetime.now(timezone.utc).date()
 
-        # Only enforce daily restriction for non-owner
+        # Check daily limit for non-owner
         if customer_email != OWNER_EMAIL:
             orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
             existing_orders = orders_ref.stream()
 
             for order in existing_orders:
-                order_data_check = order.to_dict()
-                ts = order_data_check.get("timestamp")
-
-                # Safely convert Firestore timestamp
+                ts = order.to_dict().get("timestamp")
                 if ts and hasattr(ts, "to_datetime"):
                     order_date = ts.to_datetime().astimezone(timezone.utc).date()
                 elif isinstance(ts, datetime):
                     order_date = ts.astimezone(timezone.utc).date()
                 else:
-                    continue  # Skip if timestamp missing
-
+                    continue
                 if order_date == today:
                     return jsonify({
                         "success": False,
                         "message": "You can only place one order per day."
                     }), 400
 
-        # ✅ Create order only after validation
+        # Create order
         order_data = {
             "customer": {
                 "name": data.get("name"),
@@ -295,39 +291,21 @@ def place_order():
             "timestamp": firestore.SERVER_TIMESTAMP
         }
 
+        # Save order
         db.collection("orders").add(order_data)
-
-        return jsonify({"success": True, "message": "Order placed successfully"}), 200
-
-    except Exception as e:
-        # Log the full exception so we know why Render returns 500
-        import traceback
-        traceback.print_exc()
-        return jsonify({"success": False, "message": f"Error placing order: {str(e)}"}), 500
 
         # ===== Email Notification =====
         try:
-            if isinstance(order_data, dict) and isinstance(order_data.get("customer"), dict):
-                notify_customer(order_data["customer"]["email"], order_data)
-            else:
-                print("Email notify skipped: order_data or customer info is invalid")
+            notify_customer(order_data["customer"]["email"], order_data)
         except Exception as e:
             print("Email notify error:", e)
 
         # ===== WhatsApp Notification =====
         try:
-            products = order_data.get('products', [])
-            products_text_lines = []
-
-            for p in products:
-                name = p.get('name', 'Unknown')
-                qty = int(p.get('quantity', 1))
-                price = float(p.get('price', 0))
-                total = qty * price
-                products_text_lines.append(f"{name} | Qty: {qty} | Price: ₹{price} | Total: ₹{total}")
-
-            products_text = "\n".join(products_text_lines)
-
+            products_text = "\n".join([
+                f"{p.get('name', 'Unknown')} | Qty: {int(p.get('quantity', 1))} | Price: ₹{float(p.get('price',0))} | Total: ₹{int(p.get('quantity',1))*float(p.get('price',0))}"
+                for p in order_data.get('products', [])
+            ])
             message_text = f"""
 📦 *New Order Alert!*
 👤 Name: {order_data['customer'].get('name')}
@@ -340,7 +318,6 @@ def place_order():
 🛍️ Products:
 {products_text}
 """
-
             twilio_client.messages.create(
                 from_=WHATSAPP_FROM,
                 to=WHATSAPP_TO,
@@ -352,8 +329,9 @@ def place_order():
         return jsonify({"success": True, "message": "Order placed successfully"}), 200
 
     except Exception as e:
-        print("Place order error:", e)
-        return jsonify({"success": False, "message": "Failed to place order"}), 500
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "message": f"Error placing order: {str(e)}"}), 500
 
 # ================= ADMIN DASHBOARD =================
 @app.route('/admin')
@@ -370,21 +348,26 @@ def admin_dashboard():
             order_data = doc.to_dict()
             order_data["id"] = doc.id
 
-            # Convert Firestore timestamp for template
             ts = order_data.get("timestamp")
-            if ts and hasattr(ts, "to_datetime"):
-                dt = ts.to_datetime().astimezone(timezone.utc)
-                order_data["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
-            elif isinstance(ts, datetime):
-                dt = ts.astimezone(timezone.utc)
-                order_data["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
-            else:
+            try:
+                if ts and hasattr(ts, "to_datetime"):
+                    dt = ts.to_datetime().astimezone(timezone.utc)
+                    order_data["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
+                elif isinstance(ts, datetime):
+                    dt = ts.astimezone(timezone.utc)
+                    order_data["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    order_data["created_at"] = "—"
+            except Exception as e:
+                print("Timestamp parse error:", e)
                 order_data["created_at"] = "—"
 
             orders.append(order_data)
 
     except Exception as e:
-        print("Firebase fetch error:", e)
+        import traceback
+        traceback.print_exc()
+        orders = []
 
     return render_template("admin.html", orders=orders)
 

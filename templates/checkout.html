@@ -73,7 +73,7 @@
   }
 
   // Toast helper
-  function showToast(msg, success=true){
+  function showToast(msg, success = true) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
     toast.style.background = success ? '#2e7d32' : '#c62828';
@@ -124,10 +124,9 @@
         productSummary: payload.productSummary
       };
 
-      // Use your new SMTP service ID here
       await emailjs.send(
-        "service_g6k3oyi",       // <-- replace with your SMTP Service ID
-        "template_mkn17v7",    // <-- your template ID
+        "service_g6k3oyi",       // SMTP Service ID
+        "template_mkn17v7",      // Template ID
         emailParams
       );
 
@@ -196,17 +195,20 @@
 
         const data = await res.json();
 
+        // ✅ Handle both success and order-limit responses
         if(data.success){
-          showToast("Order placed successfully!");
+          showToast(data.message || "Order placed successfully!");
           localStorage.removeItem("cart");
           populateCartSummary();
           form.reset();
           setTimeout(()=> { window.location.href = '/'; }, 2000);
         } else {
-          showToast("Error placing order: " + data.message, false);
+          // Order limit reached or other backend errors
+          showToast(data.message || "Order could not be placed.", false);
           submitBtn.disabled = false;
           submitBtn.innerText = originalText;
         }
+
       } catch(err) {
         console.error(err);
         showToast("Server or email error. Try again later.", false);
