@@ -257,19 +257,27 @@ def place_order():
         customer_email = customer.get("email")
         today = datetime.now(timezone.utc).date()
 
-        # Only enforce daily restriction for non-owner
-        if customer_email != OWNER_EMAIL:
-            orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
-            existing_orders = orders_ref.stream()
-            for order in existing_orders:
-                order_data_check = order.to_dict()
-                if "timestamp" in order_data_check:
-                    order_date = order_data_check["timestamp"].astimezone(timezone.utc).date()
-                    if order_date == today:
-                        return jsonify({
-                            "success": False,
-                            "message": "You can only place one order per day."
-                        }), 400
+       # Only enforce daily restriction for non-owner
+if customer_email != OWNER_EMAIL:
+    orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
+    existing_orders = orders_ref.stream()
+    for order in existing_orders:
+        order_data_check = order.to_dict()
+        ts = order_data_check.get("timestamp")
+
+        # Safely convert Firestore timestamp
+        if ts and hasattr(ts, "to_datetime"):
+            order_date = ts.to_datetime().astimezone(timezone.utc).date()
+        elif isinstance(ts, datetime):
+            order_date = ts.astimezone(timezone.utc).date()
+        else:
+            continue  # Skip if timestamp missing (newly created order, still syncing)
+
+        if order_date == today:
+            return jsonify({
+                "success": False,
+                "message": "You can only place one order per day."
+            }), 400
 
         # Create order dict
         order_data = {
@@ -356,17 +364,15 @@ def admin_dashboard():
 
             # ✅ Add this part (convert timestamp for template)
             ts = order_data.get("timestamp")
-            if ts and hasattr(ts, "to_datetime"):
-                order_data["created_at"] = ts.to_datetime().strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                order_data["created_at"] = "—"
 
-            total = 0
-            for p in order_data.get("products", []):
-                price = float(p.get("price", 0))
-                qty = int(p.get("qty", 1))
-                total += price * qty
-            order_data["total"] = "%.2f" % total
+if ts and hasattr(ts, "to_datetime"):
+    dt = ts.to_datetime().astimezone(timezone.utc)
+    order_data["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
+elif isinstance(ts, datetime):
+    dt = ts.astimezone(timezone.utc)
+    order_data["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
+else:
+    order_data["created_at"] = "—"
 
             orders.append(order_data)
     except Exception as e:

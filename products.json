@@ -438,77 +438,77 @@
         "price": 209,
         "description": "",
         "image": "images/energydrop.webp",
-        "categories": "medicinal"
+        "categories": ["medicinal"]
     },
     {
         "name": "Probiotic - G Plus Capsule",
         "price": 825,
         "description": "",
         "image": "images/probiotic.webp",
-        "categories": "medicinal"
+        "categories": ["medicinal"]
     },
     {
         "name": "Herbal Antacid Tablet",
         "price": 550,
         "description": "",
         "image": "images/herbalantacid.webp",
-        "categories": "medicinal"
+        "categories": ["medicinal"]
     },
     {
         "name": "Ayu-Vir Drop",
         "price": 320,
         "description": "",
         "image": "images/ayuvirdrop.webp",
-        "categories": "medicinal"
+        "categories": ["medicinal"]
     },
     {
         "name": "Full and Easy Powder",
         "price": 720,
         "description": "",
         "image": "images/fullandeasy.webp",
-        "categories": "medicinal"
+        "categories": ["medicinal"]
     },
     {
         "name": "Nerve Energy",
         "price": 1015,
         "description": "",
         "image": "images/nervenergy.webp",
-        "categories": "medicinal"
+        "categories": ["medicinal"]
     },
     {
         "name": "Piles CC Tablet",
         "price": 675,
         "description": "",
         "image": "images/pilesCCT.webp",
-        "categories": "medicinal"
+        "categories": ["medicinal"]
     },
     {
         "name": "Piles CC Cream",
         "price": 340,
         "description": "",
         "image": "images/pilesCCC.webp",
-        "categories": "medicinal"
+        "categories": ["medicinal"]
     },
     {
         "name": "EGA-12 Day Protection Cream",
         "price": 671,
         "description": "",
         "image": "images/dayprotection.webp",
-        "categories": "wellness"
+        "categories": ["wellness"]
     },
     {
         "name": "EGA-12 Night Protection Cream",
         "price": 671,
         "description": "",
         "image": "images/nightrepair.webp",
-        "categories": "wellness"
+        "categories": ["wellness"]
     },
     {
         "name": "Under Eye Gel",
         "price": 297,
         "description": "",
         "image": "images/undereyegel.webp",
-        "categories": "wellness"
+        "categories": ["wellness"]
     },
     {
         "name": "Privy Wash",

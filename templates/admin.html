@@ -128,7 +128,7 @@
                         —
                     {% endif %}
                 </td>
-                <td>{{ o.get('currency','₹') }}{{o.total }}</td>
+                <td>{{ o.get('currency','₹') }}{{ "{:,.2f}".format(o.total | float) }}</td>
                 <td>{{ o.created_at }}</td>
                 <td>
                     <span class="pill {{ o.status|lower }}">
