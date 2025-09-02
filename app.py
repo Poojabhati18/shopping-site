@@ -11,6 +11,7 @@ from firebase_config import db  # Your Firebase config
 from order_emails import notify_customer  # Your email helper
 from auth import auth  # <-- Import the auth blueprint
 from twilio.rest import Client
+from google.cloud.firestore import Timestamp
 
 # ================= LOAD ENV =================
 load_dotenv()
@@ -262,24 +263,16 @@ def place_order():
 
         # Only enforce 24-hour restriction for non-owner
         if customer_email != OWNER_EMAIL:
-            orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
-            existing_orders = orders_ref.stream()
+            orders_ref = db.collection("orders") \
+                           .where("customer.email", "==", customer_email) \
+                           .where("timestamp", ">=", Timestamp.from_datetime(twenty_four_hours_ago))
+            existing_orders = list(orders_ref.stream())
 
-            for order in existing_orders:
-                ts = order.to_dict().get("timestamp")
-                if ts and hasattr(ts, "to_datetime"):
-                    order_time = ts.to_datetime().astimezone(timezone.utc)
-                elif isinstance(ts, datetime):
-                    order_time = ts.astimezone(timezone.utc)
-                else:
-                    continue  # skip invalid/missing timestamps
-
-                # Check if last order is within 24 hours
-                if now - order_time < timedelta(hours=24):
-                    return jsonify({
-                        "success": False,
-                        "message": "You can only place one order every 24 hours."
-                    }), 400
+            if existing_orders:
+                return jsonify({
+                    "success": False,
+                    "message": "You can only place one order every 24 hours."
+                }), 400
 
         # ✅ Create order
         order_data = {
@@ -297,13 +290,6 @@ def place_order():
         }
 
         db.collection("orders").add(order_data)
-
-        return jsonify({"success": True, "message": "Order placed successfully"}), 200
-
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return jsonify({"success": False, "message": f"Error placing order: {str(e)}"}), 500
 
         # ===== Email Notification =====
         try:
