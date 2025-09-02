@@ -196,25 +196,22 @@
         const data = await res.json();
 
         // ✅ Handle both success and order-limit responses
-        if(data.success){
-          showToast(data.message || "Order placed successfully!");
-          localStorage.removeItem("cart");
-          populateCartSummary();
-          form.reset();
-          setTimeout(()=> { window.location.href = '/'; }, 2000);
-        } else {
-          // Order limit reached or other backend errors
-          showToast(data.message || "Order could not be placed.", false);
-          submitBtn.disabled = false;
-          submitBtn.innerText = originalText;
-        }
-
-      } catch(err) {
-        console.error(err);
-        showToast("Server or email error. Try again later.", false);
-        submitBtn.disabled = false;
-        submitBtn.innerText = originalText;
-      }
+if(data.success){
+  showToast(data.message || "Order placed successfully!");
+  localStorage.removeItem("cart");
+  populateCartSummary();
+  form.reset();
+  setTimeout(()=> { window.location.href = '/'; }, 2000);
+} else {
+  // Specific check for daily limit
+  if(data.message && data.message.includes("one order every 24 hours")){
+    showToast("Sorry, for now we only take one order per day.", false);
+  } else {
+    showToast(data.message || "Order could not be placed.", false);
+  }
+  submitBtn.disabled = false;
+  submitBtn.innerText = originalText;
+}
     });
   });
 </script>

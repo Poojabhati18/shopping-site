@@ -298,7 +298,8 @@ def place_order():
             },
             "products": data.get("products", []),
             "status": "pending",
-            "timestamp": firestore.SERVER_TIMESTAMP  # store proper Firestore Timestamp
+            now_utc = datetime.now(timezone.utc)
+"timestamp": now_utc  # store proper Firestore Timestamp
         }
 
         db.collection("orders").add(order_data)
