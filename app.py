@@ -257,27 +257,28 @@ def place_order():
         customer_email = customer.get("email")
         today = datetime.now(timezone.utc).date()
 
-       # Only enforce daily restriction for non-owner
-if customer_email != OWNER_EMAIL:
-    orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
-    existing_orders = orders_ref.stream()
-    for order in existing_orders:
-        order_data_check = order.to_dict()
-        ts = order_data_check.get("timestamp")
+        # Only enforce daily restriction for non-owner
+        if customer_email != OWNER_EMAIL:
+            orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
+            existing_orders = orders_ref.stream()
 
-        # Safely convert Firestore timestamp
-        if ts and hasattr(ts, "to_datetime"):
-            order_date = ts.to_datetime().astimezone(timezone.utc).date()
-        elif isinstance(ts, datetime):
-            order_date = ts.astimezone(timezone.utc).date()
-        else:
-            continue  # Skip if timestamp missing (newly created order, still syncing)
+            for order in existing_orders:
+                order_data_check = order.to_dict()
+                ts = order_data_check.get("timestamp")
 
-        if order_date == today:
-            return jsonify({
-                "success": False,
-                "message": "You can only place one order per day."
-            }), 400
+                # Safely convert Firestore timestamp
+                if ts and hasattr(ts, "to_datetime"):
+                    order_date = ts.to_datetime().astimezone(timezone.utc).date()
+                elif isinstance(ts, datetime):
+                    order_date = ts.astimezone(timezone.utc).date()
+                else:
+                    continue  # Skip if timestamp missing (newly created order, still syncing)
+
+                if order_date == today:
+                    return jsonify({
+                        "success": False,
+                        "message": "You can only place one order per day."
+                    }), 400
 
         # Create order dict
         order_data = {
@@ -296,6 +297,11 @@ if customer_email != OWNER_EMAIL:
 
         # Save order to Firestore
         db.collection("orders").add(order_data)
+
+        return jsonify({"success": True, "message": "Order placed successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Error placing order: {str(e)}"}), 500
 
         # ===== Email Notification =====
         try:
