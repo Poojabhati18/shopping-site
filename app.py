@@ -368,19 +368,19 @@ def admin_dashboard():
             order_data = doc.to_dict()
             order_data["id"] = doc.id
 
-            # ✅ Add this part (convert timestamp for template)
+            # Convert Firestore timestamp for template
             ts = order_data.get("timestamp")
-
-if ts and hasattr(ts, "to_datetime"):
-    dt = ts.to_datetime().astimezone(timezone.utc)
-    order_data["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
-elif isinstance(ts, datetime):
-    dt = ts.astimezone(timezone.utc)
-    order_data["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
-else:
-    order_data["created_at"] = "—"
+            if ts and hasattr(ts, "to_datetime"):
+                dt = ts.to_datetime().astimezone(timezone.utc)
+                order_data["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
+            elif isinstance(ts, datetime):
+                dt = ts.astimezone(timezone.utc)
+                order_data["created_at"] = dt.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                order_data["created_at"] = "—"
 
             orders.append(order_data)
+
     except Exception as e:
         print("Firebase fetch error:", e)
 
