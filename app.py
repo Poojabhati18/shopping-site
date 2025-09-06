@@ -459,7 +459,7 @@ def cancel_order(order_id):
 def complete_order(order_id):
     if not session.get("admin"):
         return redirect(url_for("login"))
-
+    
     try:
         ref = db.collection("orders").document(order_id)
         doc = ref.get()
@@ -471,7 +471,6 @@ def complete_order(order_id):
         order["status"] = "completed"
         ref.update({"status": "completed"})
 
-        # Send email
         try:
             success, msg = notify_customer(order, "Completed")
             flash(
@@ -485,7 +484,6 @@ def complete_order(order_id):
         flash(f"Error completing order: {e}", "danger")
 
     return redirect(url_for("admin_dashboard"))
-
 
 @app.route("/orders/<order_id>/pending", methods=["POST"])
 def pending_order(order_id):
