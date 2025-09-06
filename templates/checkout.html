@@ -195,7 +195,7 @@
 
         const data = await res.json();
 
-        // ✅ Handle both success and order-limit responses
+        // ✅ Handle success and daily-limit responses
         if (data.success) {
           showToast(data.message || "Order placed successfully!");
           localStorage.removeItem("cart");
@@ -203,9 +203,9 @@
           form.reset();
           setTimeout(() => { window.location.href = '/'; }, 2000);
         } else {
-          // Specific check for daily limit
-          if (data.message && data.message.includes("one order every 24 hours")) {
-            showToast("Sorry, for now we only take one order per day.", false);
+          // Specific check for daily limit message from backend
+          if (data.message && data.message.includes("already placed an order today")) {
+            showToast(data.message, false); // friendly popup
           } else {
             showToast(data.message || "Order could not be placed.", false);
           }

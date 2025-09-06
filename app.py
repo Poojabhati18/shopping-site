@@ -11,6 +11,7 @@ from firebase_config import db  # Your Firebase config
 from order_emails import notify_customer  # Your email helper
 from auth import auth  # <-- Import the auth blueprint
 from twilio.rest import Client
+import pytz
 
 # ================= LOAD ENV =================
 load_dotenv()
@@ -54,6 +55,8 @@ ADMIN_PASS_HASH = os.getenv("ADMIN_PASS_HASH")  # Hashed password from .env
 
 RECAPTCHA_SITE_KEY = os.getenv("RECAPTCHA_SITE_KEY")
 RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY")
+
+IST = pytz.timezone("Asia/Kolkata")
 
 # ================= CAPTCHA VERIFY GATE =================
 @app.route("/")
@@ -255,35 +258,34 @@ def place_order():
 
     try:
         customer_email = customer.get("email")
-        now_utc = datetime.now(timezone.utc)
-        twenty_four_hours_ago = now_utc - timedelta(hours=24)
+        now_ist = datetime.now(IST)  # current IST time
 
-        # Only enforce 24-hour restriction for non-owner
+        # ✅ Enforce one order per day (except for OWNER_EMAIL)
         if customer_email != OWNER_EMAIL:
-            # Fetch all orders for this customer
-            orders_ref = db.collection("orders").where("customer.email", "==", customer_email)
+            # Start and end of today in IST
+            start_of_day = now_ist.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_of_day = start_of_day + timedelta(days=1)
+
+            # Convert to UTC for Firestore comparison
+            start_of_day_utc = start_of_day.astimezone(timezone.utc)
+            end_of_day_utc = end_of_day.astimezone(timezone.utc)
+
+            # Fetch orders for this customer in today's IST window
+            orders_ref = (
+                db.collection("orders")
+                .where("customer.email", "==", customer_email)
+                .where("timestamp", ">=", start_of_day_utc)
+                .where("timestamp", "<", end_of_day_utc)
+            )
             existing_orders = list(orders_ref.stream())
 
-            # Check manually in Python for last 24 hours
-            for order in existing_orders:
-                ts = order.to_dict().get("timestamp")
-                if ts is None:
-                    continue
-                # Convert Firestore Timestamp -> datetime
-                if hasattr(ts, "to_datetime"):
-                    order_time = ts.to_datetime().astimezone(timezone.utc)
-                elif isinstance(ts, datetime):
-                    order_time = ts.astimezone(timezone.utc)
-                else:
-                    continue  # skip invalid timestamps
+            if existing_orders:
+                return jsonify({
+                    "success": False,
+                    "message": "⚠️ You have already placed an order today. Please try again tomorrow after midnight (IST)."
+                }), 400
 
-                if order_time >= twenty_four_hours_ago:
-                    return jsonify({
-                        "success": False,
-                        "message": "You can only place one order every 24 hours."
-                    }), 400
-
-        # ✅ Create order
+        # ✅ Create order data
         now_utc = datetime.now(timezone.utc)
         order_data = {
             "customer": {
@@ -299,6 +301,7 @@ def place_order():
             "timestamp": now_utc
         }
 
+        # Save to Firestore
         db.collection("orders").add(order_data)
 
         # ===== Email Notification =====
@@ -334,7 +337,7 @@ def place_order():
         except Exception as e:
             print("WhatsApp notify error:", e)
 
-        return jsonify({"success": True, "message": "Order placed successfully"}), 200
+        return jsonify({"success": True, "message": "✅ Order placed successfully"}), 200
 
     except Exception as e:
         import traceback
