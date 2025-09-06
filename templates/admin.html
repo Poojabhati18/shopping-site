@@ -84,6 +84,35 @@
             margin: 0;
             padding-left: 16px;
         }
+
+        /* Modal styles */
+        #pendingModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #pendingModal div {
+            background: #fff;
+            color: #000;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+        }
+
+        #pendingModal select, #pendingModal button {
+            width: 100%;
+            padding: 6px;
+            margin-bottom: 10px;
+        }
+
+        #pendingModal button.btn-cancel {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -143,6 +172,19 @@
                         <form action="{{ url_for('cancel_order', order_id=o.id) }}" method="post" style="display:inline-block; margin-left:8px;">
                             <button class="btn btn-cancel" type="submit">Cancel</button>
                         </form>
+                    {% elif o.get('status') == "confirmed" %}
+                        <!-- Completed Button -->
+                        <form action="{{ url_for('complete_order', order_id=o.id) }}" method="post" style="display:inline-block;">
+                            <button class="btn btn-confirm" type="submit">Completed</button>
+                        </form>
+
+                        <!-- Pending Button triggers modal -->
+                        <button class="btn btn-cancel" onclick="openPendingModal('{{ o.id }}')" style="margin-left:8px;">Pending</button>
+
+                        <!-- Cancel Button -->
+                        <form action="{{ url_for('cancel_order', order_id=o.id) }}" method="post" style="display:inline-block; margin-left:8px;">
+                            <button class="btn btn-cancel" type="submit">Cancel</button>
+                        </form>
                     {% else %}
                         —
                     {% endif %}
@@ -151,5 +193,35 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Pending Reason Modal -->
+    <div id="pendingModal">
+        <div>
+            <h3>Reason for Pending</h3>
+            <form id="pendingForm" method="post">
+                <select name="reason" required>
+                    <option value="">Select a reason</option>
+                    <option value="Stock empty">Stock empty</option>
+                    <option value="Payment not done">Payment not done</option>
+                    <option value="Address incomplete">Address incomplete</option>
+                </select>
+                <button type="submit" class="btn btn-confirm">Submit</button>
+            </form>
+            <button onclick="closePendingModal()" class="btn btn-cancel">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+    function openPendingModal(orderId){
+        const modal = document.getElementById('pendingModal');
+        const form = document.getElementById('pendingForm');
+        form.action = `/orders/${orderId}/pending`;
+        modal.style.display = 'flex';
+    }
+
+    function closePendingModal(){
+        document.getElementById('pendingModal').style.display = 'none';
+    }
+    </script>
 </body>
 </html>

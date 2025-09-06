@@ -455,6 +455,71 @@ def cancel_order(order_id):
 
     return redirect(url_for("admin_dashboard"))
 
+    @app.route("/orders/<order_id>/complete", methods=["POST"])
+def complete_order(order_id):
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+
+    try:
+        ref = db.collection("orders").document(order_id)
+        doc = ref.get()
+        if not doc.exists:
+            flash("Order not found.", "warning")
+            return redirect(url_for("admin_dashboard"))
+
+        order = doc.to_dict()
+        order["status"] = "completed"
+        ref.update({"status": "completed"})
+
+        # Send email
+        try:
+            success, msg = notify_customer(order, "Completed")
+            flash(
+                "Order marked as completed and email sent." if success else f"Email failed: {msg}",
+                "success" if success else "danger"
+            )
+        except Exception as e:
+            flash(f"Order completed but email failed: {e}", "danger")
+
+    except Exception as e:
+        flash(f"Error completing order: {e}", "danger")
+
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/orders/<order_id>/pending", methods=["POST"])
+def pending_order(order_id):
+    if not session.get("admin"):
+        return redirect(url_for("login"))
+
+    reason = request.form.get("reason", "No reason provided")
+
+    try:
+        ref = db.collection("orders").document(order_id)
+        doc = ref.get()
+        if not doc.exists:
+            flash("Order not found.", "warning")
+            return redirect(url_for("admin_dashboard"))
+
+        order = doc.to_dict()
+        order["status"] = "pending"
+        order["pending_reason"] = reason
+        ref.update({"status": "pending", "pending_reason": reason})
+
+        # Send email
+        try:
+            success, msg = notify_customer(order, f"Pending: {reason}")
+            flash(
+                f"Order marked as pending ({reason}) and email sent." if success else f"Email failed: {msg}",
+                "success" if success else "danger"
+            )
+        except Exception as e:
+            flash(f"Order pending but email failed: {e}", "danger")
+
+    except Exception as e:
+        flash(f"Error marking order as pending: {e}", "danger")
+
+    return redirect(url_for("admin_dashboard"))
 
 # ================= RUN APP =================
 if __name__ == "__main__":
