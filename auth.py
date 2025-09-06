@@ -208,3 +208,65 @@ def resend_verification():
 def logout_customer():
     session.pop('customer', None)
     return redirect('/')
+
+# ================= FORGOT PASSWORD =================
+@auth.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        if not email:
+            flash("Please enter your email", "error")
+            return redirect(url_for('auth.forgot_password'))
+
+        users = db.collection('customers').where('email', '==', email).get()
+        if not users:
+            flash("Email not found", "error")
+            return redirect(url_for('auth.forgot_password'))
+
+        token = get_serializer().dumps(email, salt="password-reset")
+        reset_url = url_for('auth.reset_password', token=token, _external=True)
+
+        msg = Message("Reset Your Password - AyuHealth", recipients=[email])
+        msg.body = f"Hello,\n\nClick the link below to reset your password:\n{reset_url}\n\nIf you didn’t request this, ignore this email."
+
+        try:
+            current_app.extensions['mail'].send(msg)
+            flash("Password reset email sent! Check your inbox.", "info")
+        except Exception as e:
+            print("Email send error:", e)
+            flash("Failed to send email. Try again later.", "error")
+
+        return redirect(url_for('auth.login_customer'))
+
+    return render_template('forgot_password.html')
+
+# ================= RESET PASSWORD =================
+@auth.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    try:
+        email = get_serializer().loads(token, salt="password-reset", max_age=3600)  # 1 hour expiry
+    except SignatureExpired:
+        return "Reset link expired", 400
+    except BadSignature:
+        return "Invalid reset link", 400
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        if not password or not confirm_password:
+            flash("Please fill all fields", "error")
+            return redirect(url_for('auth.reset_password', token=token))
+        if password != confirm_password:
+            flash("Passwords do not match", "error")
+            return redirect(url_for('auth.reset_password', token=token))
+
+        users = db.collection('customers').where('email', '==', email).get()
+        if not users:
+            return "User not found", 404
+
+        hashed_password = generate_password_hash(password)
+        users[0].reference.update({"password": hashed_password})
+        flash("Password updated! You can now login.", "success")
+        return redirect(url_for('auth.login_customer'))
+
+    return render_template('reset_password.html', token=token)

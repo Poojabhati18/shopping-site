@@ -245,6 +245,11 @@ def post_review(product_id):
 
 OWNER_EMAIL = os.environ.get("EMAIL_USER")  # reads your email from env
 
+import pytz
+from datetime import datetime, timedelta, timezone
+
+IST = pytz.timezone("Asia/Kolkata")
+
 @app.route("/place_order", methods=["POST"])
 @require_verification
 def place_order():
@@ -258,19 +263,15 @@ def place_order():
 
     try:
         customer_email = customer.get("email")
-        now_ist = datetime.now(IST)  # current IST time
+        now_ist = datetime.now(IST)
 
-        # ✅ Enforce one order per day (except for OWNER_EMAIL)
+        # ===================== PER-DAY LIMIT =====================
         if customer_email != OWNER_EMAIL:
-            # Start and end of today in IST
             start_of_day = now_ist.replace(hour=0, minute=0, second=0, microsecond=0)
             end_of_day = start_of_day + timedelta(days=1)
-
-            # Convert to UTC for Firestore comparison
             start_of_day_utc = start_of_day.astimezone(timezone.utc)
             end_of_day_utc = end_of_day.astimezone(timezone.utc)
 
-            # Fetch orders for this customer in today's IST window
             orders_ref = (
                 db.collection("orders")
                 .where("customer.email", "==", customer_email)
@@ -280,12 +281,13 @@ def place_order():
             existing_orders = list(orders_ref.stream())
 
             if existing_orders:
+                # Customer already ordered today, return immediately
                 return jsonify({
                     "success": False,
                     "message": "⚠️ You have already placed an order today. Please try again tomorrow after midnight (IST)."
                 }), 400
 
-        # ✅ Create order data
+        # ===================== CREATE ORDER =====================
         now_utc = datetime.now(timezone.utc)
         order_data = {
             "customer": {
@@ -301,22 +303,22 @@ def place_order():
             "timestamp": now_utc
         }
 
-        # Save to Firestore
         db.collection("orders").add(order_data)
 
-        # ===== Email Notification =====
+        # ===================== EMAIL NOTIFICATION =====================
         try:
             notify_customer(order_data["customer"]["email"], order_data)
         except Exception as e:
             print("Email notify error:", e)
 
-        # ===== WhatsApp Notification =====
+        # ===================== WHATSAPP NOTIFICATION =====================
         try:
             products_text = "\n".join([
-                f"{p.get('name', 'Unknown')} | Qty: {int(p.get('quantity', 1))} | "
-                f"Price: ₹{float(p.get('price',0))} | Total: ₹{int(p.get('quantity',1))*float(p.get('price',0))}"
+                f"{p.get('name', 'Unknown')} | Qty: {int(p.get('quantity', p.get('qty', 1)))} | "
+                f"Price: ₹{float(p.get('price',0))} | Total: ₹{int(p.get('quantity', p.get('qty',1)))*float(p.get('price',0))}"
                 for p in order_data.get('products', [])
             ])
+
             message_text = f"""
 📦 *New Order Alert!*
 👤 Name: {order_data['customer'].get('name')}
@@ -329,6 +331,7 @@ def place_order():
 🛍️ Products:
 {products_text}
 """
+
             twilio_client.messages.create(
                 from_=WHATSAPP_FROM,
                 to=WHATSAPP_TO,
@@ -337,6 +340,7 @@ def place_order():
         except Exception as e:
             print("WhatsApp notify error:", e)
 
+        # ===================== SUCCESS RESPONSE =====================
         return jsonify({"success": True, "message": "✅ Order placed successfully"}), 200
 
     except Exception as e:
