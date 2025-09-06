@@ -455,7 +455,7 @@ def cancel_order(order_id):
 
     return redirect(url_for("admin_dashboard"))
 
-    @app.route("/orders/<order_id>/complete", methods=["POST"])
+@app.route("/orders/<order_id>/complete", methods=["POST"])
 def complete_order(order_id):
     if not session.get("admin"):
         return redirect(url_for("login"))
