@@ -17,6 +17,7 @@ import pytz
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
+DISABLE_CAPTCHA = os.getenv("DISABLE_CAPTCHA", "false").lower() in ("1", "true", "yes")
 
 # ================= TWILIO CONFIG =================
 ACCOUNT_SID = os.getenv("ACCOUNT_SID")
@@ -61,12 +62,19 @@ IST = pytz.timezone("Asia/Kolkata")
 # ================= CAPTCHA VERIFY GATE =================
 @app.route("/")
 def root():
+    if DISABLE_CAPTCHA:
+        session["verified"] = True
+        return redirect(url_for("home"))
     if session.get("verified"):
         return redirect(url_for("home"))
     return render_template("verify.html", site_key=RECAPTCHA_SITE_KEY)
 
 @app.route("/verify", methods=["POST"])
 def verify():
+    if DISABLE_CAPTCHA:
+        session["verified"] = True
+        return redirect(url_for("home"))
+
     recaptcha_response = request.form.get("g-recaptcha-response")
     if not recaptcha_response:
         return "Please complete the CAPTCHA.", 400

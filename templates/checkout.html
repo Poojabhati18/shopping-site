@@ -72,20 +72,34 @@ button, a { padding:10px 15px; font-size:16px; display:inline-block; text-decora
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>
-  // Initialize EmailJS with your Public Key
-  emailjs.init("xpG24aRhhXMkfUo8c"); // public key
+<!-- 1️⃣ Include EmailJS SDK first -->
+<script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script type="text/javascript">
+  // Initialize EmailJS
+  if (window.emailjs) {
+    emailjs.init("xpG24aRhhXMkfUo8c"); // Replace with your public key
+    console.log("✅ EmailJS loaded successfully");
+  } else {
+    console.error("❌ EmailJS failed to load!");
+  }
+</script>
 
+<!-- 2️⃣ Your custom checkout script -->
+<script>
   let gujaratPincodes = [];
 
-  // Load pincodes once when page loads
   async function loadPincodes() {
-    const res = await fetch('/static/gujarat_pincodes.json');
-    gujaratPincodes = await res.json();
+    try {
+      const res = await fetch('/static/gujarat_pincodes.json');
+      if (!res.ok) throw new Error("Failed to load pincodes");
+      gujaratPincodes = await res.json();
+      console.log("✅ Pincodes loaded");
+    } catch (err) {
+      console.error("❌ Error loading pincodes:", err);
+      gujaratPincodes = []; // fallback
+    }
   }
 
-  // Toast helper
   function showToast(msg, success = true) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
@@ -94,7 +108,6 @@ button, a { padding:10px 15px; font-size:16px; display:inline-block; text-decora
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  // Populate cart summary from localStorage
   function populateCartSummary() {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const cartItemsText = document.getElementById("cartItemsText");
@@ -124,8 +137,12 @@ button, a { padding:10px 15px; font-size:16px; display:inline-block; text-decora
     submitBtn.disabled = false;
   }
 
-  // Send email using EmailJS via SMTP
   async function sendEmail(payload) {
+    if (!window.emailjs) {
+      showToast("Email service unavailable!", false);
+      return false;
+    }
+
     try {
       const emailParams = {
         name: payload.name,
@@ -138,8 +155,8 @@ button, a { padding:10px 15px; font-size:16px; display:inline-block; text-decora
       };
 
       await emailjs.send(
-        "service_g6k3oyi",       // SMTP Service ID
-        "template_mkn17v7",      // Template ID
+        "service_g6k3oyi",  // Service ID
+        "template_mkn17v7", // Template ID
         emailParams
       );
 
@@ -185,13 +202,11 @@ button, a { padding:10px 15px; font-size:16px; display:inline-block; text-decora
         productSummary: document.getElementById("productSummary").value
       };
 
-      // Disable button while processing
       submitBtn.disabled = true;
       const originalText = submitBtn.innerText;
       submitBtn.innerText = "Placing Order...";
 
       try {
-        // 1️⃣ Send email via EmailJS (SMTP)
         const emailSuccess = await sendEmail(payload);
         if (!emailSuccess) {
           submitBtn.disabled = false;
@@ -199,7 +214,6 @@ button, a { padding:10px 15px; font-size:16px; display:inline-block; text-decora
           return;
         }
 
-        // 2️⃣ Send order data to backend
         const res = await fetch("/place_order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -208,7 +222,6 @@ button, a { padding:10px 15px; font-size:16px; display:inline-block; text-decora
 
         const data = await res.json();
 
-        // ✅ Handle success and daily-limit responses
         if (data.success) {
           showToast(data.message || "Order placed successfully!");
           localStorage.removeItem("cart");
@@ -216,16 +229,10 @@ button, a { padding:10px 15px; font-size:16px; display:inline-block; text-decora
           form.reset();
           setTimeout(() => { window.location.href = '/'; }, 2000);
         } else {
-          // Specific check for daily limit message from backend
-          if (data.message && data.message.includes("already placed an order today")) {
-            showToast(data.message, false); // friendly popup
-          } else {
-            showToast(data.message || "Order could not be placed.", false);
-          }
+          showToast(data.message || "Order could not be placed.", false);
           submitBtn.disabled = false;
           submitBtn.innerText = originalText;
         }
-
       } catch (err) {
         console.error("❌ Order placement failed", err);
         showToast("Something went wrong. Please try again.", false);
