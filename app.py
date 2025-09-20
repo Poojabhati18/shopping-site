@@ -113,6 +113,13 @@ def require_verification(f):
     from functools import wraps
     @wraps(f)
     def wrapper(*args, **kwargs):
+        # If the feature-flag is on, mark session verified and allow through
+        if DISABLE_CAPTCHA:
+            # ensure session has verified flag so any code checking session['verified'] still works
+            session["verified"] = True
+            return f(*args, **kwargs)
+
+        # Normal behavior: redirect to CAPTCHA gate if not verified
         if not session.get("verified"):
             return redirect(url_for("root"))
         return f(*args, **kwargs)
