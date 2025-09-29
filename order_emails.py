@@ -12,24 +12,54 @@ SHOP_WEBSITE = "https://ayuhealth.onrender.com"
 
 # ---------- Build Email Template ----------
 def build_order_email(customer_name, cart_html, status):
-    if status == "Completed":
-        title = "✅ Your Order has been Delivered"
-        message = "Thank you for shopping with us! Your order has been delivered. If there’s any issue, contact us via our website."
-        color = "#4caf50"
-    elif status.startswith("Pending"):
-        title = "⚠️ Your Order is Pending"
-        reason = status.replace("Pending:", "").strip()
-        message = f"Your order is marked as pending due to: {reason}. Please contact us for more details."
-        color = "#ff9800"
-    elif status == "Cancelled":
-        title = "❌ Your Order has been Cancelled"
-        message = "We’re sorry, but your order was cancelled. Please contact us from our website for support."
-        color = "#f44336"
-    else:
-        title = "ℹ️ Order Status Updated"
-        message = f"Your order status is now: {status}"
+    """Build an HTML order email with a human touch and a mini life lesson."""
+    
+    if status == "Confirmed":
+        title = "✅ Your Order has been Confirmed"
+        message = (
+            f"Hi {customer_name}, your order has been confirmed! "
+            "Just like every small step leads to big progress, confirming your order "
+            "is the first step towards a delightful experience. Patience and care go a long way!"
+        )
         color = "#2196f3"
 
+    elif status.startswith("Pending"):
+        reason = status.replace("Pending:", "").strip()
+        title = "⚠️ Your Order is Pending"
+        message = (
+            f"Your order is currently pending due to: {reason}. "
+            "Sometimes things don't go as planned, but challenges are opportunities in disguise. "
+            "We’ll notify you as soon as your order is ready!"
+        )
+        color = "#ff9800"
+
+    elif status == "Cancelled":
+        title = "❌ Your Order has been Cancelled"
+        message = (
+            "We’re sorry, but your order was cancelled. "
+            "Remember, every setback is a setup for a comeback. "
+            "Feel free to reach out, and we’ll help you place a new order quickly!"
+        )
+        color = "#f44336"
+
+    elif status == "Completed":
+        title = "🎉 Your Order has been Delivered"
+        message = (
+            "Your order has been successfully delivered! "
+            "Just like seeds grow into beautiful plants with care, your support allows us to grow. "
+            "We hope your purchase brings joy and value!"
+        )
+        color = "#4caf50"
+
+    else:
+        title = "ℹ️ Order Status Update"
+        message = (
+            f"Hello {customer_name}, your order status is now: {status}. "
+            "Remember, consistency and mindfulness turn ordinary moments into extraordinary ones!"
+        )
+        color = "#2196f3"
+
+    # HTML email template
     return f"""<html>
     <body style="font-family: Arial, sans-serif; background:#f5f5f5; padding:20px;">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
@@ -40,10 +70,9 @@ def build_order_email(customer_name, cart_html, status):
         </tr>
         <tr>
           <td style="padding:20px;">
-            <p>Hi <b>{customer_name}</b>,</p>
             <p>{message}</p>
 
-            <h3 style="margin-top:20px;">🛒 Order Details</h3>
+            <h3 style="margin-top:20px;">🛒 Your Order Details</h3>
             <table width="100%" border="1" cellspacing="0" cellpadding="8" style="border-collapse:collapse;">
               <tr style="background:#f0f0f0;">
                 <th>Product & Quantity</th>
@@ -51,7 +80,8 @@ def build_order_email(customer_name, cart_html, status):
               {cart_html}
             </table>
 
-            <p style="margin-top:20px;">Best regards,<br><b>{SHOP_NAME} Team</b></p>
+            <p style="margin-top:20px;">Thank you for trusting <b>{SHOP_NAME}</b>!<br>
+            Visit us anytime: <a href="{SHOP_WEBSITE}">{SHOP_WEBSITE}</a></p>
           </td>
         </tr>
         <tr>
@@ -69,14 +99,28 @@ def format_product_summary_as_html(product_summary):
 
 # ---------- Send Email ----------
 def send_email(to, subject, html_body):
+    if not SENDER_EMAIL or not SENDER_PASS:
+        print("❌ Missing EMAIL_USER or EMAIL_PASS in .env")
+        return False
+
+    if not to:
+        print("❌ No recipient email provided")
+        return False
+
     msg = MIMEText(html_body, "html")
     msg["Subject"] = subject
     msg["From"] = SENDER_EMAIL
     msg["To"] = to
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(SENDER_EMAIL, SENDER_PASS)
-        server.send_message(msg)
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(SENDER_EMAIL, SENDER_PASS)
+            server.send_message(msg)
+        print(f"✅ Email sent to {to}")
+        return True
+    except Exception as e:
+        print(f"❌ Email sending failed: {e}")
+        return False
 
 # ---------- Notify Customer ----------
 def notify_customer(order_data, status):
@@ -87,7 +131,7 @@ def notify_customer(order_data, status):
     if not customer_email:
         return False, "No customer email found"
 
-    # Build product summary HTML
+    # Build product summary
     products = order_data.get("products", [])
     if not products:
         products = [{"name": "No products found", "qty": 0, "price": 0}]
@@ -99,8 +143,12 @@ def notify_customer(order_data, status):
         price = p.get("price", 0)
         cart_html += f"<tr><td>{name} (x{qty}) - ₹{qty*price}</td></tr>"
 
-    # Build and send email
+    # Build email template
     html_body = build_order_email(customer_name, cart_html, status)
-    send_email(customer_email, f"Order Update from {SHOP_NAME}", html_body)
+
+    ok = send_email(customer_email, f"Order Update from {SHOP_NAME}", html_body)
+    if not ok:
+        return False, f"Failed to send email to {customer_email}"
 
     return True, f"Email sent to {customer_email}"
+
