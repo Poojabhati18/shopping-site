@@ -181,7 +181,7 @@ emailInput.addEventListener('blur', async () => {
     <script>
       document.addEventListener("DOMContentLoaded", function() {
         {% for category, message in messages %}
-          showToast("{{ message|escapejs }}", "{{ category }}");
+          showToast("{{ message }}", "{{ category }}");
         {% endfor %}
       });
     </script>

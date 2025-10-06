@@ -6,6 +6,7 @@ import re
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask_mail import Message
 from email_utils import safe_send_mail
+from extensions import mail
 
 auth = Blueprint('auth', __name__)
 
@@ -116,7 +117,9 @@ def signup():
             )
             flash("🎉 Account created! Please check your email to verify your account.", "success")
         except Exception as e:
+            import tracebackss
             print("Email send error:", e)
+            traceback.print_exc()
             flash("Account created, but we couldn’t send the verification email. Please contact support.", "error")
 
         return redirect(url_for('auth.login_customer'))
@@ -226,7 +229,7 @@ def resend_verification():
 
     try:
         # ✅ use current_app.extensions['mail']
-        safe_send_mail(msg.subject, msg.recipients, msg.body)
+        safe_send_mail(subject=msg.subject, recipients=msg.recipients, body=msg.body)
         flash("Verification email resent! Please check your inbox.", "info")
     except Exception as e:
         print("Email send error:", e)
@@ -261,7 +264,7 @@ def forgot_password():
         msg.body = f"Hello,\n\nClick the link below to reset your password:\n{reset_url}\n\nIf you didn’t request this, ignore this email."
 
         try:
-            safe_send_mail(msg.subject, msg.recipients, msg.body)
+            safe_send_mail(subject=msg.subject, recipients=msg.recipients, body=msg.body)
             flash("Password reset email sent! Check your inbox.", "info")
         except Exception as e:
             print("Email send error:", e)

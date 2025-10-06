@@ -2,7 +2,7 @@ from flask import (
     Flask, request, jsonify, render_template,
     redirect, url_for, session, flash, abort
 )
-from flask_mail import Mail
+from extensions import Mail
 from werkzeug.security import check_password_hash
 from twilio.rest import Client
 from dotenv import load_dotenv
