@@ -175,5 +175,54 @@ emailInput.addEventListener('blur', async () => {
 });
 </script>
 
+<!-- ✅ Toast Notification System -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        {% for category, message in messages %}
+          showToast("{{ message|escapejs }}", "{{ category }}");
+        {% endfor %}
+      });
+    </script>
+  {% endif %}
+{% endwith %}
+
+<script>
+function showToast(message, category) {
+  const toast = document.createElement("div");
+  toast.className = `toast ${category}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add("show"), 50);
+  setTimeout(() => toast.classList.remove("show"), 4000);
+  setTimeout(() => toast.remove(), 4500);
+}
+</script>
+
+<style>
+.toast {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  background: #2b4d3a;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  font-size: 0.95rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast.success { background: #4caf50; }
+.toast.error { background: #f44336; }
+.toast.info { background: #2196f3; }
+</style>
+
 </body>
 </html>

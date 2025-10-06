@@ -5,6 +5,7 @@ from datetime import datetime
 import re
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask_mail import Message
+from email_utils import safe_send_mai
 
 auth = Blueprint('auth', __name__)
 
@@ -36,38 +37,31 @@ def login_required(f):
 @auth.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        name = request.form.get('name').strip()
-        email = request.form.get('email').strip().lower()
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip().lower()
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         agree = request.form.get('agree')
 
+        # Validation checks
         if not all([name, email, password, confirm_password, agree]):
-            return render_template('signup.html', error="Please fill all fields and agree to terms")
+            return render_template('signup.html', error="Please fill all fields and agree to the terms.")
 
-        # Validate email format
-        email_regex = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
-        if not re.match(email_regex, email):
-            return render_template('signup.html', error="Invalid email address. Please enter a valid one.")
+        if not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", email):
+            return render_template('signup.html', error="Invalid email format.")
 
-        # Check if email exists
         if db.collection('customers').where('email', '==', email).get():
             return render_template('signup.html', error="Email already registered. Please login.")
 
-        # Check if username exists
         if db.collection('customers').where('name', '==', name).get():
             return render_template('signup.html', error="Username already taken. Please choose another.")
 
-        # Check passwords match
         if password != confirm_password:
             return render_template('signup.html', error="Passwords do not match.")
 
-        # Hash password
+        # Hash password and save user
         hashed_password = generate_password_hash(password)
-
-        # Save unverified account
-        customer_ref = db.collection('customers').document()
-        customer_ref.set({
+        db.collection('customers').document().set({
             'name': name,
             'email': email,
             'password': hashed_password,
@@ -79,15 +73,52 @@ def signup():
         token = get_serializer().dumps(email, salt="email-confirm")
         verify_url = url_for('auth.verify_email', token=token, _external=True)
 
-        # Send email
-        msg = Message("Verify Your Email - AyuHealth", recipients=[email])
-        msg.body = f"Hello {name},\n\nPlease click the link to verify your account:\n{verify_url}\n\nIf you didn’t request this, ignore this email."
+        # ✉️ Build HTML email
+        html_body = f"""
+        <html>
+        <body style="font-family:Arial,sans-serif;background:#f7f7f7;padding:20px;">
+          <table style="max-width:600px;margin:auto;background:white;border-radius:10px;overflow:hidden;">
+            <tr><td style="background:#2b4d3a;color:white;padding:20px;text-align:center;font-size:20px;">
+              🌿 Welcome to AyuHealth, {name}!
+            </td></tr>
+            <tr><td style="padding:20px;color:#333;">
+              <p>Hi <b>{name}</b>,</p>
+              <p>We’re delighted to have you join the <b>AyuHealth</b> family. 
+              Please verify your email address by clicking the button below:</p>
+              <p style="text-align:center;margin:25px 0;">
+                <a href="{verify_url}" 
+                   style="background:#4caf50;color:white;text-decoration:none;padding:12px 25px;border-radius:6px;">
+                   Verify My Email
+                </a>
+              </p>
+              <p>If you didn’t create an account, please ignore this email.</p>
+              <hr style="border:none;border-top:1px solid #ddd;margin:20px 0;">
+              <p style="font-style:italic;color:#555;">
+                💭 <b>Life Tip:</b> The best investment you can ever make is in your health — 
+                because every step toward wellness builds a better tomorrow.
+              </p>
+              <p style="margin-top:20px;">With care,<br><b>The AyuHealth Team</b></p>
+            </td></tr>
+            <tr><td style="background:#2b4d3a;color:white;text-align:center;padding:10px;font-size:12px;">
+              © 2025 AyuHealth | <a href="https://ayuhealth.onrender.com" style="color:white;">Visit Website</a>
+            </td></tr>
+          </table>
+        </body>
+        </html>
+        """
+
         try:
-            current_app.extensions['mail'].send(msg)
+            # Safe send HTML email
+            safe_send_mail(
+                subject="🌿 Verify Your Email - AyuHealth",
+                recipients=[email],
+                html_body=html_body
+            )
+            flash("🎉 Account created! Please check your email to verify your account.", "success")
         except Exception as e:
             print("Email send error:", e)
+            flash("Account created, but we couldn’t send the verification email. Please contact support.", "error")
 
-        flash("Account created! Please check your email to verify your account.", "info")
         return redirect(url_for('auth.login_customer'))
 
     return render_template('signup.html')
@@ -195,7 +226,7 @@ def resend_verification():
 
     try:
         # ✅ use current_app.extensions['mail']
-        current_app.extensions['mail'].send(msg)
+        safe_send_mail(msg.subject, msg.recipients, msg.body)
         flash("Verification email resent! Please check your inbox.", "info")
     except Exception as e:
         print("Email send error:", e)
@@ -230,7 +261,7 @@ def forgot_password():
         msg.body = f"Hello,\n\nClick the link below to reset your password:\n{reset_url}\n\nIf you didn’t request this, ignore this email."
 
         try:
-            current_app.extensions['mail'].send(msg)
+            safe_send_mail(msg.subject, msg.recipients, msg.body)
             flash("Password reset email sent! Check your inbox.", "info")
         except Exception as e:
             print("Email send error:", e)
