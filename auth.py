@@ -5,7 +5,7 @@ from datetime import datetime
 import re
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask_mail import Message
-from email_utils import safe_send_mai
+from email_utils import safe_send_mail
 
 auth = Blueprint('auth', __name__)
 
